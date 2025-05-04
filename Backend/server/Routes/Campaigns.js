@@ -126,10 +126,9 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
 // Fetch comments
 router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   try {
-    const campaign = await Campaign.findById(req.params.id).populate(
-      "comments.user",
-      "name email"
-    );
+    const comments = await Comment.find({
+      campaign: req.params.campaignId,
+    }).populate("user", "name _id");
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
     res.status(200).json({ comments: campaign.comments });
