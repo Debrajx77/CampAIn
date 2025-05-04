@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const authenticate = require("../middleware/authenticate"); // Ensure authenticate middleware is used
-const Campaign = require("../Models/Campaign"); // Assuming you have a Campaign model
-const mongoose = require("mongoose");
-const transporter = require("../utils/email"); // Import the configured transporter
+const authenticate = require("../middleware/authenticate");
+const Campaign = require("../Models/Campaign");
+const Comment = require("../Models/Comment"); // Ensure this exists
+const transporter = require("../utils/email");
 
-// Fetch all campaigns for a specific user
+// Fetch all campaigns with optional search
 router.get("/campaigns", authenticate, async (req, res) => {
   try {
     const search = req.query.search || "";
     const campaigns = await Campaign.find({
-      title: { $regex: search, $options: "i" }, // Case-insensitive search
+      title: { $regex: search, $options: "i" },
     }).sort({ createdAt: -1 });
 
     res.json(campaigns);
@@ -20,32 +20,10 @@ router.get("/campaigns", authenticate, async (req, res) => {
   }
 });
 
-// DELETE a campaign
-router.delete("/campaign/:id", authenticate, async (req, res) => {
-  try {
-    const campaign = await Campaign.findById(req.params.id);
-
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
-
-    if (campaign.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "Not authorized" });
-    }
-
-    await campaign.deleteOne();
-    res.json({ msg: "Campaign removed" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
 // Create a new campaign
 router.post("/create-campaign", authenticate, async (req, res) => {
   try {
     const { title, description, objective, startDate, endDate } = req.body;
-
     if (!title || !description || !objective) {
       return res.status(400).json({ msg: "All fields are required" });
     }
@@ -67,24 +45,32 @@ router.post("/create-campaign", authenticate, async (req, res) => {
   }
 });
 
-// Update campaign analytics (clicks, conversions)
+// Delete a campaign
+router.delete("/campaign/:id", authenticate, async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id);
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
+    if (campaign.user.toString() !== req.user.id)
+      return res.status(401).json({ msg: "Not authorized" });
+
+    await campaign.deleteOne();
+    res.json({ msg: "Campaign removed" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// Campaign analytics update
 router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
   try {
-    const { type } = req.body; // type can be "click" or "conversion"
+    const { type } = req.body;
     const campaign = await Campaign.findById(req.params.id);
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
-
-    // Update analytics based on the type
-    if (type === "click") {
-      campaign.clicks += 1;
-    } else if (type === "conversion") {
-      campaign.conversions += 1;
-    } else {
-      return res.status(400).json({ msg: "Invalid analytics type" });
-    }
+    if (type === "click") campaign.clicks += 1;
+    else if (type === "conversion") campaign.conversions += 1;
+    else return res.status(400).json({ msg: "Invalid analytics type" });
 
     await campaign.save();
     res.status(200).json({ msg: "Analytics updated", campaign });
@@ -94,7 +80,7 @@ router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
   }
 });
 
-// Fetch campaign analytics
+// Campaign analytics fetch
 router.get("/campaigns/analytics", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find(
@@ -102,13 +88,13 @@ router.get("/campaigns/analytics", authenticate, async (req, res) => {
       "title clicks conversions objective startDate endDate"
     );
 
-    const analytics = campaigns.map((campaign) => ({
-      title: campaign.title,
-      clicks: campaign.clicks,
-      conversions: campaign.conversions,
-      budget: campaign.objective,
-      startDate: campaign.startDate,
-      endDate: campaign.endDate,
+    const analytics = campaigns.map((c) => ({
+      title: c.title,
+      clicks: c.clicks,
+      conversions: c.conversions,
+      budget: c.objective,
+      startDate: c.startDate,
+      endDate: c.endDate,
     }));
 
     res.status(200).json(analytics);
@@ -118,27 +104,16 @@ router.get("/campaigns/analytics", authenticate, async (req, res) => {
   }
 });
 
-// Add a comment to a campaign
+// Add comment
 router.post("/campaign/:id/comment", authenticate, async (req, res) => {
   try {
     const { text } = req.body;
-
-    if (!text) {
-      return res.status(400).json({ msg: "Comment text is required" });
-    }
+    if (!text) return res.status(400).json({ msg: "Comment text is required" });
 
     const campaign = await Campaign.findById(req.params.id);
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
-
-    const comment = {
-      user: req.user.id,
-      text,
-    };
-
-    campaign.comments.push(comment);
+    campaign.comments.push({ user: req.user.id, text });
     await campaign.save();
 
     res.status(201).json({ msg: "Comment added", comments: campaign.comments });
@@ -148,23 +123,14 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
   }
 });
 
-// Fetch comments for a specific campaign
+// Fetch comments
 router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ msg: "Invalid campaign ID" });
-    }
-
-    const campaign = await Campaign.findById(id).populate(
+    const campaign = await Campaign.findById(req.params.id).populate(
       "comments.user",
       "name email"
     );
-
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
     res.status(200).json({ comments: campaign.comments });
   } catch (err) {
@@ -173,31 +139,26 @@ router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/campaign/:campaignId/comment/:commentId
+// Delete comment
 router.delete(
   "/campaign/:campaignId/comment/:commentId",
-  authMiddleware,
+  authenticate,
   async (req, res) => {
-    const { campaignId, commentId } = req.params;
-    const userId = req.user.id;
-
     try {
+      const { campaignId, commentId } = req.params;
       const comment = await Comment.findById(commentId);
       if (!comment || comment.campaign.toString() !== campaignId) {
         return res.status(404).json({ msg: "Comment not found" });
       }
-
-      if (comment.user.toString() !== userId) {
-        return res
-          .status(403)
-          .json({ msg: "Not authorized to delete this comment" });
+      if (comment.user.toString() !== req.user.id) {
+        return res.status(403).json({ msg: "Not authorized" });
       }
 
       await comment.remove();
-      return res.json({ msg: "Comment deleted" });
+      res.json({ msg: "Comment deleted" });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ msg: "Server error" });
+      console.error("Error deleting comment:", err);
+      res.status(500).json({ msg: "Server error" });
     }
   }
 );
@@ -206,23 +167,20 @@ router.delete(
 router.post("/campaign/:id/email", authenticate, async (req, res) => {
   try {
     const { recipients, subject, message } = req.body;
-
     if (!recipients || !subject || !message) {
       return res.status(400).json({ msg: "All fields are required" });
     }
 
-    // Send email to all recipients
-    const emailPromises = recipients.map((recipient) =>
+    const emailPromises = recipients.map((email) =>
       transporter.sendMail({
-        from: '"CampAin" <your-email@gmail.com>', // Replace with your sender email
-        to: recipient, // Recipient email
-        subject, // Email subject
-        html: `<p>${message}</p>`, // Email content
+        from: '"CampAin" <your-email@gmail.com>',
+        to: email,
+        subject,
+        html: `<p>${message}</p>`,
       })
     );
 
     await Promise.all(emailPromises);
-
     res.status(200).json({ msg: "Email campaign sent successfully!" });
   } catch (err) {
     console.error("Error sending email campaign:", err.message);
@@ -230,36 +188,32 @@ router.post("/campaign/:id/email", authenticate, async (req, res) => {
   }
 });
 
-// Fetch campaign dates for the calendar
+// Fetch calendar data
 router.get("/campaigns/calendar", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title startDate endDate");
-
-    const calendarData = campaigns.map((campaign) => ({
-      title: campaign.title,
-      start: campaign.startDate,
-      end: campaign.endDate,
+    const calendarData = campaigns.map((c) => ({
+      title: c.title,
+      start: c.startDate,
+      end: c.endDate,
     }));
-
     res.status(200).json(calendarData);
   } catch (err) {
-    console.error("Error fetching campaign calendar data:", err);
+    console.error("Error fetching calendar data:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
 
-// Fetch campaign budgets
+// Fetch budget info
 router.get("/campaigns/budgets", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title objective spent");
-
-    const budgets = campaigns.map((campaign) => ({
-      title: campaign.title,
-      budget: campaign.objective,
-      spent: campaign.spent,
-      remaining: campaign.objective - campaign.spent,
+    const budgets = campaigns.map((c) => ({
+      title: c.title,
+      budget: c.objective,
+      spent: c.spent,
+      remaining: c.objective - c.spent,
     }));
-
     res.status(200).json(budgets);
   } catch (err) {
     console.error("Error fetching campaign budgets:", err);
@@ -267,75 +221,64 @@ router.get("/campaigns/budgets", authenticate, async (req, res) => {
   }
 });
 
-// Update campaign spending
+// Update spending
 router.put("/campaign/:id/budget", authenticate, async (req, res) => {
   try {
     const { spent } = req.body;
-
     if (spent == null) {
       return res.status(400).json({ msg: "Spent amount is required" });
     }
 
     const campaign = await Campaign.findById(req.params.id);
-
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
     campaign.spent += spent;
-
     if (campaign.spent > campaign.objective) {
       return res.status(400).json({ msg: "Budget exceeded" });
     }
 
     await campaign.save();
-
-    res.status(200).json({ msg: "Budget updated successfully", campaign });
+    res.status(200).json({ msg: "Budget updated", campaign });
   } catch (err) {
-    console.error("Error updating campaign budget:", err);
+    console.error("Error updating budget:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
 
-// Mock AI Analysis Function
+// AI optimization logic
 const analyzeCampaign = (campaign) => {
   const insights = [];
 
-  // Example: Budget Utilization
   if (campaign.spent / campaign.objective > 0.8) {
     insights.push("Your budget is almost exhausted. Consider increasing it.");
   }
 
-  // Example: Click-Through Rate (CTR)
-  const ctr = (campaign.clicks / campaign.impressions) * 100;
+  const ctr = campaign.impressions
+    ? (campaign.clicks / campaign.impressions) * 100
+    : 0;
   if (ctr < 2) {
-    insights.push(
-      "Your click-through rate is low. Consider improving your ad content."
-    );
+    insights.push("CTR is low. Try improving ad content or targeting.");
   }
 
-  // Example: Conversion Rate
-  const conversionRate = (campaign.conversions / campaign.clicks) * 100;
+  const conversionRate = campaign.clicks
+    ? (campaign.conversions / campaign.clicks) * 100
+    : 0;
   if (conversionRate < 5) {
     insights.push(
-      "Your conversion rate is low. Consider optimizing your landing page."
+      "Low conversion rate. Consider optimizing your landing page."
     );
   }
 
   return insights;
 };
 
-// AI Analysis API
-router.get("/campaigns/:id/optimize", async (req, res) => {
+// Get AI insights
+router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
-
-    if (!campaign) {
-      return res.status(404).json({ msg: "Campaign not found" });
-    }
+    if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
     const insights = analyzeCampaign(campaign);
-
     res.status(200).json({ insights });
   } catch (err) {
     console.error("Error analyzing campaign:", err);
@@ -343,5 +286,4 @@ router.get("/campaigns/:id/optimize", async (req, res) => {
   }
 });
 
-// Export the router
 module.exports = router;
