@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://campain-2.onrender.com/ap", // <-- not localhost
+  baseURL: "https://campain-2.onrender.com/api", // <-- not localhost
   withCredentials: true,
 });
 
