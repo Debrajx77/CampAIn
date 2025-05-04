@@ -92,9 +92,10 @@ function CampaignDetails() {
         setError(data.msg || "Failed to add comment");
         return;
       }
+
       setNewComment("");
       socket.emit("newComment", {
-        ...data.comments[data.comments.length - 1],
+        ...data.comment, // assume single comment object returned
         campaignId,
       });
     } catch (err) {
@@ -119,6 +120,7 @@ function CampaignDetails() {
         setError(data.msg || "Failed to delete comment");
         return;
       }
+
       socket.emit("deleteComment", commentId);
     } catch (err) {
       console.error("Error deleting comment:", err);
@@ -174,12 +176,8 @@ function CampaignDetails() {
                   borderRadius: "8px",
                   marginBottom: "1rem",
                 }}
-                InputLabelProps={{
-                  style: { color: "#aaa" },
-                }}
-                InputProps={{
-                  style: { color: "#fff" },
-                }}
+                InputLabelProps={{ style: { color: "#aaa" } }}
+                InputProps={{ style: { color: "#fff" } }}
               />
               <Button
                 type="submit"
@@ -238,7 +236,9 @@ function CampaignDetails() {
                         >
                           By: {comment.user?.name || "Unknown"}
                         </Typography>
-                        {comment.user?._id === userId && (
+
+                        {/* ✅ Show delete button only if user's own comment */}
+                        {comment?.user?._id === userId && (
                           <IconButton
                             aria-label="delete"
                             size="small"
