@@ -1,6 +1,13 @@
 // src/services/api.js (example)
 import axios from "axios";
 
+const api = axios.create({
+  baseURL: "https://campain-2.onrender.com", // <-- not localhost
+  withCredentials: true,
+});
+
+export default api;
+
 const API_URL = "https://campain-2.onrender.com"; // Replace with your backend URL
 
 export const signup = async (data) => {
