@@ -71,7 +71,7 @@ function CampaignDetails() {
 
     try {
       const res = await fetch(
-        `http://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
+        `https://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
         {
           method: "POST",
           headers: {

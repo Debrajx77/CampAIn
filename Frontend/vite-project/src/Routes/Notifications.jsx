@@ -42,7 +42,7 @@ const Notifications = ({ notifications, setNotifications }) => {
 
   const markAsRead = async () => {
     try {
-      await fetch("http://campain-2.onrender.com/api/notifications/read", {
+      await fetch("https://campain-2.onrender.com/api/notifications/read", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

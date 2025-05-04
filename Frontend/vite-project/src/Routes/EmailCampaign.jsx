@@ -46,7 +46,7 @@ const EmailCampaign = () => {
 
     try {
       const res = await fetch(
-        "http://campain-2.onrender.com/api/campaign/123/email",
+        "https://campain-2.onrender.com/api/campaign/123/email",
         {
           method: "POST",
           headers: {
