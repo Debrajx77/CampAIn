@@ -75,6 +75,8 @@ function CampaignDetails() {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
+    if (!newComment.trim()) return;
+
     try {
       const res = await fetch(
         `https://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
@@ -95,7 +97,7 @@ function CampaignDetails() {
 
       setNewComment("");
       socket.emit("newComment", {
-        ...data.comment, // assume single comment object returned
+        ...data.comment,
         campaignId,
       });
     } catch (err) {
@@ -237,7 +239,7 @@ function CampaignDetails() {
                           By: {comment.user?.name || "Unknown"}
                         </Typography>
 
-                        {/* ✅ Show delete button only if user's own comment */}
+                        {/* ✅ Delete only visible to comment owner */}
                         {comment?.user?._id === userId && (
                           <IconButton
                             aria-label="delete"
@@ -263,7 +265,7 @@ function CampaignDetails() {
         </>
       )}
 
-      {/* Link to Optimization Insights */}
+      {/* Link to Optimization Page */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
