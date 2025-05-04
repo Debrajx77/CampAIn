@@ -44,11 +44,14 @@ const BudgetManagement = () => {
 
   const fetchBudgets = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/campaigns/budgets", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch(
+        "https://campain-2.onrender.com/api/campaigns/budgets",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
