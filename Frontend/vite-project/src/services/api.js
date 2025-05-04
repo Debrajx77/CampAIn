@@ -22,56 +22,9 @@ export const getAnalytics = async () => {
     throw error;
   }
 };
-// src/services/api.js
-
-import axios from "axios";
-
-const API_URL = "https://campain-2.onrender.com"; // Replace with your backend URL
-
-// Socket API Endpoints
-
-export const connectSocket = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/socket/connect`);
-    return response.data;
-  } catch (error) {
-    console.error("Error connecting to socket:", error);
-    throw error;
-  }
-};
-
-export const sendMessage = async (message) => {
-  try {
-    const response = await axios.post(`${API_URL}/socket/send`, { message });
-    return response.data;
-  } catch (error) {
-    console.error("Error sending message through socket:", error);
-    throw error;
-  }
-};
-
-export const receiveMessage = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/socket/receive`);
-    return response.data;
-  } catch (error) {
-    console.error("Error receiving message from socket:", error);
-    throw error;
-  }
-};
-
-export const closeSocket = async () => {
-  try {
-    const response = await axios.delete(`${API_URL}/socket/close`);
-    return response.data;
-  } catch (error) {
-    console.error("Error closing socket connection:", error);
-    throw error;
-  }
-};
 export const login = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/signin`, data);
+    const response = await axios.post(`${API_URL}/login`, data);
     return response.data;
   } catch (error) {
     console.error("Error:", error);
