@@ -13,11 +13,11 @@ const Campaign = require("./Models/Campaign");
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // Create HTTP server
-const io = new Server(server, {
+const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"], // Allow both origins
+    origin: "https://camp-a-in.vercel.app/",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
