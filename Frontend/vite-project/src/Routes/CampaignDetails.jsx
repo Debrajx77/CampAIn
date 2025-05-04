@@ -12,7 +12,9 @@ import {
 import { motion } from "framer-motion"; // Import motion from framer-motion
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // Connect to the backend WebSocket server
+const socket = io("https://your-backend-url.onrender.com", {
+  transports: ["websocket"],
+}); // Connect to the backend WebSocket server
 
 function CampaignDetails() {
   const { id: campaignId } = useParams();
