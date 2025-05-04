@@ -14,20 +14,23 @@ function CreateCampaign() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/create-campaign", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          title: campaignName,
-          description,
-          objective: budget,
-          startDate,
-          endDate,
-        }),
-      });
+      const res = await fetch(
+        "https://campain-2.onrender.com/api/create-campaign",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            title: campaignName,
+            description,
+            objective: budget,
+            startDate,
+            endDate,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
