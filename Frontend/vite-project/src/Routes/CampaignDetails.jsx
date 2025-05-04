@@ -14,6 +14,7 @@ import { io } from "socket.io-client";
 
 const socket = io("https://your-backend-url.onrender.com", {
   transports: ["websocket"],
+  credentials: true,
 }); // Connect to the backend WebSocket server
 
 function CampaignDetails() {
