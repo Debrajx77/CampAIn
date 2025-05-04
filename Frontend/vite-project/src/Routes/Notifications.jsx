@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("https://your-backend-url.onrender.com", {
+const socket = io("https://campain-2.onrender.com", {
   transports: ["websocket"],
   credentials: true,
 });
