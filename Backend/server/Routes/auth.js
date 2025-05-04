@@ -4,7 +4,7 @@ const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendWelcomeEmail } = require("../controllers/emailController");
-
+k;
 // SIGNUP (already present)
 router.post("/signup", async (req, res) => {
   try {
