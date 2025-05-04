@@ -56,11 +56,14 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const res = await fetch("http://campain-2.onrender.com/api/campaigns", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const res = await fetch(
+          "https://campain-2.onrender.com/api/campaigns",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
         const data = await res.json();
 
