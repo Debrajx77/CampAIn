@@ -14,7 +14,7 @@ function CampaignList() {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/campaigns", {
+      const res = await fetch("https://campain-2.onrender.com/api/campaigns", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -38,12 +38,15 @@ function CampaignList() {
     if (!window.confirm("Are you sure you want to delete this campaign?"))
       return;
     try {
-      const res = await fetch(`http://localhost:5000/api/campaign/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch(
+        `https://campain-2.onrender.com/api/campaign/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       const data = await res.json();
 
@@ -61,14 +64,17 @@ function CampaignList() {
 
   const updateAnalytics = async (id, type) => {
     try {
-      await fetch(`http://localhost:5000/api/campaign/${id}/analytics`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ type }),
-      });
+      await fetch(
+        `http://campain-2.onrender.com/api/campaign/${id}/analytics`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ type }),
+        }
+      );
     } catch (err) {
       console.error("Error updating analytics:", err);
     }
