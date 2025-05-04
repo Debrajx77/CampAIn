@@ -15,11 +15,14 @@ const CampaignCalendar = () => {
 
   const fetchCalendarData = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/campaigns/calendar", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch(
+        "http://campain-2.onrender.com/api/campaigns/calendar",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();

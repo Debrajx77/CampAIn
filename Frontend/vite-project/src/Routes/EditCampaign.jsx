@@ -13,11 +13,14 @@ function EditCampaign() {
   useEffect(() => {
     const fetchCampaignData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/campaign/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const res = await fetch(
+          `http://campain-2.onrender.com/api/campaign/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
         const data = await res.json();
 
@@ -46,18 +49,21 @@ function EditCampaign() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/campaign/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          title: campaignName,
-          description,
-          objective: budget,
-        }),
-      });
+      const res = await fetch(
+        `http://campain-2.onrender.com/api/campaign/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            title: campaignName,
+            description,
+            objective: budget,
+          }),
+        }
+      );
 
       const data = await res.json();
 

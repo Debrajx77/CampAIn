@@ -45,18 +45,21 @@ const EmailCampaign = () => {
     setSuccess("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/campaign/123/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          recipients: recipients.split(","),
-          subject,
-          message,
-        }),
-      });
+      const res = await fetch(
+        "http://campain-2.onrender.com/api/campaign/123/email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            recipients: recipients.split(","),
+            subject,
+            message,
+          }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();

@@ -42,7 +42,7 @@ function CampaignDetails() {
   const fetchComments = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/campaign/${campaignId}/comments`,
+        `http://campain-2.onrender.com/api/campaign/${campaignId}/comments`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -71,7 +71,7 @@ function CampaignDetails() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/campaign/${campaignId}/comment`,
+        `http://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
         {
           method: "POST",
           headers: {
