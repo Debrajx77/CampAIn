@@ -65,7 +65,7 @@ function CampaignList() {
   const updateAnalytics = async (id, type) => {
     try {
       await fetch(
-        `http://campain-2.onrender.com/api/campaign/${id}/analytics`,
+        `https://campain-2.onrender.com/api/campaign/${id}/analytics`,
         {
           method: "POST",
           headers: {
