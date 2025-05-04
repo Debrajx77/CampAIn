@@ -1,11 +1,11 @@
 const express = require("express");
-const http = require("http"); // Required for Socket.IO
+const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const campaignRoutes = require("./Routes/Campaigns"); // <-- use Campaigns.js
+const campaignRoutes = require("./Routes/Campaigns");
 const authRoutes = require("./Routes/auth");
 const cron = require("node-cron");
 const Campaign = require("./Models/Campaign");
@@ -13,51 +13,59 @@ const Campaign = require("./Models/Campaign");
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+
+// ✅ Use only one well-configured CORS setup
+const allowedOrigin = "https://camp-a-in.vercel.app";
+
 app.use(
   cors({
-    origin: "https://camp-a-in.vercel.app",
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
 
-const server = http.createServer(app);
-
+// ✅ Socket.IO instance with proper CORS
 const io = new Server(server, {
   cors: {
-    origin: "https://camp-a-in.vercel.app",
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors());
+// ✅ Middleware
 app.use(bodyParser.json());
 app.use(express.json());
 
-// Routes
+// ✅ Basic test route
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
+
+// ✅ Routes
 app.use("/api", campaignRoutes);
 app.use("/api", authRoutes);
+app.use(require("./Routes/auth"));
 
-// MongoDB connection
-require("dotenv").config();
-
+// ✅ MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Cron job to update campaign statuses every minute
+// ✅ Cron job to auto-activate/deactivate campaigns
 cron.schedule("* * * * *", async () => {
   try {
     const now = new Date();
 
-    const activated = await Campaign.updateMany(
+    await Campaign.updateMany(
       { startDate: { $lte: now }, endDate: { $gte: now }, isActive: false },
       { $set: { isActive: true } }
     );
 
-    const deactivated = await Campaign.updateMany(
+    await Campaign.updateMany(
       { endDate: { $lt: now }, isActive: true },
       { $set: { isActive: false } }
     );
@@ -66,26 +74,28 @@ cron.schedule("* * * * *", async () => {
   }
 });
 
-// Socket.IO connection
-io.on("connection", (socket) => {
-  console.log("A user connected");
+// ✅ WebSocket events
+let notifications = []; // mock in-memory store (replace with DB in prod)
 
-  // Listen for new comments
+io.on("connection", (socket) => {
+  console.log("🔌 A user connected");
+
   socket.on("newComment", (data) => {
-    io.emit("commentAdded", data); // Broadcast the comment to all clients
+    io.emit("commentAdded", data);
   });
 
-  // Broadcast a new notification
   socket.on("newNotification", (notification) => {
-    notifications.push(notification); // Save to mock database
-    io.emit("notification", notification); // Broadcast to all clients
+    notifications.push(notification);
+    io.emit("notification", notification);
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    console.log("❌ A user disconnected");
   });
 });
 
-// Start the server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT);
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
