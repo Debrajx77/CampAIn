@@ -173,6 +173,35 @@ router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   }
 });
 
+// DELETE /api/campaign/:campaignId/comment/:commentId
+router.delete(
+  "/campaign/:campaignId/comment/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    const { campaignId, commentId } = req.params;
+    const userId = req.user.id;
+
+    try {
+      const comment = await Comment.findById(commentId);
+      if (!comment || comment.campaign.toString() !== campaignId) {
+        return res.status(404).json({ msg: "Comment not found" });
+      }
+
+      if (comment.user.toString() !== userId) {
+        return res
+          .status(403)
+          .json({ msg: "Not authorized to delete this comment" });
+      }
+
+      await comment.remove();
+      return res.json({ msg: "Comment deleted" });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Server error" });
+    }
+  }
+);
+
 // Send email campaign
 router.post("/campaign/:id/email", authenticate, async (req, res) => {
   try {

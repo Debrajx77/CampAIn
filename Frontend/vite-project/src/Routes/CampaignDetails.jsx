@@ -8,14 +8,17 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
-import { motion } from "framer-motion"; // Import motion from framer-motion
+import DeleteIcon from "@mui/icons-material/Delete";
+import { motion } from "framer-motion";
 import { io } from "socket.io-client";
+import jwt_decode from "jwt-decode";
 
 const socket = io("https://campain-2.onrender.com", {
   transports: ["websocket"],
   credentials: true,
-}); // Connect to the backend WebSocket server
+});
 
 function CampaignDetails() {
   const { id: campaignId } = useParams();
@@ -24,18 +27,25 @@ function CampaignDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const token = localStorage.getItem("token");
+  const userId = token ? jwt_decode(token)?.id : null;
+
   useEffect(() => {
     fetchComments();
 
-    // Listen for real-time comments
     socket.on("commentAdded", (comment) => {
       if (comment.campaignId === campaignId) {
-        setComments((prevComments) => [...prevComments, comment]);
+        setComments((prev) => [...prev, comment]);
       }
     });
 
+    socket.on("commentDeleted", (deletedId) => {
+      setComments((prev) => prev.filter((c) => c._id !== deletedId));
+    });
+
     return () => {
-      socket.off("commentAdded"); // Clean up the listener
+      socket.off("commentAdded");
+      socket.off("commentDeleted");
     };
   }, [campaignId]);
 
@@ -45,18 +55,15 @@ function CampaignDetails() {
         `https://campain-2.onrender.com/api/campaign/${campaignId}/comments`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.msg || "Failed to fetch comments");
         return;
       }
-
       setComments(data.comments);
     } catch (err) {
       console.error("Error fetching comments:", err);
@@ -68,7 +75,6 @@ function CampaignDetails() {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch(
         `https://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
@@ -76,28 +82,46 @@ function CampaignDetails() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ text: newComment }),
         }
       );
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.msg || "Failed to add comment");
         return;
       }
-
       setNewComment("");
-
-      // Emit the new comment to the WebSocket server
       socket.emit("newComment", {
         ...data.comments[data.comments.length - 1],
         campaignId,
       });
     } catch (err) {
       console.error("Error adding comment:", err);
+      setError("Server error");
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const res = await fetch(
+        `https://campain-2.onrender.com/api/campaign/${campaignId}/comment/${commentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.msg || "Failed to delete comment");
+        return;
+      }
+      socket.emit("deleteComment", commentId);
+    } catch (err) {
+      console.error("Error deleting comment:", err);
       setError("Server error");
     }
   };
@@ -202,6 +226,7 @@ function CampaignDetails() {
                         backgroundColor: "#2a2a3b",
                         color: "#fff",
                         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                        position: "relative",
                       }}
                     >
                       <CardContent>
@@ -213,6 +238,21 @@ function CampaignDetails() {
                         >
                           By: {comment.user?.name || "Unknown"}
                         </Typography>
+                        {comment.user?._id === userId && (
+                          <IconButton
+                            aria-label="delete"
+                            size="small"
+                            sx={{
+                              position: "absolute",
+                              top: 8,
+                              right: 8,
+                              color: "#f44336",
+                            }}
+                            onClick={() => handleDeleteComment(comment._id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
