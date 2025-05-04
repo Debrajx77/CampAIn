@@ -1,12 +1,15 @@
 const handleDelete = async (id) => {
   if (!window.confirm("Are you sure you want to delete this campaign?")) return;
   try {
-    const res = await fetch(`http://localhost:5000/api/campaign/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const res = await fetch(
+      `http://campain-2.onrender.com/api/campaign/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     let data;
     try {
