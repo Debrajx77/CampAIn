@@ -22,7 +22,7 @@ const Notifications = ({ notifications, setNotifications }) => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/notifications", {
+      const res = await fetch("https://campain-2.onrender.com", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
