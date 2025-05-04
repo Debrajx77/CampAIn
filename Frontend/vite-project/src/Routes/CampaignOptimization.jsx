@@ -13,7 +13,7 @@ const CampaignOptimization = () => {
   const fetchInsights = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/campaigns/${id}/optimize`,
+        `http://campain-2.onrender.com/api/campaigns/${id}/optimize`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

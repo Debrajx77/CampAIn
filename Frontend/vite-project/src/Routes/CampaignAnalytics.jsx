@@ -12,11 +12,14 @@ function CampaignAnalytics() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/campaigns/analytics", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch(
+        "http://campain-2.onrender.com/api/campaigns/analytics",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
