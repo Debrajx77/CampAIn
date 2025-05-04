@@ -31,7 +31,7 @@ export const getAnalytics = async () => {
 };
 export const login = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/`, data);
+    const response = await axios.post(`${API_URL}/login`, data);
     return response.data;
   } catch (error) {
     console.error("Error:", error);
