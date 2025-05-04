@@ -8,7 +8,7 @@ const Campaigns = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/campaigns", {
+        const res = await fetch("http://campain-2.onrender.com/api/campaigns", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
