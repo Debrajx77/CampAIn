@@ -12,7 +12,7 @@ function SignUp() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://campain-2.onrender.com", {
+      const res = await fetch("https://campain-2.onrender.com/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
