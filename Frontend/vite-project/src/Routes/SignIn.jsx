@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function SignIn() {
   const [email, setEmail] = useState("");
@@ -126,6 +126,16 @@ function SignIn() {
         >
           Sign In
         </button>
+
+        {/* Sign Up Link */}
+        <div style={{ marginTop: "1rem", textAlign: "center" }}>
+          <p style={{ color: "#94a3b8" }}>
+            Don't have an account?{" "}
+            <Link to="/signup" style={{ color: "#60a5fa", fontWeight: "bold" }}>
+              Create one
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
