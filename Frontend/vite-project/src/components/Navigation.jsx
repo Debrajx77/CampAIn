@@ -36,19 +36,25 @@ const Navigation = () => {
           </Link>
         </li>
         <li>
-          <Link to="/email">
+          <Link to="/email-campaign">
+            {" "}
+            {/* FIXED */}
             <Email />
             Email
           </Link>
         </li>
         <li>
           <Link to="/calendar">
+            {" "}
+            {/* FIXED */}
             <CalendarToday />
             Calendar
           </Link>
         </li>
         <li>
-          <Link to="/budget">
+          <Link to="/budget-management">
+            {" "}
+            {/* FIXED */}
             <AccountBalanceWallet />
             Budget
           </Link>
