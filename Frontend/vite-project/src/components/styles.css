@@ -45,6 +45,10 @@ nav a:hover {
 
 .hamburger-icon.open {
   transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
 }
 
 /* Add some basic styling to the close icon */

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import SignIn from "./Routes/SignIn";
 import SignUp from "./Routes/SignUp";
 import Dashboard from "./Routes/Dashboard";
@@ -9,103 +9,109 @@ import CampaignList from "./Routes/CampaignList";
 import EditCampaign from "./Routes/EditCampaign";
 import CampaignDetails from "./Routes/CampaignDetails";
 import CampaignAnalytics from "./Routes/CampaignAnalytics";
-import Navigation from "./components/Navigation"; // Import Navigation
+import Navigation from "./components/Navigation";
 import EmailCampaign from "./Routes/EmailCampaign";
 import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import "./index.css";
-import "./styles.css"; // Import your CSS file for custom styles
+import "./styles.css";
 
-const App = () => {
+const AppRoutes = () => {
+  const location = useLocation();
+  const hideNavRoutes = ["/", "/signup"];
+
   return (
-    <BrowserRouter>
-      <div>
-        <Navigation /> {/* Add Navigation here */}
-        <div style={{ paddingTop: "6rem" }}>
-          <Routes>
-            <Route path="/" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
+    <div>
+      {!hideNavRoutes.includes(location.pathname) && <Navigation />}
+      <div style={{ paddingTop: "6rem" }}>
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/create-campaign"
-              element={
-                <PrivateRoute>
-                  <CreateCampaign />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/campaigns"
-              element={
-                <PrivateRoute>
-                  <CampaignList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/edit-campaign/:id"
-              element={
-                <PrivateRoute>
-                  <EditCampaign />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <PrivateRoute>
-                  <CampaignAnalytics />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/email-campaign"
-              element={
-                <PrivateRoute>
-                  <EmailCampaign />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <PrivateRoute>
-                  <CampaignCalendar />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/budget-management"
-              element={
-                <PrivateRoute>
-                  <BudgetManagement />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/campaign/:id" element={<CampaignDetails />} />
-            <Route
-              path="/campaign/:id/optimize"
-              element={
-                <PrivateRoute>
-                  <CampaignOptimization />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </div>
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/create-campaign"
+            element={
+              <PrivateRoute>
+                <CreateCampaign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/campaigns"
+            element={
+              <PrivateRoute>
+                <CampaignList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/edit-campaign/:id"
+            element={
+              <PrivateRoute>
+                <EditCampaign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <PrivateRoute>
+                <CampaignAnalytics />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/email-campaign"
+            element={
+              <PrivateRoute>
+                <EmailCampaign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <PrivateRoute>
+                <CampaignCalendar />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/budget-management"
+            element={
+              <PrivateRoute>
+                <BudgetManagement />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/campaign/:id" element={<CampaignDetails />} />
+          <Route
+            path="/campaign/:id/optimize"
+            element={
+              <PrivateRoute>
+                <CampaignOptimization />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
       </div>
-    </BrowserRouter>
+    </div>
   );
 };
+
+const App = () => (
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+);
 
 export default App;
