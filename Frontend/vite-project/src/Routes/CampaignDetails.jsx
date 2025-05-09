@@ -13,7 +13,8 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { motion } from "framer-motion";
 import { io } from "socket.io-client";
-import jwt_decode from "jwt-decode";
+// Change the import for jwt-decode
+import * as jwt_decode from "jwt-decode";
 
 const socket = io("https://campain-2.onrender.com", {
   transports: ["websocket"],
@@ -28,7 +29,7 @@ function CampaignDetails() {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
-  const userId = token ? jwt_decode(token)?.id : null;
+  const userId = token ? jwt_decode(token)?.id : null; // jwt_decode is now used correctly
 
   useEffect(() => {
     fetchComments();
