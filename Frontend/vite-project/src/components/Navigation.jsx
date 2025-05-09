@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IconButton } from "@mui/material";
+import "./styles.css"; // Import your CSS file for custom styles
 import {
   Home,
   BarChart,
