@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Notification from "../Routes/Notifications";
+import LayoutWrapper from "../components/LayoutWrapper";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -85,146 +86,140 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        backgroundColor: "#1e1e2f",
-        color: "#fff",
-        pt: "6rem", // adjust for fixed navbar height
-        px: "2rem",
-        pb: "2rem",
-        boxSizing: "border-box",
-        position: "relative",
-        overflowX: "hidden",
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 4,
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold">
-          Welcome to CampAIgn
-        </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <IconButton onClick={toggleNotifications}>
-            <Badge
-              badgeContent={notifications.filter((n) => !n.read).length || null}
-              color="secondary"
-            >
-              <NotificationsIcon sx={{ color: "#a78bfa" }} />
-            </Badge>
-          </IconButton>
-
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => navigate("/")}
-            sx={{
-              textTransform: "none",
-            }}
-          >
-            Logout
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Notification panel */}
-      {showNotifications && (
-        <Box
-          ref={notificationRef}
-          sx={{
-            position: "absolute",
-            top: "6rem",
-            right: "2rem",
-            zIndex: 1000,
-          }}
-        >
-          <Notification
-            notifications={notifications}
-            setNotifications={setNotifications}
-          />
-        </Box>
-      )}
-
-      {/* Action Bar */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          mb: 4,
-        }}
-      >
-        <Button
-          variant="contained"
-          onClick={handleCreateCampaign}
-          sx={{
-            textTransform: "none",
-            background: "linear-gradient(to right, #6a11cb, #2575fc)",
-          }}
-        >
-          + Create New Campaign
-        </Button>
-      </Box>
-
-      {/* Campaign Section */}
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Your Campaigns
-      </Typography>
-
-      {loading ? (
+    <LayoutWrapper>
+      <Box sx={{ position: "relative" }}>
+        {/* Header */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
-            height: "50vh",
+            marginBottom: "2rem",
           }}
         >
-          <CircularProgress color="primary" />
-        </Box>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : campaigns.length === 0 ? (
-        <Typography>No campaigns found. Create one to get started!</Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {campaigns.map((campaign) => (
-            <Grid item xs={12} sm={6} md={4} key={campaign._id}>
-              <Card
-                sx={{
-                  backgroundColor: "#2a2a3b",
-                  color: "#fff",
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "#3a3a4b",
-                  },
-                }}
-                onClick={() => navigate(`/campaign/${campaign._id}`)}
+          <Typography variant="h4" fontWeight="bold">
+            Welcome to CampAIgn
+          </Typography>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <IconButton onClick={toggleNotifications}>
+              <Badge
+                badgeContent={
+                  notifications.filter((n) => !n.read).length || null
+                }
+                color="secondary"
               >
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">
-                    {campaign.campaignName}
-                  </Typography>
-                  <Typography variant="body2" color="gray">
-                    {campaign.description}
-                  </Typography>
-                  <Typography variant="body2" color="gray">
-                    Budget: ${campaign.budget}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </Box>
+                <NotificationsIcon sx={{ color: "#a78bfa" }} />
+              </Badge>
+            </IconButton>
+
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => navigate("/")}
+              sx={{
+                textTransform: "none",
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Notification panel */}
+        {showNotifications && (
+          <Box
+            ref={notificationRef}
+            sx={{
+              position: "absolute",
+              top: "4rem",
+              right: "2rem",
+              zIndex: 1000,
+            }}
+          >
+            <Notification
+              notifications={notifications}
+              setNotifications={setNotifications}
+            />
+          </Box>
+        )}
+
+        {/* Action Bar */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "2rem",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={handleCreateCampaign}
+            sx={{
+              textTransform: "none",
+              background: "linear-gradient(to right, #6a11cb, #2575fc)",
+            }}
+          >
+            + Create New Campaign
+          </Button>
+        </Box>
+
+        {/* Campaigns */}
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Your Campaigns
+        </Typography>
+
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "50vh",
+            }}
+          >
+            <CircularProgress color="primary" />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : campaigns.length === 0 ? (
+          <Typography>
+            No campaigns found. Create one to get started!
+          </Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {campaigns.map((campaign) => (
+              <Grid item xs={12} sm={6} md={4} key={campaign._id}>
+                <Card
+                  sx={{
+                    backgroundColor: "#2a2a3b",
+                    color: "#fff",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#3a3a4b",
+                    },
+                  }}
+                  onClick={() => navigate(`/campaign/${campaign._id}`)}
+                >
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold">
+                      {campaign.campaignName}
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                      {campaign.description}
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                      Budget: ${campaign.budget}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
+    </LayoutWrapper>
   );
 };
 
