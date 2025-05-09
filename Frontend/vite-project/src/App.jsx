@@ -15,6 +15,7 @@ import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import "./index.css";
+import "./styles.css"; // Import your CSS file for custom styles
 
 const App = () => {
   return (

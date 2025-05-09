@@ -1,5 +1,6 @@
 // src/services/api.js (example)
 import axios from "axios";
+import "./styles.css"; // Import your CSS file
 
 const api = axios.create({
   baseURL: "https://campain-2.onrender.com/api", // <-- not localhost
