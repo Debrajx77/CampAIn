@@ -33,34 +33,96 @@ function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-16">
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(to bottom, #0f172a, #1e293b)",
+      }}
+    >
       <form
         onSubmit={handleLogin}
-        className="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800 w-full max-w-sm"
+        style={{
+          backgroundColor: "#111",
+          padding: "2rem",
+          borderRadius: "1rem",
+          boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+          width: "100%",
+          maxWidth: "400px",
+        }}
       >
-        <h2 className="text-3xl font-bold text-white mb-6 text-center">
+        <h2
+          style={{
+            fontSize: "1.8rem",
+            fontWeight: "bold",
+            color: "#fff",
+            marginBottom: "1.5rem",
+            textAlign: "center",
+          }}
+        >
           Sign In
         </h2>
-        {error && <div className="mb-4 text-red-400 text-center">{error}</div>}
+
+        {error && (
+          <div
+            style={{
+              marginBottom: "1rem",
+              color: "#f87171",
+              textAlign: "center",
+            }}
+          >
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Email"
-          className="mb-4 w-full p-3 rounded bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1rem",
+            borderRadius: "0.5rem",
+            backgroundColor: "#1e293b",
+            border: "1px solid #334155",
+            color: "#fff",
+          }}
         />
+
         <input
           type="password"
           placeholder="Password"
-          className="mb-6 w-full p-3 rounded bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            marginBottom: "1.5rem",
+            borderRadius: "0.5rem",
+            backgroundColor: "#1e293b",
+            border: "1px solid #334155",
+            color: "#fff",
+          }}
         />
+
         <button
           type="submit"
-          className="w-full py-3 rounded bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-black text-white font-semibold transition"
+          style={{
+            width: "100%",
+            padding: "0.75rem",
+            background: "linear-gradient(to right, #3b82f6, #1e40af)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "0.5rem",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
         >
           Sign In
         </button>
