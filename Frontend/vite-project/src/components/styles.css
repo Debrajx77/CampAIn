@@ -1,0 +1,54 @@
+.nav-menu {
+  display: none;
+}
+
+.nav-menu.open {
+  display: block;
+}
+
+/* Add some basic styling to the navigation menu */
+nav {
+  background-color: #333;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+nav li {
+  margin-bottom: 1rem;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: #ccc;
+}
+
+/* Add some basic styling to the hamburger icon */
+.hamburger-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.hamburger-icon.open {
+  transform: rotate(45deg);
+}
+
+/* Add some basic styling to the close icon */
+.close-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}

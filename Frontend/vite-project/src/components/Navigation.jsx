@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { IconButton } from "@mui/material";
 import {
   Home,
   BarChart,
@@ -13,7 +14,9 @@ import {
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   const menuItems = [
     { name: "Dashboard", icon: <Home />, path: "/dashboard" },
@@ -33,15 +36,18 @@ const Navigation = () => {
         {/* Logo */}
         <div className="text-2xl font-bold tracking-wide">
           <Link to="/" className="hover:text-gray-300 transition duration-300">
-            CampAIgn
+            CampAIn
           </Link>
         </div>
 
         {/* Hamburger Icon (Mobile Only) */}
         <div className="md:hidden">
-          <button onClick={toggleMenu} className="focus:outline-none">
+          <IconButton
+            onClick={() => setIsOpen(!isOpen)}
+            className="focus:outline-none"
+          >
             {isOpen ? <Close fontSize="large" /> : <Menu fontSize="large" />}
-          </button>
+          </IconButton>
         </div>
 
         {/* Desktop Menu */}
@@ -61,27 +67,29 @@ const Navigation = () => {
             </li>
           ))}
         </ul>
-      </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden px-4 pb-4 bg-black bg-opacity-90">
-          <ul className="flex flex-col space-y-4">
-            {menuItems.map(({ name, icon, path }) => (
-              <li key={name}>
-                <Link
-                  to={path}
-                  onClick={toggleMenu}
-                  className="flex items-center space-x-2 text-white hover:text-gray-300 transition"
-                >
-                  {React.cloneElement(icon, { className: "text-lg" })}
-                  <span>{name}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {/* Mobile Menu */}
+        {isOpen && (
+          <div className="md:hidden px-4 pb-4 bg-black bg-opacity-90">
+            <ul className="flex flex-col space-y-4">
+              {menuItems.map(({ name, icon, path }) => (
+                <li key={name}>
+                  <Link
+                    to={path}
+                    className="flex items-center space-x-2 hover:text-gray-300 transition duration-300"
+                  >
+                    {React.cloneElement(icon, {
+                      className:
+                        "text-lg group-hover:scale-110 transition-transform duration-300",
+                    })}
+                    <span>{name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };
