@@ -90,9 +90,12 @@ const Dashboard = () => {
         minHeight: "100vh",
         backgroundColor: "#1e1e2f",
         color: "#fff",
-        padding: "2rem",
-        paddingTop: "6rem",
+        pt: "6rem", // adjust for fixed navbar height
+        px: "2rem",
+        pb: "2rem",
+        boxSizing: "border-box",
         position: "relative",
+        overflowX: "hidden",
       }}
     >
       {/* Header */}
@@ -101,7 +104,7 @@ const Dashboard = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "2rem",
+          mb: 4,
         }}
       >
         <Typography variant="h4" fontWeight="bold">
@@ -154,7 +157,7 @@ const Dashboard = () => {
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          marginBottom: "2rem",
+          mb: 4,
         }}
       >
         <Button
@@ -169,7 +172,7 @@ const Dashboard = () => {
         </Button>
       </Box>
 
-      {/* Recent Campaigns */}
+      {/* Campaign Section */}
       <Typography variant="h5" fontWeight="bold" gutterBottom>
         Your Campaigns
       </Typography>

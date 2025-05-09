@@ -33,10 +33,10 @@ function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-20 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-24 pb-10 flex justify-center items-start">
       <form
         onSubmit={handleLogin}
-        className="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800 w-full max-w-sm"
+        className="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800 w-full max-w-sm mt-10"
       >
         <h2 className="text-3xl font-bold text-white mb-6 text-center">
           Sign In
