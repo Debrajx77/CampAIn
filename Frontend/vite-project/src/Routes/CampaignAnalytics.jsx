@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Bar, Line } from "react-chartjs-2";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import "chart.js/auto";
 
 function CampaignAnalytics() {
   const [analytics, setAnalytics] = useState([]);
   const [error, setError] = useState("");
-  const [viewType, setViewType] = useState("bar"); // Toggle between bar and line
+  const chartRef = useRef();
 
   useEffect(() => {
     fetchAnalytics();
@@ -36,37 +38,41 @@ function CampaignAnalytics() {
     }
   };
 
+  const exportAsImage = async () => {
+    const canvas = await html2canvas(chartRef.current);
+    const link = document.createElement("a");
+    link.download = "campaign_analytics.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  const exportAsPDF = async () => {
+    const canvas = await html2canvas(chartRef.current);
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("landscape");
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("campaign_analytics.pdf");
+  };
+
   const chartData = {
     labels: analytics.map((campaign) => campaign.title),
     datasets: [
       {
         label: "Clicks",
-        data: analytics.map((c) => c.clicks),
-        backgroundColor: "rgba(99, 102, 241, 0.6)",
-        borderColor: "rgba(99, 102, 241, 1)",
-        fill: true,
+        data: analytics.map((campaign) => campaign.clicks),
+        backgroundColor: "rgba(56, 189, 248, 0.6)",
+        borderColor: "rgba(56, 189, 248, 1)",
+        borderWidth: 1,
       },
       {
         label: "Conversions",
-        data: analytics.map((c) => c.conversions),
-        backgroundColor: "rgba(236, 72, 153, 0.6)",
-        borderColor: "rgba(236, 72, 153, 1)",
-        fill: true,
-      },
-    ],
-  };
-
-  const ctrData = {
-    labels: analytics.map((c) => c.title),
-    datasets: [
-      {
-        label: "CTR (%)",
-        data: analytics.map((c) =>
-          c.clicks ? ((c.conversions / c.clicks) * 100).toFixed(2) : 0
-        ),
-        backgroundColor: "rgba(34, 197, 94, 0.6)",
-        borderColor: "rgba(34, 197, 94, 1)",
-        fill: true,
+        data: analytics.map((campaign) => campaign.conversions),
+        backgroundColor: "rgba(168, 85, 247, 0.6)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 1,
       },
     ],
   };
@@ -77,60 +83,56 @@ function CampaignAnalytics() {
       {
         label: "Budget",
         data: analytics.map((campaign) => campaign.budget),
-        backgroundColor: "rgba(251, 191, 36, 0.6)",
+        fill: false,
         borderColor: "rgba(251, 191, 36, 1)",
-        fill: true,
+        backgroundColor: "rgba(251, 191, 36, 0.4)",
+        tension: 0.4,
       },
     ],
   };
 
-  const ChartComponent = viewType === "bar" ? Bar : Line;
-
   return (
-    <div className="min-h-screen bg-neutral-950 text-white px-6 py-20">
-      <h1 className="text-3xl font-bold mb-8 text-purple-400">
-        📈 Campaign Analytics
+    <div className="min-h-screen bg-black text-white px-4 sm:px-6 lg:px-10 py-10">
+      <h1 className="text-3xl font-bold mb-6 text-purple-400">
+        Campaign Analytics
       </h1>
 
-      {error && <p className="text-red-500 mb-6">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
 
-      {analytics.length === 0 ? (
-        <p className="text-gray-400 text-center">
-          No analytics data available.
-        </p>
-      ) : (
-        <>
-          <div className="mb-8 flex justify-end">
-            <button
-              onClick={() => setViewType(viewType === "bar" ? "line" : "bar")}
-              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md transition text-sm"
-            >
-              Switch to {viewType === "bar" ? "Line" : "Bar"} View
-            </button>
+      <div className="flex gap-4 mb-6 flex-wrap">
+        <button
+          onClick={exportAsImage}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+        >
+          Export as Image
+        </button>
+        <button
+          onClick={exportAsPDF}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded transition"
+        >
+          Export as PDF
+        </button>
+      </div>
+
+      <div ref={chartRef} className="space-y-12">
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-cyan-400">
+            Clicks & Conversions
+          </h2>
+          <div className="bg-neutral-900 p-4 rounded-xl shadow-lg">
+            <Bar data={chartData} />
           </div>
+        </div>
 
-          <div className="mb-14">
-            <h2 className="text-xl font-semibold mb-4 text-purple-300">
-              Clicks & Conversions
-            </h2>
-            <ChartComponent data={chartData} />
-          </div>
-
-          <div className="mb-14">
-            <h2 className="text-xl font-semibold mb-4 text-green-400">
-              CTR (Click-Through Rate)
-            </h2>
-            <Line data={ctrData} />
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-yellow-400">
-              Budget Utilization
-            </h2>
+        <div>
+          <h2 className="text-xl font-semibold mb-4 text-yellow-400">
+            Budget Utilization
+          </h2>
+          <div className="bg-neutral-900 p-4 rounded-xl shadow-lg">
             <Line data={budgetData} />
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
