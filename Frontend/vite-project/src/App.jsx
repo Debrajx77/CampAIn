@@ -17,18 +17,17 @@ import CampaignOptimization from "./Routes/CampaignOptimization";
 import "./index.css";
 import "./styles.css";
 
-const AppRoutes = () => {
+const AppContent = () => {
   const location = useLocation();
-  const hideNavRoutes = ["/", "/signup"];
+  const hideNavbarPaths = ["/", "/signup"];
 
   return (
     <div>
-      {!hideNavRoutes.includes(location.pathname) && <Navigation />}
+      {!hideNavbarPaths.includes(location.pathname) && <Navigation />}
       <div style={{ paddingTop: "6rem" }}>
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-
           <Route
             path="/dashboard"
             element={
@@ -108,10 +107,12 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => (
-  <BrowserRouter>
-    <AppRoutes />
-  </BrowserRouter>
-);
+const App = () => {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+};
 
 export default App;
