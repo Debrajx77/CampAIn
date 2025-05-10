@@ -1,90 +1,142 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Snackbar,
+  Alert,
+  Grid,
+  Paper,
+} from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import { styled } from "@mui/system";
 import axios from "axios";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Send } from "lucide-react";
+
+const DarkPaper = styled(Paper)(({ theme }) => ({
+  backgroundColor: "#1e1e1e",
+  color: "#fff",
+  padding: theme.spacing(4),
+  borderRadius: "16px",
+  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+}));
 
 const EmailCampaign = () => {
   const [to, setTo] = useState("");
   const [subject, setSubject] = useState("");
-  const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(null);
+  const [body, setBody] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSend = async () => {
-    setLoading(true);
-    setSuccess(null);
     try {
-      await axios.post("/api/email/send-email", { to, subject, text });
-      setSuccess("Email sent successfully!");
-      setTo("");
-      setSubject("");
-      setText("");
+      const response = await axios.post("/api/email/send", {
+        to,
+        subject,
+        body,
+      });
+
+      if (response.data.success) {
+        setSuccess(true);
+        setTo("");
+        setSubject("");
+        setBody("");
+      } else {
+        throw new Error("Failed to send email.");
+      }
     } catch (err) {
-      console.error(err);
-      setSuccess("Failed to send email.");
-    } finally {
-      setLoading(false);
+      setError(err.message || "Something went wrong.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl bg-[#1a1a1a] border border-[#2a2a2a] shadow-lg">
-        <CardContent className="space-y-4 p-6">
-          <h2 className="text-2xl font-bold text-center">📧 Email Campaign</h2>
+    <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
+      <DarkPaper>
+        <Typography variant="h4" gutterBottom fontWeight="bold">
+          Launch Email Campaign 🚀
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          Reach your audience directly with personalized email campaigns.
+        </Typography>
 
-          <Input
-            type="email"
-            placeholder="Recipient Email"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="bg-[#121212] text-white border-[#333] focus:ring-purple-500"
-          />
+        <Grid container spacing={3} mt={2}>
+          <Grid item xs={12}>
+            <TextField
+              label="Recipient Email"
+              fullWidth
+              variant="filled"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              InputProps={{ style: { color: "white" } }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Subject"
+              fullWidth
+              variant="filled"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              InputProps={{ style: { color: "white" } }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Email Body"
+              multiline
+              rows={8}
+              fullWidth
+              variant="filled"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              InputProps={{ style: { color: "white" } }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Box display="flex" justifyContent="flex-end">
+              <Button
+                variant="contained"
+                endIcon={<SendIcon />}
+                onClick={handleSend}
+                sx={{
+                  backgroundColor: "#00bfa5",
+                  color: "#fff",
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: "12px",
+                  "&:hover": {
+                    backgroundColor: "#008e76",
+                  },
+                }}
+              >
+                Send Email
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </DarkPaper>
 
-          <Input
-            type="text"
-            placeholder="Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            className="bg-[#121212] text-white border-[#333] focus:ring-purple-500"
-          />
-
-          <Textarea
-            placeholder="Your message..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={8}
-            className="bg-[#121212] text-white border-[#333] focus:ring-purple-500"
-          />
-
-          <div className="flex items-center justify-between">
-            <Button
-              onClick={handleSend}
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 flex items-center gap-2"
-            >
-              {loading ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-              {loading ? "Sending..." : "Send Email"}
-            </Button>
-
-            {success && (
-              <span className="text-sm text-gray-400">{success}</span>
-            )}
-          </div>
-
-          <div className="text-xs text-gray-500 text-center pt-4">
-            Ensure your SMTP settings are correctly configured.
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      {/* Snackbar */}
+      <Snackbar
+        open={success}
+        autoHideDuration={4000}
+        onClose={() => setSuccess(false)}
+      >
+        <Alert severity="success" variant="filled">
+          Email sent successfully!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        onClose={() => setError("")}
+      >
+        <Alert severity="error" variant="filled">
+          {error}
+        </Alert>
+      </Snackbar>
+    </Container>
   );
 };
 
