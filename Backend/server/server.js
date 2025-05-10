@@ -27,8 +27,6 @@ app.use(
   })
 );
 
-app.use("/api/email", emailRoutes);
-
 // ✅ Socket.IO instance with proper CORS
 const io = new Server(server, {
   cors: {
@@ -51,6 +49,7 @@ app.get("/", (req, res) => {
 app.use("/api", campaignRoutes);
 app.use("/api", authRoutes);
 app.use(require("./Routes/auth"));
+app.use("/api/email", emailRoutes);
 
 // ✅ MongoDB connection
 mongoose
