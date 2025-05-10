@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ThemeProvider, createTheme } from "@mui/material/styles"; // Importing necessary components
 import SignIn from "./Routes/SignIn";
 import SignUp from "./Routes/SignUp";
 import Dashboard from "./Routes/Dashboard";
@@ -15,6 +16,27 @@ import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import "./index.css";
+
+// Creating a custom theme
+const theme = createTheme({
+  palette: {
+    mode: "dark", // dark mode theme
+    primary: {
+      main: "#3f51b5",
+    },
+    secondary: {
+      main: "#f50057",
+    },
+    background: {
+      default: "#121212", // Dark background
+      paper: "#1e1e1e", // Dark paper
+    },
+  },
+  typography: {
+    fontFamily: "'Roboto', sans-serif",
+  },
+});
+
 const AppContent = () => {
   const location = useLocation();
   const hideNavbarPaths = ["/", "/signup"];
@@ -108,7 +130,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <BrowserRouter>
-      <AppContent />
+      <ThemeProvider theme={theme}>
+        {" "}
+        {/* Wrapping with ThemeProvider */}
+        <AppContent />
+      </ThemeProvider>
     </BrowserRouter>
   );
 };
