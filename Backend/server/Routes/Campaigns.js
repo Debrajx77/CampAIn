@@ -4,6 +4,7 @@ const authenticate = require("../middleware/authenticate");
 const Campaign = require("../Models/Campaign");
 const Comment = require("../Models/Comment"); // Ensure this exists
 const transporter = require("../utils/email");
+const Comment = require("../Models/Comment");
 
 // Fetch all campaigns with optional search
 router.get("/campaigns", authenticate, async (req, res) => {
@@ -124,14 +125,18 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
 });
 
 // Fetch comments
+// Fetch comments
 router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   try {
-    const comments = await Comment.find({
-      campaign: req.params.campaignId,
-    }).populate("user", "name _id");
+    const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-    res.status(200).json({ comments: campaign.comments });
+    const comments = await Comment.find({ campaign: req.params.id }).populate(
+      "user",
+      "name _id"
+    ); // Populate user details if necessary
+
+    res.status(200).json({ comments });
   } catch (err) {
     console.error("Error fetching comments:", err);
     res.status(500).json({ msg: "Server error" });
