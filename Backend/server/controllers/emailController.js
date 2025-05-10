@@ -1,25 +1,33 @@
-const transporter = require("../utils/email"); // Import the configured transporter
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
-/**
- * Send a welcome email to the user
- * @param {string} userEmail - The recipient's email address
- * @param {string} userName - The recipient's name
- */
-const sendWelcomeEmail = async (userEmail, userName) => {
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+export const sendCampaignEmail = async (req, res) => {
+  const { to, subject, text } = req.body;
+
+  if (!to || !subject || !text) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   try {
-    await transporter.sendMail({
-      from: '"CampAin" <your-email@gmail.com>', // Replace with your sender email
-      to: userEmail, // Recipient email
-      subject: "Welcome to CampAin!", // Email subject
-      template: "welcome", // Template name (matches the .hbs file in the templates folder)
-      context: {
-        name: userName, // Dynamic data for the template
-      },
+    const info = await transporter.sendMail({
+      from: `"CampAIn" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
     });
-    console.log("Welcome email sent successfully!");
-  } catch (err) {
-    console.error("Error sending welcome email:", err.message);
+
+    res.status(200).json({ message: "Email sent successfully", info });
+  } catch (error) {
+    console.error("Email error:", error);
+    res.status(500).json({ error: "Failed to send email" });
   }
 };
-
-module.exports = { sendWelcomeEmail };

@@ -9,6 +9,7 @@ const campaignRoutes = require("./Routes/Campaigns");
 const authRoutes = require("./Routes/auth");
 const cron = require("node-cron");
 const Campaign = require("./Models/Campaign");
+const emailRoutes = require("./Routes/emailRoutes");
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/api/email", emailRoutes);
 
 // ✅ Socket.IO instance with proper CORS
 const io = new Server(server, {
