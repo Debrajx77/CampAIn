@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
 
+// Create reusable email transport object using Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -10,6 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Send email campaign
 export const sendCampaignEmail = async (req, res) => {
   const { to, subject, text } = req.body;
 

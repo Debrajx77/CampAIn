@@ -55,7 +55,7 @@ router.delete("/campaign/:id", authenticate, async (req, res) => {
     await campaign.deleteOne();
     res.json({ msg: "Campaign removed" });
   } catch (err) {
-    console.error(err.message);
+    console.error("Error deleting campaign:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -79,7 +79,7 @@ router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
   }
 });
 
-// Campaign analytics fetch
+// Fetch campaign analytics
 router.get("/campaigns/analytics", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find(
@@ -112,7 +112,8 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-    campaign.comments.push({ user: req.user.id, text });
+    const newComment = { user: req.user.id, text };
+    campaign.comments.push(newComment);
     await campaign.save();
 
     res.status(201).json({ msg: "Comment added", comments: campaign.comments });
@@ -122,7 +123,7 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
   }
 });
 
-// Fetch comments
+// Fetch comments for a campaign
 router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id).populate(
@@ -138,7 +139,7 @@ router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   }
 });
 
-// Delete comment
+// Delete a comment
 router.delete(
   "/campaign/:campaignId/comment/:commentId",
   authenticate,
@@ -174,7 +175,7 @@ router.post("/campaign/:id/email", authenticate, async (req, res) => {
 
     const emailPromises = recipients.map((email) =>
       transporter.sendMail({
-        from: '"CampAin" <your-email@gmail.com>',
+        from: '"CampAIn" <your-email@gmail.com>',
         to: email,
         subject,
         html: `<p>${message}</p>`,
@@ -189,7 +190,7 @@ router.post("/campaign/:id/email", authenticate, async (req, res) => {
   }
 });
 
-// Fetch calendar data
+// Fetch calendar data for campaigns
 router.get("/campaigns/calendar", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title startDate endDate");
@@ -205,7 +206,7 @@ router.get("/campaigns/calendar", authenticate, async (req, res) => {
   }
 });
 
-// Fetch budget info
+// Fetch budget info for campaigns
 router.get("/campaigns/budgets", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title objective spent");
@@ -222,7 +223,7 @@ router.get("/campaigns/budgets", authenticate, async (req, res) => {
   }
 });
 
-// Update spending
+// Update campaign spending
 router.put("/campaign/:id/budget", authenticate, async (req, res) => {
   try {
     const { spent } = req.body;
@@ -246,7 +247,7 @@ router.put("/campaign/:id/budget", authenticate, async (req, res) => {
   }
 });
 
-// AI optimization logic
+// AI optimization logic for campaign analysis
 const analyzeCampaign = (campaign) => {
   const insights = [];
 
@@ -273,7 +274,7 @@ const analyzeCampaign = (campaign) => {
   return insights;
 };
 
-// Get AI insights
+// Get AI insights for campaign optimization
 router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);

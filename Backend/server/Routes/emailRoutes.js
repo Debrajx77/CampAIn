@@ -1,8 +1,8 @@
-import express from "express";
-import { sendCampaignEmail } from "../controllers/emailController.js";
+const express = require("express");
+const { sendCampaignEmail } = require("../controllers/emailController");
 
 const router = express.Router();
 
 router.post("/send-email", sendCampaignEmail);
 
-export default router;
+module.exports = router;

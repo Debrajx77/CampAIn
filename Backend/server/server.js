@@ -7,17 +7,17 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const campaignRoutes = require("./Routes/Campaigns");
 const authRoutes = require("./Routes/auth");
+const emailRoutes = require("./Routes/emailRoutes");
 const cron = require("node-cron");
 const Campaign = require("./Models/Campaign");
-const emailRoutes = require("./Routes/emailRoutes");
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Use only one well-configured CORS setup
-const allowedOrigin = "https://camp-a-in.vercel.app";
+// ✅ CORS Setup (use environment variable for flexibility)
+const allowedOrigin = process.env.CORS_ORIGIN || "https://camp-a-in.vercel.app";
 
 app.use(
   cors({
@@ -27,7 +27,7 @@ app.use(
   })
 );
 
-// ✅ Socket.IO instance with proper CORS
+// ✅ Socket.IO Setup with CORS
 const io = new Server(server, {
   cors: {
     origin: allowedOrigin,
@@ -37,10 +37,8 @@ const io = new Server(server, {
 });
 
 // ✅ Middleware
-app.use(bodyParser.json());
-app.use(express.json());
+app.use(express.json()); // Using express.json() for JSON parsing (bodyParser is not needed)
 
-// ✅ Basic test route
 app.get("/", (req, res) => {
   res.send("API is running");
 });
@@ -56,16 +54,18 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Cron job to auto-activate/deactivate campaigns
+// ✅ Cron job to auto-activate/deactivate campaigns every minute (change schedule for production)
 cron.schedule("* * * * *", async () => {
   try {
     const now = new Date();
 
+    // Activate campaigns that are active within the current time window
     await Campaign.updateMany(
       { startDate: { $lte: now }, endDate: { $gte: now }, isActive: false },
       { $set: { isActive: true } }
     );
 
+    // Deactivate campaigns that have passed their end date
     await Campaign.updateMany(
       { endDate: { $lt: now }, isActive: true },
       { $set: { isActive: false } }
@@ -75,24 +75,33 @@ cron.schedule("* * * * *", async () => {
   }
 });
 
-// ✅ WebSocket events
-let notifications = []; // mock in-memory store (replace with DB in prod)
+// ✅ WebSocket events for real-time notifications
+let notifications = []; // mock in-memory store (replace with DB in production)
 
 io.on("connection", (socket) => {
   console.log("🔌 A user connected");
 
+  // Emit comment addition
   socket.on("newComment", (data) => {
     io.emit("commentAdded", data);
   });
 
+  // Emit new notification
   socket.on("newNotification", (notification) => {
     notifications.push(notification);
     io.emit("notification", notification);
   });
 
+  // Handle disconnect
   socket.on("disconnect", () => {
     console.log("❌ A user disconnected");
   });
+});
+
+// ✅ Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ msg: "Something went wrong!" });
 });
 
 // ✅ Start server
