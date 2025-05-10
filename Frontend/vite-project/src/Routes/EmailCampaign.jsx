@@ -9,8 +9,12 @@ import {
   Alert,
   Grid,
   Paper,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import PreviewIcon from "@mui/icons-material/Visibility";
 import { styled } from "@mui/system";
 import axios from "axios";
 
@@ -26,22 +30,27 @@ const EmailCampaign = () => {
   const [to, setTo] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+  const [file, setFile] = useState(null);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const handleSend = async () => {
     try {
-      const response = await axios.post("/api/email/send", {
-        to,
-        subject,
-        body,
-      });
+      const formData = new FormData();
+      formData.append("to", to);
+      formData.append("subject", subject);
+      formData.append("body", body);
+      if (file) formData.append("attachment", file);
+
+      const response = await axios.post("/api/email/send", formData);
 
       if (response.data.success) {
         setSuccess(true);
         setTo("");
         setSubject("");
         setBody("");
+        setFile(null);
       } else {
         throw new Error("Failed to send email.");
       }
@@ -93,6 +102,36 @@ const EmailCampaign = () => {
               InputProps={{ style: { color: "white" } }}
             />
           </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<AttachFileIcon />}
+              sx={{ color: "#00e676", borderColor: "#00e676" }}
+            >
+              Attach File
+              <input
+                type="file"
+                hidden
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+            </Button>
+            {file && (
+              <Typography variant="body2" mt={1}>
+                Attached: {file.name}
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={12} sm={6} textAlign="right">
+            <Button
+              variant="outlined"
+              startIcon={<PreviewIcon />}
+              onClick={() => setPreviewOpen(true)}
+              sx={{ color: "#29b6f6", borderColor: "#29b6f6" }}
+            >
+              Preview
+            </Button>
+          </Grid>
           <Grid item xs={12}>
             <Box display="flex" justifyContent="flex-end">
               <Button
@@ -136,6 +175,23 @@ const EmailCampaign = () => {
           {error}
         </Alert>
       </Snackbar>
+
+      {/* Preview Modal */}
+      {previewOpen && (
+        <DarkPaper sx={{ mt: 4 }}>
+          <Typography variant="h6">Preview</Typography>
+          <Typography variant="subtitle2">To: {to}</Typography>
+          <Typography variant="subtitle2">Subject: {subject}</Typography>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            {body}
+          </Typography>
+          <Box mt={2} textAlign="right">
+            <Button variant="contained" onClick={() => setPreviewOpen(false)}>
+              Close
+            </Button>
+          </Box>
+        </DarkPaper>
+      )}
     </Container>
   );
 };
