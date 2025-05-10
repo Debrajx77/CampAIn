@@ -4,7 +4,7 @@ const authenticate = require("../middleware/authenticate");
 const Campaign = require("../Models/Campaign");
 const Comment = require("../Models/Comment"); // Ensure this exists
 const transporter = require("../utils/email");
-const Comment = require("../Models/Comment");
+const Comment = require("../Models/comment");
 
 // Fetch all campaigns with optional search
 router.get("/campaigns", authenticate, async (req, res) => {
