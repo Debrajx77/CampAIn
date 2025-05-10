@@ -48,7 +48,6 @@ app.get("/", (req, res) => {
 // ✅ Routes
 app.use("/api", campaignRoutes);
 app.use("/api", authRoutes);
-app.use(require("./Routes/auth"));
 app.use("/api/email", emailRoutes);
 
 // ✅ MongoDB connection
