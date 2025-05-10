@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authenticate");
 const Campaign = require("../Models/Campaign");
-const Comment = require("../Models/Comment"); // Ensure this exists
 const transporter = require("../utils/email");
-const Comment = require("./Models/Comment");
 
 // Fetch all campaigns with optional search
 router.get("/campaigns", authenticate, async (req, res) => {
@@ -125,18 +123,15 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
 });
 
 // Fetch comments
-// Fetch comments
 router.get("/campaign/:id/comments", authenticate, async (req, res) => {
   try {
-    const campaign = await Campaign.findById(req.params.id);
+    const campaign = await Campaign.findById(req.params.id).populate(
+      "comments.user",
+      "name _id"
+    );
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-    const comments = await Comment.find({ campaign: req.params.id }).populate(
-      "user",
-      "name _id"
-    ); // Populate user details if necessary
-
-    res.status(200).json({ comments });
+    res.status(200).json({ comments: campaign.comments });
   } catch (err) {
     console.error("Error fetching comments:", err);
     res.status(500).json({ msg: "Server error" });
@@ -150,15 +145,17 @@ router.delete(
   async (req, res) => {
     try {
       const { campaignId, commentId } = req.params;
-      const comment = await Comment.findById(commentId);
-      if (!comment || comment.campaign.toString() !== campaignId) {
-        return res.status(404).json({ msg: "Comment not found" });
-      }
-      if (comment.user.toString() !== req.user.id) {
-        return res.status(403).json({ msg: "Not authorized" });
-      }
+      const campaign = await Campaign.findById(campaignId);
+      if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
 
-      await comment.remove();
+      const comment = campaign.comments.id(commentId);
+      if (!comment) return res.status(404).json({ msg: "Comment not found" });
+      if (comment.user.toString() !== req.user.id)
+        return res.status(403).json({ msg: "Not authorized" });
+
+      comment.remove();
+      await campaign.save();
+
       res.json({ msg: "Comment deleted" });
     } catch (err) {
       console.error("Error deleting comment:", err);
