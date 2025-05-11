@@ -22,18 +22,14 @@ function CampaignList() {
         }
       );
 
+      const data = await res.json();
+      console.log("Fetched campaigns:", data);
+
       if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.msg || "Failed to fetch campaigns");
+        setError(data.msg || "Failed to fetch campaigns");
         return;
       }
 
-      const data = await res.json();
-
-      // Log the data to check the response shape
-      console.log("Fetched campaigns:", data);
-
-      // Ensure that data is an array before setting it
       if (Array.isArray(data)) {
         setCampaigns(data);
       } else {
@@ -48,6 +44,7 @@ function CampaignList() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this campaign?"))
       return;
+
     try {
       const res = await fetch(
         `https://campain-b2rr.onrender.com/api/campaign/${id}`,
@@ -90,9 +87,11 @@ function CampaignList() {
     }
   };
 
-  const filteredCampaigns = campaigns.filter((campaign) =>
-    campaign.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCampaigns = Array.isArray(campaigns)
+    ? campaigns.filter((campaign) =>
+        (campaign.title || "").toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white px-4 py-20">
