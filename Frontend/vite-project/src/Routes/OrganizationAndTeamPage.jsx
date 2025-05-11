@@ -22,30 +22,64 @@ const OrganizationAndTeamPage = () => {
   const [selectedRole, setSelectedRole] = useState("");
 
   const fetchOrganizations = async () => {
-    const res = await axios.get("/api/organizations");
-    setOrganizations(res.data);
+    try {
+      const res = await axios.get("/api/organization"); // fixed endpoint (singular)
+      // API returns single organization object, wrap in array for map
+      if (Array.isArray(res.data)) {
+        setOrganizations(res.data);
+      } else if (res.data) {
+        setOrganizations([res.data]);
+      } else {
+        setOrganizations([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch organizations:", error);
+      setOrganizations([]);
+    }
   };
 
   const fetchTeams = async () => {
-    const res = await axios.get("/api/teams");
-    setTeams(res.data);
+    try {
+      const res = await axios.get("/api/team/view"); // fixed endpoint
+      // Assuming API returns single team object or array
+      if (Array.isArray(res.data)) {
+        setTeams(res.data);
+      } else if (res.data) {
+        setTeams([res.data]);
+      } else {
+        setTeams([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch teams:", error);
+      setTeams([]);
+    }
   };
 
   const handleCreateOrganization = async () => {
     if (!newOrgName) return;
-    await axios.post("/api/organizations", { name: newOrgName });
-    setNewOrgName("");
-    fetchOrganizations();
+    try {
+      await axios.post("/api/organization", { name: newOrgName }); // fixed endpoint singular
+      setNewOrgName("");
+      fetchOrganizations();
+    } catch (error) {
+      console.error("Failed to create organization:", error);
+    }
   };
 
   const handleAssignRole = async () => {
     if (!selectedUser || !selectedRole || !selectedTeam) return;
-    await axios.post(`/api/teams/${selectedTeam}/assign-role`, {
-      userId: selectedUser,
-      role: selectedRole,
-    });
-    setOpen(false);
-    fetchTeams();
+    try {
+      await axios.put(`/api/team/${selectedTeam}/add-member`, {
+        userId: selectedUser,
+        role: selectedRole,
+      });
+      setOpen(false);
+      setSelectedUser("");
+      setSelectedRole("");
+      fetchTeams();
+    } catch (error) {
+      console.error("Failed to assign role:", error);
+    }
   };
 
   useEffect(() => {
@@ -58,7 +92,6 @@ const OrganizationAndTeamPage = () => {
       <Typography variant="h4" gutterBottom>
         Organizations
       </Typography>
-
       <Box display="flex" mb={4} gap={2}>
         <TextField
           label="New Organization"
@@ -72,42 +105,53 @@ const OrganizationAndTeamPage = () => {
           Create
         </Button>
       </Box>
-
       <Grid container spacing={2}>
-        {organizations.map((org) => (
-          <Grid item xs={12} sm={6} md={4} key={org._id}>
-            <Card style={{ backgroundColor: "#1e1e1e", color: "#fff" }}>
-              <CardContent>
-                <Typography variant="h6">{org.name}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        {organizations.length > 0 ? (
+          organizations.map((org) => (
+            <Grid item xs={12} sm={6} md={4} key={org._id}>
+              <Card style={{ backgroundColor: "#1e1e1e", color: "#fff" }}>
+                <CardContent>
+                  <Typography variant="h6">{org.name}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography>No organizations found.</Typography>
+        )}
       </Grid>
 
       <Typography variant="h4" mt={6} gutterBottom>
         Teams
       </Typography>
-
       <Grid container spacing={2}>
-        {teams.map((team) => (
-          <Grid item xs={12} sm={6} md={4} key={team._id}>
-            <Card
-              style={{ backgroundColor: "#1e1e1e", color: "#fff" }}
+        {teams.length > 0 ? (
+          teams.map((team) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={team._id}
               onClick={() => {
                 setSelectedTeam(team._id);
                 setOpen(true);
               }}
+              style={{ cursor: "pointer" }}
             >
-              <CardContent>
-                <Typography variant="h6">{team.name}</Typography>
-                <Typography variant="body2">
-                  Members: {team.members.length}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+              <Card style={{ backgroundColor: "#1e1e1e", color: "#fff" }}>
+                <CardContent>
+                  <Typography variant="h6">{team.name}</Typography>
+                  <Typography variant="body2">
+                    Members: {team.members ? team.members.length : 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography>No teams found.</Typography>
+        )}
       </Grid>
 
       <Modal open={open} onClose={() => setOpen(false)}>
@@ -124,7 +168,6 @@ const OrganizationAndTeamPage = () => {
           <Typography variant="h6" mb={2}>
             Assign Role
           </Typography>
-
           <TextField
             label="User ID"
             fullWidth
@@ -137,7 +180,6 @@ const OrganizationAndTeamPage = () => {
             InputLabelProps={{ style: { color: "#aaa" } }}
             sx={{ mb: 2 }}
           />
-
           <TextField
             select
             label="Role"
@@ -153,7 +195,6 @@ const OrganizationAndTeamPage = () => {
             <MenuItem value="admin">Admin</MenuItem>
             <MenuItem value="member">Member</MenuItem>
           </TextField>
-
           <Button
             fullWidth
             variant="contained"
