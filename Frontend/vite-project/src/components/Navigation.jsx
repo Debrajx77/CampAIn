@@ -8,15 +8,14 @@ import {
   AccountBalanceWallet,
   Menu,
   Close,
+  Group, // MUI icon for org-team
 } from "@mui/icons-material";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
-
   return (
     <nav className="w-full bg-neutral-900 text-white shadow-md fixed top-0 left-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,7 +29,6 @@ const Navigation = () => {
             </button>
             <h1 className="text-xl font-semibold text-purple-400">CampAIgn</h1>
           </div>
-
           <div className="hidden lg:flex space-x-6 items-center">
             <Link
               to="/dashboard"
@@ -62,10 +60,15 @@ const Navigation = () => {
             >
               <AccountBalanceWallet fontSize="small" /> Budget
             </Link>
+            <Link
+              to="/org-team"
+              className="flex items-center gap-2 hover:text-purple-400"
+            >
+              <Group fontSize="small" /> Org-Team
+            </Link>
           </div>
         </div>
       </div>
-
       {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden bg-neutral-800 px-4 pb-4">
@@ -113,6 +116,15 @@ const Navigation = () => {
                 className="flex items-center gap-2 hover:text-purple-400"
               >
                 <AccountBalanceWallet fontSize="small" /> Budget
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/org-team"
+                onClick={handleToggle}
+                className="flex items-center gap-2 hover:text-purple-400"
+              >
+                <Group fontSize="small" /> Org-Team
               </Link>
             </li>
           </ul>

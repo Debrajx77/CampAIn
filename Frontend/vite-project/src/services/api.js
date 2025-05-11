@@ -7,7 +7,27 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export default api;
+export default api; // src/services/api.js (example additions)
+
+export const getOrganization = async () => {
+  try {
+    const response = await api.get("/organization");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching organization:", error);
+    throw error;
+  }
+};
+
+export const getTeam = async () => {
+  try {
+    const response = await api.get("/team/view");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching team:", error);
+    throw error;
+  }
+};
 
 const API_URL = "https://campain-b2rr.onrender.com"; // Replace with your backend URL
 
