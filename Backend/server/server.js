@@ -16,7 +16,13 @@ const app = express();
 const server = http.createServer(app);
 
 // ✅ CORS Setup
-const allowedOrigin = process.env.CORS_ORIGIN || "https://camp-a-in.vercel.app";
+app.use(
+  cors({
+    origin: "https://camp-a-in.vercel.app", // Aapka frontend ka domain
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow DELETE method
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  })
+);
 
 app.use(
   cors({
