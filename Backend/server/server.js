@@ -16,28 +16,23 @@ const app = express();
 const server = http.createServer(app);
 
 // ✅ CORS Setup
-app.use(
-  cors({
-    origin: "https://camp-a-in.vercel.app", // Aapka frontend ka domain
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow DELETE method
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-  })
-);
+const allowedOrigin = "https://camp-a-in.vercel.app"; // Aapka frontend ka domain
 
 app.use(
   cors({
-    origin: allowedOrigin,
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: allowedOrigin, // Allow frontend domain
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow required methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow headers
+    credentials: true, // Allow credentials (cookies, authorization headers)
   })
 );
 
 // ✅ Socket.IO Setup
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigin,
+    origin: allowedOrigin, // Same frontend domain for Socket.IO
     methods: ["GET", "POST"],
-    credentials: true,
+    credentials: true, // Enable credentials for WebSocket connection
   },
 });
 

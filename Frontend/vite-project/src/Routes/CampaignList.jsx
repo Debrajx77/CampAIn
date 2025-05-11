@@ -63,7 +63,10 @@ function CampaignList() {
         return;
       }
 
-      setCampaigns(campaigns.filter((c) => c._id !== id));
+      // Remove the deleted campaign from the state
+      setCampaigns((prevCampaigns) =>
+        prevCampaigns.filter((c) => c._id !== id)
+      );
     } catch (err) {
       console.error("Error deleting campaign:", err);
       setError("Server error");
