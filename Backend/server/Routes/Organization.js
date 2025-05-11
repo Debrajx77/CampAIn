@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authenticate");
-const authorizeRole = require("../middleware/authorizeRole");
+const checkRole = require("../middleware/checkRole");
 const Organization = require("../Models/Organization");
 const User = require("../Models/user");
 
@@ -9,7 +9,7 @@ const User = require("../Models/user");
 router.post(
   "/organization",
   authenticate,
-  authorizeRole("admin"),
+  checkRole("admin"),
   async (req, res) => {
     try {
       const { name } = req.body;
@@ -51,7 +51,7 @@ router.get("/organization", authenticate, async (req, res) => {
 router.put(
   "/organization/:orgId/add-member",
   authenticate,
-  authorizeRole("admin"),
+  checkRole("admin"),
   async (req, res) => {
     try {
       const organization = await Organization.findById(req.params.orgId);
