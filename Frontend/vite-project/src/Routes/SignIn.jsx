@@ -10,14 +10,15 @@ function SignIn() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
+    const apiUrl = "https://campain-2.onrender.com/api/auth"; // Directly use the API URL
+
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+      const res = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
-      console.log("API URL:", process.env.REACT_APP_API_URL);
 
       const data = await res.json();
 
