@@ -17,6 +17,8 @@ function SignIn() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("API URL:", process.env.REACT_APP_API_URL);
+
       const data = await res.json();
 
       if (!res.ok) {
