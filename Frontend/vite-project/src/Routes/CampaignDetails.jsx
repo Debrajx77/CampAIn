@@ -206,7 +206,7 @@ function CampaignDetails() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            {comments.length === 0 ? (
+            {comments?.length === 0 ? (
               <Typography>No comments yet. Be the first to comment!</Typography>
             ) : (
               <Box
