@@ -1,37 +1,16 @@
-const handleDelete = async (id) => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this campaign?"
-  );
-  if (!confirmed) return;
+const express = require("express");
+const router = express.Router();
+const Campaign = require("../Models/Campaign"); // Assuming you have a Campaign model
 
+// GET /api/campaigns - fetch all campaigns from DB
+router.get("/", async (req, res) => {
   try {
-    const res = await fetch(
-      `https://campain-b2rr.onrender.com/api/campaign/${id}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    let data = {};
-    try {
-      data = await res.json();
-    } catch (parseError) {
-      setError("Invalid server response");
-      return;
-    }
-
-    if (!res.ok) {
-      setError(data.msg || "Failed to delete campaign");
-      return;
-    }
-
-    // Remove the deleted campaign from state
-    setCampaigns((prev) => prev.filter((c) => c._id !== id));
+    const campaigns = await Campaign.find();
+    res.json(campaigns);
   } catch (err) {
-    console.error("Error deleting campaign:", err);
-    setError("Server error");
+    console.error("Error fetching campaigns:", err);
+    res.status(500).json({ msg: "Server error" });
   }
-};
+});
+
+module.exports = router;

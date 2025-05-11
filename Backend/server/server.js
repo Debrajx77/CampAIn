@@ -10,6 +10,7 @@ const createTeamRouter = require("./Routes/CreateTeam");
 const viewTeamRouter = require("./Routes/viewTeam");
 const addMembersToTeamRouter = require("./Routes/addMembersToTeam");
 const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
+const campaignsRouter = require("./Routes/CampaignRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -44,8 +45,6 @@ app.use("/api/team/create", createTeamRouter);
 app.use("/api/team/view", viewTeamRouter);
 app.use("/api/team/add-member", addMembersToTeamRouter);
 app.use("/api/team/remove-member", removeMembersFromTeamRouter);
-
-const campaignsRouter = require("./Routes/Campaigns");
 app.use("/api/campaigns", campaignsRouter);
 
 // Default route
