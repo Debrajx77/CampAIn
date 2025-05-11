@@ -11,7 +11,7 @@ function SignIn() {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("https://campain-2.onrender.com/login", {
+      const res = await fetch(`${process.env.API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -127,7 +127,6 @@ function SignIn() {
           Sign In
         </button>
 
-        {/* Sign Up Link */}
         <div style={{ marginTop: "1rem", textAlign: "center" }}>
           <p style={{ color: "#94a3b8" }}>
             Don't have an account?{" "}
