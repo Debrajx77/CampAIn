@@ -26,6 +26,16 @@ connectDB();
 // Middleware
 app.use(express.json());
 
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: "https://camp-a-in.vercel.app", // apne frontend ka URL yahan daalo
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // agar cookies/token bhejna hai to
+  })
+);
+
 // Routes
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/organization", organizationRouter);
