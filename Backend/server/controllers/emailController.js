@@ -13,9 +13,9 @@ const transporter = nodemailer.createTransport({
 
 // Send email campaign
 export const sendCampaignEmail = async (req, res) => {
-  const { to, subject, text } = req.body;
+  const { to, subject, body } = req.body;
 
-  if (!to || !subject || !text) {
+  if (!to || !subject || !body) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -24,12 +24,12 @@ export const sendCampaignEmail = async (req, res) => {
       from: `"CampAIn" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      text,
+      text: body, // now correct
     });
 
     res.status(200).json({ message: "Email sent successfully", info });
   } catch (error) {
-    console.error("Error sending email:", error); // This will log the detailed error
+    console.error("Error sending email:", error);
     res
       .status(500)
       .json({ error: "Failed to send email", details: error.message });
