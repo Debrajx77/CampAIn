@@ -16,7 +16,7 @@ import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import OrganizationAndTeamPage from "./Routes/OrganizationAndTeamPage";
-import Billing from "./Routes/Billing";
+import Billing from "./components/Billing";
 import "./index.css";
 
 const theme = createTheme({
