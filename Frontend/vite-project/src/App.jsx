@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles"; // Importing necessary components
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import SignIn from "./Routes/SignIn";
 import SignUp from "./Routes/SignUp";
 import Dashboard from "./Routes/Dashboard";
@@ -15,12 +15,12 @@ import EmailCampaign from "./Routes/EmailCampaign";
 import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
+import OrganizationAndTeamPage from "./Routes/OrganizationAndTeamPage";
 import "./index.css";
 
-// Creating a custom theme
 const theme = createTheme({
   palette: {
-    mode: "dark", // dark mode theme
+    mode: "dark",
     primary: {
       main: "#3f51b5",
     },
@@ -28,8 +28,8 @@ const theme = createTheme({
       main: "#f50057",
     },
     background: {
-      default: "#121212", // Dark background
-      paper: "#1e1e1e", // Dark paper
+      default: "#121212",
+      paper: "#1e1e1e",
     },
   },
   typography: {
@@ -121,6 +121,14 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/org-team"
+            element={
+              <PrivateRoute>
+                <OrganizationAndTeamPage />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
     </div>
@@ -131,8 +139,6 @@ const App = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        {" "}
-        {/* Wrapping with ThemeProvider */}
         <AppContent />
       </ThemeProvider>
     </BrowserRouter>

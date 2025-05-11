@@ -4,6 +4,7 @@ const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendWelcomeEmail } = require("../controllers/emailController");
+const Organization = require("../Models/Organization");
 // SIGNUP (already present)
 router.post("/signup", async (req, res) => {
   try {
@@ -14,6 +15,16 @@ router.post("/signup", async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ msg: "User already exists" });
+
+    // Inside signup handler:
+    const organization = await Organization.create({ name: `${name}'s Org` });
+
+    const newUser = new User({
+      name,
+      email,
+      password,
+      organizationId: organization._id,
+    });
 
     const user = new User({ name, email, password });
     await user.save();

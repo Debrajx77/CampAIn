@@ -9,6 +9,7 @@ router.get("/campaigns", authenticate, async (req, res) => {
   try {
     const search = req.query.search || "";
     const campaigns = await Campaign.find({
+      organizationId: req.user.organizationId, // Filter by organizationId
       title: { $regex: search, $options: "i" },
     }).sort({ createdAt: -1 });
 
@@ -29,6 +30,7 @@ router.post("/create-campaign", authenticate, async (req, res) => {
 
     const newCampaign = new Campaign({
       user: req.user.id,
+      organizationId: req.user.organizationId, // Add organizationId here
       title,
       description,
       objective,
@@ -51,6 +53,12 @@ router.delete("/campaign/:id", authenticate, async (req, res) => {
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
     if (campaign.user.toString() !== req.user.id)
       return res.status(401).json({ msg: "Not authorized" });
+    if (
+      campaign.organizationId.toString() !== req.user.organizationId.toString()
+    )
+      return res
+        .status(401)
+        .json({ msg: "Not authorized to delete this campaign" });
 
     await campaign.deleteOne();
     res.json({ msg: "Campaign removed" });
@@ -59,13 +67,18 @@ router.delete("/campaign/:id", authenticate, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 // Campaign analytics update
 router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
   try {
     const { type } = req.body;
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
+    if (
+      campaign.organizationId.toString() !== req.user.organizationId.toString()
+    )
+      return res
+        .status(401)
+        .json({ msg: "Not authorized to update this campaign" });
 
     if (type === "click") campaign.clicks += 1;
     else if (type === "conversion") campaign.conversions += 1;
@@ -273,12 +286,17 @@ const analyzeCampaign = (campaign) => {
 
   return insights;
 };
-
 // Get AI insights for campaign optimization
 router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
+    if (
+      campaign.organizationId.toString() !== req.user.organizationId.toString()
+    )
+      return res
+        .status(401)
+        .json({ msg: "Not authorized to view insights for this campaign" });
 
     const insights = analyzeCampaign(campaign);
     res.status(200).json({ insights });
@@ -287,5 +305,3 @@ router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
-module.exports = router;
