@@ -8,7 +8,8 @@ import {
   AccountBalanceWallet,
   Menu,
   Close,
-  Group, // MUI icon for org-team
+  Group,
+  AccountBalance, // Use this icon for Billing
 } from "@mui/icons-material";
 
 const Navigation = () => {
@@ -65,6 +66,12 @@ const Navigation = () => {
               className="flex items-center gap-2 hover:text-purple-400"
             >
               <Group fontSize="small" /> Org-Team
+            </Link>
+            <Link
+              to="/billing"
+              className="flex items-center gap-2 hover:text-purple-400"
+            >
+              <AccountBalance fontSize="small" /> Billing
             </Link>
           </div>
         </div>
@@ -125,6 +132,15 @@ const Navigation = () => {
                 className="flex items-center gap-2 hover:text-purple-400"
               >
                 <Group fontSize="small" /> Org-Team
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/billing"
+                onClick={handleToggle}
+                className="flex items-center gap-2 hover:text-purple-400"
+              >
+                <AccountBalance fontSize="small" /> Billing
               </Link>
             </li>
           </ul>
