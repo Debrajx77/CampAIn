@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 // ✅ Routes
 app.use("/api", campaignRoutes);
 
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use("/api/email", emailRoutes);
 
