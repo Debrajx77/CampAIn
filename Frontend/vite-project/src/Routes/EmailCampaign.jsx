@@ -43,7 +43,10 @@ const EmailCampaign = () => {
       formData.append("body", body);
       if (file) formData.append("attachment", file);
 
-      const response = await axios.post("/api/email/send", formData);
+      const response = await axios.post(
+        "https://campain-b2rr.onrender.com/api/email/send",
+        formData
+      );
 
       if (response.data.success) {
         setSuccess(true);
