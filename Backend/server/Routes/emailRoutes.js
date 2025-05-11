@@ -1,21 +1,10 @@
-const express = require("express");
+import express from "express";
+import multer from "multer";
+import { sendCampaignEmail } from "../controllers/emailController.js";
+
 const router = express.Router();
-const { sendWelcomeEmail } = require("../controllers/emailController");
+const upload = multer(); // handles multipart/form-data with text only
 
-router.post("/send", async (req, res) => {
-  const { email, name } = req.body;
+router.post("/send", upload.none(), sendCampaignEmail);
 
-  if (!email || !name) {
-    return res.status(400).json({ msg: "Missing fields" });
-  }
-
-  try {
-    await sendWelcomeEmail(email, name);
-    res.json({ msg: "Email sent successfully" });
-  } catch (err) {
-    console.error("Email send error:", err.message);
-    res.status(500).json({ msg: "Failed to send email" });
-  }
-});
-
-module.exports = router;
+export default router;
