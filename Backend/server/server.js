@@ -67,13 +67,15 @@ cron.schedule("* * * * *", async () => {
     // Activate campaigns that are active within the current time window
     await Campaign.updateMany(
       { startDate: { $lte: now }, endDate: { $gte: now }, isActive: false },
-      { $set: { isActive: true } }
+      { $set: { isActive: true } },
+      { timeout: 30000 } // increase timeout to 30 seconds
     );
 
     // Deactivate campaigns that have passed their end date
     await Campaign.updateMany(
       { endDate: { $lt: now }, isActive: true },
-      { $set: { isActive: false } }
+      { $set: { isActive: false } },
+      { timeout: 30000 } // increase timeout to 30 seconds
     );
   } catch (err) {
     console.error("Error updating campaign statuses:", err);
