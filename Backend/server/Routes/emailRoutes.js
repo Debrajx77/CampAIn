@@ -1,10 +1,10 @@
-import express from "express";
-import multer from "multer";
-import { sendCampaignEmail } from "../controllers/emailController.js";
+const express = require("express");
+const multer = require("multer");
+const { sendCampaignEmail } = require("../controllers/emailController");
 
 const router = express.Router();
 const upload = multer(); // handles multipart/form-data with text only
 
 router.post("/send", upload.none(), sendCampaignEmail);
 
-export default router;
+module.exports = router;

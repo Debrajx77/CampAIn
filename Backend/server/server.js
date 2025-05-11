@@ -4,10 +4,9 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const campaignRoutes = require("./Routes/Campaigns");
 const authRoutes = require("./Routes/auth");
-const emailRoutes = require("./Routes/emailRoutes");
+const emailRoutes = require("./Routes/emailRoutes"); // ✅ CommonJS version
 const cron = require("node-cron");
 const Campaign = require("./Models/Campaign");
 
@@ -16,7 +15,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ CORS Setup (use environment variable for flexibility)
+// ✅ CORS Setup
 const allowedOrigin = process.env.CORS_ORIGIN || "https://camp-a-in.vercel.app";
 
 app.use(
@@ -27,7 +26,7 @@ app.use(
   })
 );
 
-// ✅ Socket.IO Setup with CORS
+// ✅ Socket.IO Setup
 const io = new Server(server, {
   cors: {
     origin: allowedOrigin,
@@ -37,77 +36,70 @@ const io = new Server(server, {
 });
 
 // ✅ Middleware
-app.use(express.json()); // Using express.json() for JSON parsing (bodyParser is not needed)
+app.use(express.json());
 
+// ✅ Routes
 app.get("/", (req, res) => {
   res.send("API is running");
 });
 
-// ✅ Routes
 app.use("/api", campaignRoutes);
-
 app.use("/api/auth", authRoutes);
-
-app.use("/api/email", emailRoutes);
+app.use("/api/email", emailRoutes); // ✅ Make sure this is CommonJS-compatible
 
 // ✅ MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
-    socketTimeoutMS: 45000, // Increase socket timeout to 45 seconds
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
   })
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Cron job to auto-activate/deactivate campaigns every minute (change schedule for production)
+// ✅ Cron job for campaign auto-toggle
 cron.schedule("* * * * *", async () => {
   try {
     const now = new Date();
 
-    // Activate campaigns that are active within the current time window
     await Campaign.updateMany(
       { startDate: { $lte: now }, endDate: { $gte: now }, isActive: false },
       { $set: { isActive: true } },
-      { timeout: 30000 } // increase timeout to 30 seconds
+      { timeout: 30000 }
     );
 
-    // Deactivate campaigns that have passed their end date
     await Campaign.updateMany(
       { endDate: { $lt: now }, isActive: true },
       { $set: { isActive: false } },
-      { timeout: 30000 } // increase timeout to 30 seconds
+      { timeout: 30000 }
     );
   } catch (err) {
     console.error("Error updating campaign statuses:", err);
   }
 });
 
-// ✅ WebSocket events for real-time notifications
-let notifications = []; // mock in-memory store (replace with DB in production)
+// ✅ WebSocket
+let notifications = [];
 
 io.on("connection", (socket) => {
   console.log("🔌 A user connected");
 
-  // Emit comment addition
   socket.on("newComment", (data) => {
     io.emit("commentAdded", data);
   });
 
-  // Emit new notification
   socket.on("newNotification", (notification) => {
     notifications.push(notification);
     io.emit("notification", notification);
   });
 
-  // Handle disconnect
   socket.on("disconnect", () => {
     console.log("❌ A user disconnected");
   });
 });
 
-// ✅ Global error handler
+// ✅ Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ msg: "Something went wrong!" });

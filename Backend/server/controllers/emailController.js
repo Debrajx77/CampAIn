@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
 dotenv.config();
 
 // Create reusable email transport object using Gmail
@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Send email campaign
-export const sendCampaignEmail = async (req, res) => {
+const sendCampaignEmail = async (req, res) => {
   const { to, subject, body } = req.body;
 
   // Debugging form data
@@ -35,12 +35,12 @@ export const sendCampaignEmail = async (req, res) => {
       .json({ success: true, message: "Email sent successfully", info });
   } catch (error) {
     console.error("Error sending email:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: "Failed to send email",
-        details: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      error: "Failed to send email",
+      details: error.message,
+    });
   }
 };
+
+module.exports = { sendCampaignEmail };
