@@ -13,11 +13,12 @@ const transporter = nodemailer.createTransport({
 
 // Send email campaign
 export const sendCampaignEmail = async (req, res) => {
-  const { to, subject, text } = req.body;
-
-  if (!to || !subject || !text) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+  const info = await transporter.sendMail({
+    from: `"CampAIn" <${process.env.EMAIL_USER}>`,
+    to, // The recipient email
+    subject, // Subject of the email
+    text, // The body of the email
+  });
 
   try {
     const info = await transporter.sendMail({
