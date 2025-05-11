@@ -14,7 +14,8 @@ function SignIn() {
     const apiUrl = "https://campain-b2rr.onrender.com/api/auth/login"; // Directly use the API URL
 
     try {
-      const res = await fetch(`${apiUrl}/login`, {
+      const res = await fetch(apiUrl, {
+        // Use the full URL without appending /login again
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
