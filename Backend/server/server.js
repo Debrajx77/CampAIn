@@ -45,6 +45,9 @@ app.use("/api/team/view", viewTeamRouter);
 app.use("/api/team/add-member", addMembersToTeamRouter);
 app.use("/api/team/remove-member", removeMembersFromTeamRouter);
 
+const campaignsRouter = require("./Routes/Campaigns");
+app.use("/api/campaigns", campaignsRouter);
+
 // Default route
 app.get("/", (req, res) => {
   res.send("API is running");
