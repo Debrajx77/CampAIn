@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { motion } from "framer-motion";
 import { io } from "socket.io-client";
 // Import jwtDecode correctly for decoding token
-import * as jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const socket = io("https://campain-b2rr.onrender.com", {
   transports: ["websocket"],
