@@ -13,8 +13,8 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { motion } from "framer-motion";
 import { io } from "socket.io-client";
-// Change the import for jwt-decode
-import { jwtDecode } from "jwt-decode";
+// Import jwtDecode correctly for decoding token
+import jwtDecode from "jwt-decode";
 
 const socket = io("https://campain-b2rr.onrender.com", {
   transports: ["websocket"],
@@ -29,7 +29,7 @@ function CampaignDetails() {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
-  const userId = token ? jwtDecode(token)?.id : null; // jwt_decode is now used correctly
+  const userId = token ? jwtDecode(token)?.id : null;
 
   useEffect(() => {
     fetchComments();

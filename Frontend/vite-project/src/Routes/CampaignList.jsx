@@ -127,24 +127,45 @@ function CampaignList() {
               <p>🖱️ Clicks: {campaign.clicks}</p>
               <p>🎯 Conversions: {campaign.conversions}</p>
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(campaign._id);
-              }}
-              className="mb-2 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
-            >
-              Delete
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/campaign/${campaign._id}`);
-              }}
-              className="py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
-            >
-              View Comments
-            </button>
+
+            {/* Display optimization insights */}
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-300">
+                Optimization Insights:
+              </h3>
+              {campaign.optimizationInsights &&
+              campaign.optimizationInsights.length > 0 ? (
+                campaign.optimizationInsights.map((insight, index) => (
+                  <p key={index} className="text-sm text-gray-400">
+                    📈 {insight}
+                  </p>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No insights available.</p>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex space-x-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(campaign._id);
+                }}
+                className="py-2 px-4 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
+              >
+                Delete
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/campaign/${campaign._id}`);
+                }}
+                className="py-2 px-4 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                View Comments
+              </button>
+            </div>
           </div>
         ))}
       </div>

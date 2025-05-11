@@ -59,11 +59,13 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Cron job for campaign auto-toggle
+//const optimizeCampaign = require("./utils/optimizer");
+
 cron.schedule("* * * * *", async () => {
   try {
     const now = new Date();
 
+    // Step 1: Auto-toggle active/inactive campaigns based on dates
     await Campaign.updateMany(
       { startDate: { $lte: now }, endDate: { $gte: now }, isActive: false },
       { $set: { isActive: true } },
@@ -75,8 +77,26 @@ cron.schedule("* * * * *", async () => {
       { $set: { isActive: false } },
       { timeout: 30000 }
     );
+
+    // Step 2: Optimize campaigns (based on various metrics)
+    const campaigns = await Campaign.find({ isActive: true });
+
+    for (const campaign of campaigns) {
+      const { updates, insights } = optimizeCampaign(campaign);
+
+      if (Object.keys(updates).length > 0) {
+        // Update campaign based on optimizer results
+        await Campaign.findByIdAndUpdate(campaign._id, updates);
+      }
+
+      // Optionally, log or store the insights for later review
+      console.log(`[Auto-Optimize] ${campaign.title}:`, insights);
+    }
   } catch (err) {
-    console.error("Error updating campaign statuses:", err);
+    console.error(
+      "Error updating campaign statuses and optimizing campaigns:",
+      err
+    );
   }
 });
 
