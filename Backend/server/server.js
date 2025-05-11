@@ -1,7 +1,6 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const authenticate = require("./middleware/authenticate");
-
 const notificationsRouter = require("./Routes/Notifications");
 const organizationRouter = require("./Routes/Organization");
 const authRouter = require("./Routes/auth");
