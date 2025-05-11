@@ -29,7 +29,16 @@ function CampaignList() {
       }
 
       const data = await res.json();
-      setCampaigns(data);
+
+      // Log the data to check the response shape
+      console.log("Fetched campaigns:", data);
+
+      // Ensure that data is an array before setting it
+      if (Array.isArray(data)) {
+        setCampaigns(data);
+      } else {
+        setError("Invalid response format");
+      }
     } catch (err) {
       console.error("Error fetching campaigns:", err);
       setError("Server error");
