@@ -16,7 +16,7 @@ const CampaignCalendar = () => {
   const fetchCalendarData = async () => {
     try {
       const res = await fetch(
-        "https://campain-2.onrender.com/api/campaigns/calendar",
+        "https://campain-b2rr.onrender.com/api/campaigns/calendar",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

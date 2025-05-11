@@ -16,7 +16,7 @@ import { io } from "socket.io-client";
 // Change the import for jwt-decode
 import * as jwt_decode from "jwt-decode";
 
-const socket = io("https://campain-2.onrender.com", {
+const socket = io("https://campain-b2rr.onrender.com", {
   transports: ["websocket"],
   credentials: true,
 });
@@ -53,7 +53,7 @@ function CampaignDetails() {
   const fetchComments = async () => {
     try {
       const res = await fetch(
-        `https://campain-2.onrender.com/api/campaign/${campaignId}/comments`,
+        `https://campain-b2rr.onrender.com/api/campaign/${campaignId}/comments`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ function CampaignDetails() {
 
     try {
       const res = await fetch(
-        `https://campain-2.onrender.com/api/campaign/${campaignId}/comment`,
+        `https://campain-b2rr.onrender.com/api/campaign/${campaignId}/comment`,
         {
           method: "POST",
           headers: {
@@ -110,7 +110,7 @@ function CampaignDetails() {
   const handleDeleteComment = async (commentId) => {
     try {
       const res = await fetch(
-        `https://campain-2.onrender.com/api/campaign/${campaignId}/comment/${commentId}`,
+        `https://campain-b2rr.onrender.com/api/campaign/${campaignId}/comment/${commentId}`,
         {
           method: "DELETE",
           headers: {

@@ -3,13 +3,13 @@ import axios from "axios";
 import "./styles.css"; // Import your CSS file
 
 const api = axios.create({
-  baseURL: "https://campain-2.onrender.com/api", // <-- not localhost
+  baseURL: "https://campain-b2rr.onrender.com/api", // <-- not localhost
   withCredentials: true,
 });
 
 export default api;
 
-const API_URL = "https://campain-2.onrender.com"; // Replace with your backend URL
+const API_URL = "https://campain-b2rr.onrender.com"; // Replace with your backend URL
 
 export const signup = async (data) => {
   try {

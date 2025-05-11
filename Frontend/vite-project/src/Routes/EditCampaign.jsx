@@ -14,7 +14,7 @@ function EditCampaign() {
     const fetchCampaignData = async () => {
       try {
         const res = await fetch(
-          `https://campain-2.onrender.com/api/campaign/${id}`,
+          `https://campain-b2rr.onrender.com/api/campaign/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -50,7 +50,7 @@ function EditCampaign() {
 
     try {
       const res = await fetch(
-        `https://campain-2.onrender.com/api/campaign/${id}`,
+        `https://campain-b2rr.onrender.com/api/campaign/${id}`,
         {
           method: "PUT",
           headers: {

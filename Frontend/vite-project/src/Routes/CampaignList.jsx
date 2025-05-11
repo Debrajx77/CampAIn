@@ -13,11 +13,14 @@ function CampaignList() {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch("https://campain-2.onrender.com/api/campaigns", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch(
+        "https://campain-b2rr.onrender.com/api/campaigns",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -38,7 +41,7 @@ function CampaignList() {
       return;
     try {
       const res = await fetch(
-        `https://campain-2.onrender.com/api/campaign/${id}`,
+        `https://campain-b2rr.onrender.com/api/campaign/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -63,7 +66,7 @@ function CampaignList() {
   const updateAnalytics = async (id, type) => {
     try {
       await fetch(
-        `https://campain-2.onrender.com/api/campaign/${id}/analytics`,
+        `https://campain-b2rr.onrender.com/api/campaign/${id}/analytics`,
         {
           method: "POST",
           headers: {

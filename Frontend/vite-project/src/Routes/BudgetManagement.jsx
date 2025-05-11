@@ -45,7 +45,7 @@ const BudgetManagement = () => {
   const fetchBudgets = async () => {
     try {
       const res = await fetch(
-        "https://campain-2.onrender.com/api/campaigns/budgets",
+        "https://campain-b2rr.onrender.com/api/campaigns/budgets",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

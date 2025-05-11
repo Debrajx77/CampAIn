@@ -20,7 +20,7 @@ function CreateCampaign() {
 
     try {
       const res = await fetch(
-        "https://campain-2.onrender.com/api/create-campaign",
+        "https://campain-b2rr.onrender.com/api/create-campaign",
         {
           method: "POST",
           headers: {

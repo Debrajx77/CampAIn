@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("https://campain-2.onrender.com", {
+const socket = io("https://campain-b2rr.onrender.com", {
   transports: ["websocket"],
   credentials: true,
 });
@@ -22,7 +22,7 @@ const Notifications = ({ notifications, setNotifications }) => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("https://campain-2.onrender.com", {
+      const res = await fetch("https://campain-b2rr.onrender.com", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -42,7 +42,7 @@ const Notifications = ({ notifications, setNotifications }) => {
 
   const markAsRead = async () => {
     try {
-      await fetch("https://campain-2.onrender.com/api/notifications/read", {
+      await fetch("https://campain-b2rr.onrender.com/api/notifications/read", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

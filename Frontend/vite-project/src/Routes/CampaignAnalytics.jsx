@@ -15,7 +15,7 @@ function CampaignAnalytics() {
   const fetchAnalytics = async () => {
     try {
       const res = await fetch(
-        "https://campain-2.onrender.com/api/campaigns/analytics",
+        "https://campain-b2rr.onrender.com/api/campaigns/analytics",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -11,7 +11,7 @@ function SignIn() {
     e.preventDefault();
     setError("");
 
-    const apiUrl = "https://campain-2.onrender.com/api/auth"; // Directly use the API URL
+    const apiUrl = "https://campain-b2rr.onrender.com/api/auth"; // Directly use the API URL
 
     try {
       const res = await fetch(`${apiUrl}/login`, {

@@ -57,7 +57,7 @@ const Dashboard = () => {
     const fetchCampaigns = async () => {
       try {
         const res = await fetch(
-          "https://campain-2.onrender.com/api/campaigns",
+          "https://campain-b2rr.onrender.com/api/campaigns",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
