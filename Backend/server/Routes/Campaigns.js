@@ -12,7 +12,6 @@ router.get("/campaigns", authenticate, async (req, res) => {
       organizationId: req.user.organizationId, // Filter by organizationId
       title: { $regex: search, $options: "i" },
     }).sort({ createdAt: -1 });
-
     res.json(campaigns);
   } catch (err) {
     console.error("Error fetching campaigns:", err);
@@ -20,14 +19,13 @@ router.get("/campaigns", authenticate, async (req, res) => {
   }
 });
 
-// Create a new campaign
-router.post("/api/create-campaign", authenticate, async (req, res) => {
+// Create a new campaign (fixed route path: removed /api prefix)
+router.post("/create-campaign", authenticate, async (req, res) => {
   try {
     const { title, description, objective, startDate, endDate } = req.body;
     if (!title || !description || !objective) {
       return res.status(400).json({ msg: "All fields are required" });
     }
-
     const newCampaign = new Campaign({
       user: req.user.id,
       organizationId: req.user.organizationId, // Add organizationId here
@@ -37,7 +35,6 @@ router.post("/api/create-campaign", authenticate, async (req, res) => {
       startDate,
       endDate,
     });
-
     await newCampaign.save();
     res.status(201).json({ msg: "Campaign created", campaign: newCampaign });
   } catch (err) {
@@ -59,7 +56,6 @@ router.delete("/campaign/:id", authenticate, async (req, res) => {
       return res
         .status(401)
         .json({ msg: "Not authorized to delete this campaign" });
-
     await campaign.deleteOne();
     res.json({ msg: "Campaign removed" });
   } catch (err) {
@@ -67,7 +63,8 @@ router.delete("/campaign/:id", authenticate, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-// Campaign analytics update
+
+// Campaign analytics updater
 router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
   try {
     const { type } = req.body;
@@ -79,11 +76,9 @@ router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
       return res
         .status(401)
         .json({ msg: "Not authorized to update this campaign" });
-
     if (type === "click") campaign.clicks += 1;
     else if (type === "conversion") campaign.conversions += 1;
     else return res.status(400).json({ msg: "Invalid analytics type" });
-
     await campaign.save();
     res.status(200).json({ msg: "Analytics updated", campaign });
   } catch (err) {
@@ -99,7 +94,6 @@ router.get("/campaigns/analytics", authenticate, async (req, res) => {
       {},
       "title clicks conversions objective startDate endDate"
     );
-
     const analytics = campaigns.map((c) => ({
       title: c.title,
       clicks: c.clicks,
@@ -108,7 +102,6 @@ router.get("/campaigns/analytics", authenticate, async (req, res) => {
       startDate: c.startDate,
       endDate: c.endDate,
     }));
-
     res.status(200).json(analytics);
   } catch (err) {
     console.error("Error fetching campaign analytics:", err);
@@ -121,14 +114,11 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
   try {
     const { text } = req.body;
     if (!text) return res.status(400).json({ msg: "Comment text is required" });
-
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
-
     const newComment = { user: req.user.id, text };
     campaign.comments.push(newComment);
     await campaign.save();
-
     res.status(201).json({ msg: "Comment added", comments: campaign.comments });
   } catch (err) {
     console.error("Error adding comment:", err);
@@ -144,7 +134,6 @@ router.get("/campaign/:id/comments", authenticate, async (req, res) => {
       "name _id"
     );
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
-
     res.status(200).json({ comments: campaign.comments });
   } catch (err) {
     console.error("Error fetching comments:", err);
@@ -161,22 +150,19 @@ router.delete(
       const { campaignId, commentId } = req.params;
       const campaign = await Campaign.findById(campaignId);
       if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
-
       const comment = campaign.comments.id(commentId);
       if (!comment) return res.status(404).json({ msg: "Comment not found" });
       if (comment.user.toString() !== req.user.id)
         return res.status(403).json({ msg: "Not authorized" });
-
       comment.remove();
       await campaign.save();
-
       res.json({ msg: "Comment deleted" });
     } catch (err) {
       console.error("Error deleting comment:", err);
       res.status(500).json({ msg: "Server error" });
     }
   }
-);
+});
 
 // Send email campaign
 router.post("/campaign/:id/email", authenticate, async (req, res) => {
