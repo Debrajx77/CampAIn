@@ -297,3 +297,5 @@ router.post("/something", (req, res) => {
   // ...some code...
   res.json({ success: true });
 });
+
+module.exports = router;
