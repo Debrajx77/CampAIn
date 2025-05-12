@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     ref: "Organization",
     required: true,
   },
+  organization: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
 });
 
 // Password hash before save

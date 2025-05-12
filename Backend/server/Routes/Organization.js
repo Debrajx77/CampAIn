@@ -1,80 +1,114 @@
 const express = require("express");
 const router = express.Router();
-const authenticate = require("../middleware/authenticate");
-const checkRole = require("../middleware/checkRole");
 const Organization = require("../Models/Organization");
 const User = require("../Models/user");
+const { checkAuth, checkOrg, checkRole } = require("../middleware/orgAuth");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-// Create an organization (admin only)
-router.post("/", authenticate, checkRole("admin"), async (req, res) => {
+// Plan limits
+const PLAN_LIMITS = { free: 3, premium: 10 };
+
+// Create organization
+router.post("/create", checkAuth, async (req, res) => {
   try {
-    const { name } = req.body;
-    if (!name)
-      return res.status(400).json({ msg: "Organization name is required" });
-
-    const newOrganization = new Organization({
+    const { name, plan } = req.body;
+    // Create Stripe customer
+    const customer = await stripe.customers.create({
+      email: req.user.email,
       name,
-      createdBy: req.user.id,
-      members: [req.user.id],
     });
-
-    await newOrganization.save();
-    res
-      .status(201)
-      .json({ msg: "Organization created", organization: newOrganization });
+    const org = new Organization({
+      name,
+      owner: req.user._id,
+      members: [{ user: req.user._id, role: "admin" }],
+      stripeCustomerId: customer.id,
+      plan: plan || "free",
+    });
+    await org.save();
+    req.user.organization = org._id;
+    await req.user.save();
+    res.status(201).json({ org });
   } catch (err) {
-    console.error("Error creating organization:", err);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: "Error creating organization" });
   }
 });
 
-// Get organization details for current user
-router.get("/", authenticate, async (req, res) => {
-  try {
-    const organization = await Organization.findOne({ members: req.user.id });
-    if (!organization)
-      return res.status(404).json({ msg: "Organization not found" });
-
-    res.json(organization);
-  } catch (err) {
-    console.error("Error fetching organization:", err);
-    res.status(500).json({ msg: "Server error" });
-  }
+// Get current user's org
+router.get("/my-org", checkAuth, async (req, res) => {
+  const org = await Organization.findOne({
+    "members.user": req.user._id,
+  }).populate("members.user", "name email");
+  if (!org) return res.status(404).json({ msg: "No organization found" });
+  res.json(org);
 });
 
-// Add a member to the organization (admin only)
-router.put(
-  "/:orgId/add-member",
-  authenticate,
+// Invite member (admin only, check plan limit)
+router.post(
+  "/invite",
+  checkAuth,
+  checkOrg,
   checkRole("admin"),
   async (req, res) => {
-    try {
-      const organization = await Organization.findById(req.params.orgId);
-      if (!organization)
-        return res.status(404).json({ msg: "Organization not found" });
-
-      const user = await User.findById(req.body.userId);
-      if (!user) return res.status(404).json({ msg: "User not found" });
-
-      organization.members.push(user._id);
-      await organization.save();
-      res.status(200).json({ msg: "User added to organization", organization });
-    } catch (err) {
-      console.error("Error adding member to organization:", err);
-      res.status(500).json({ msg: "Server error" });
+    const org = req.organization;
+    if (org.members.length >= PLAN_LIMITS[org.plan]) {
+      return res
+        .status(403)
+        .json({ msg: "Member limit reached. Upgrade your plan." });
     }
+    const { email, role } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) {
+      // Optionally, create a user or send invite email
+      return res.status(404).json({ msg: "User not found" });
+    }
+    if (org.members.some((m) => m.user.equals(user._id))) {
+      return res.status(400).json({ msg: "User already in organization" });
+    }
+    org.members.push({ user: user._id, role: role || "member" });
+    await org.save();
+    user.organization = org._id;
+    await user.save();
+    res.json({ msg: "User added", org });
   }
 );
 
-// Fetch all organizations (admin only)
-router.get("/all", authenticate, checkRole("admin"), async (req, res) => {
-  try {
-    const organizations = await Organization.find();
-    res.json(organizations);
-  } catch (err) {
-    console.error("Error fetching organizations:", err);
-    res.status(500).json({ msg: "Server error" });
+// Change member role (admin only)
+router.put(
+  "/change-role",
+  checkAuth,
+  checkOrg,
+  checkRole("admin"),
+  async (req, res) => {
+    const { userId, role } = req.body;
+    const org = req.organization;
+    const member = org.members.find((m) => m.user.equals(userId));
+    if (!member) return res.status(404).json({ msg: "Member not found" });
+    member.role = role;
+    await org.save();
+    res.json({ msg: "Role updated", org });
   }
+);
+
+// Remove member (admin only)
+router.delete(
+  "/remove-member",
+  checkAuth,
+  checkOrg,
+  checkRole("admin"),
+  async (req, res) => {
+    const { userId } = req.body;
+    const org = req.organization;
+    org.members = org.members.filter((m) => !m.user.equals(userId));
+    await org.save();
+    await User.findByIdAndUpdate(userId, { $unset: { organization: "" } });
+    res.json({ msg: "Member removed", org });
+  }
+);
+
+// Get plan limits
+router.get("/limits", checkAuth, checkOrg, (req, res) => {
+  const org = req.organization;
+  res.json({ memberLimit: PLAN_LIMITS[org.plan], plan: org.plan });
 });
 
 module.exports = router;
