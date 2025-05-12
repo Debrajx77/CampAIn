@@ -327,9 +327,9 @@ const OrganizationAndTeamPage = () => {
                       onChange={(e) => setAssignUserId(e.target.value)}
                       sx={{ bgcolor: "#181c24", minWidth: 120 }}
                     >
-                      {orgMembers
+                      {(organization?.members || [])
                         .filter((m) => {
-                          const team = teamsSafe.find(
+                          const team = (teams || []).find(
                             (t) => t._id === selectedTeam
                           );
                           if (!team || !Array.isArray(team.members))
