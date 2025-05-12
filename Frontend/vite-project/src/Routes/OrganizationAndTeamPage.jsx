@@ -16,6 +16,8 @@ import {
   Chip,
   Snackbar,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,6 +44,8 @@ const OrganizationAndTeamPage = () => {
     msg: "",
     severity: "success",
   });
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Fetch organization and teams on mount
   useEffect(() => {
@@ -197,26 +201,29 @@ const OrganizationAndTeamPage = () => {
   const atLimit = organization?.members?.length >= memberLimit;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", p: 3 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", p: isMobile ? 1 : 3 }}>
       {/* Header */}
       <Box
         sx={{
           display: "flex",
+          flexDirection: isMobile ? "column" : "row",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: isMobile ? "stretch" : "center",
           mb: 3,
+          gap: isMobile ? 2 : 0,
         }}
       >
-        <Typography variant="h4" fontWeight={700}>
+        <Typography variant={isMobile ? "h5" : "h4"} fontWeight={700}>
           Organization & Teams
         </Typography>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, flexDirection: isMobile ? "column" : "row" }}>
           {!organization && (
             <Button
               variant="contained"
               color="primary"
               startIcon={<AddIcon />}
               onClick={() => setOpenOrgModal(true)}
+              fullWidth={isMobile}
             >
               Create Organization
             </Button>
@@ -227,6 +234,7 @@ const OrganizationAndTeamPage = () => {
               color="primary"
               startIcon={<AddIcon />}
               onClick={() => setOpenTeamModal(true)}
+              fullWidth={isMobile}
             >
               Create Team
             </Button>
@@ -248,7 +256,7 @@ const OrganizationAndTeamPage = () => {
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Members
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={isMobile ? 1 : 2}>
               {(organization?.members || []).map((m) => (
                 <Grid item xs={12} sm={6} md={4} key={m.user._id}>
                   <Card sx={{ bgcolor: "#23293a" }}>
@@ -300,7 +308,14 @@ const OrganizationAndTeamPage = () => {
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 Invite/Add Member
               </Typography>
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  alignItems: isMobile ? "stretch" : "center",
+                  flexDirection: isMobile ? "column" : "row",
+                }}
+              >
                 <TextField
                   label="Email"
                   size="small"
@@ -308,6 +323,7 @@ const OrganizationAndTeamPage = () => {
                   onChange={(e) => setInviteEmail(e.target.value)}
                   disabled={atLimit}
                   sx={{ bgcolor: "#181c24" }}
+                  fullWidth={isMobile}
                 />
                 <TextField
                   select
@@ -317,6 +333,7 @@ const OrganizationAndTeamPage = () => {
                   onChange={(e) => setInviteRole(e.target.value)}
                   disabled={atLimit}
                   sx={{ bgcolor: "#181c24" }}
+                  fullWidth={isMobile}
                 >
                   <MenuItem value="member">Member</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
@@ -330,7 +347,8 @@ const OrganizationAndTeamPage = () => {
                   value={inviteTeamId}
                   onChange={(e) => setInviteTeamId(e.target.value)}
                   disabled={atLimit || !teams.length}
-                  sx={{ bgcolor: "#181c24", minWidth: 150 }}
+                  sx={{ bgcolor: "#181c24", minWidth: isMobile ? undefined : 150 }}
+                  fullWidth={isMobile}
                 >
                   <MenuItem value="">None</MenuItem>
                   {(Array.isArray(teams) ? teams : []).map((team) => (
@@ -345,6 +363,7 @@ const OrganizationAndTeamPage = () => {
                   color="primary"
                   onClick={handleInviteMember}
                   disabled={atLimit || !inviteEmail}
+                  fullWidth={isMobile}
                 >
                   Invite/Add
                 </Button>
@@ -364,7 +383,7 @@ const OrganizationAndTeamPage = () => {
         <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
           Teams
         </Typography>
-        <Grid container spacing={2}>
+        <Grid container spacing={isMobile ? 1 : 2}>
           {(Array.isArray(teams) ? teams : []).filter(Boolean).map((team) => (
             <Grid item xs={12} sm={6} md={4} key={team._id}>
               <Card sx={{ bgcolor: "#23293a" }}>
@@ -378,14 +397,23 @@ const OrganizationAndTeamPage = () => {
                   </Typography>
                   <Divider sx={{ my: 1 }} />
                   <Typography variant="subtitle2">Assign Member</Typography>
-                  <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      mt: 1,
+                      flexDirection: isMobile ? "column" : "row",
+                      alignItems: isMobile ? "stretch" : "center",
+                    }}
+                  >
                     <TextField
                       select
                       size="small"
                       label="User"
                       value={assignUserId}
                       onChange={(e) => setAssignUserId(e.target.value)}
-                      sx={{ bgcolor: "#181c24", minWidth: 120 }}
+                      sx={{ bgcolor: "#181c24", minWidth: isMobile ? undefined : 120 }}
+                      fullWidth={isMobile}
                     >
                       {(Array.isArray(organization?.members)
                         ? organization.members
@@ -423,14 +451,15 @@ const OrganizationAndTeamPage = () => {
                             {m.user.name}
                           </MenuItem>
                         ))}
-                    </TextField>{" "}
+                    </TextField>
                     <TextField
                       select
                       size="small"
                       label="Role"
                       value={assignRole}
                       onChange={(e) => setAssignRole(e.target.value)}
-                      sx={{ bgcolor: "#181c24", minWidth: 100 }}
+                      sx={{ bgcolor: "#181c24", minWidth: isMobile ? undefined : 100 }}
+                      fullWidth={isMobile}
                     >
                       <MenuItem value="member">Member</MenuItem>
                       <MenuItem value="admin">Admin</MenuItem>
@@ -443,6 +472,7 @@ const OrganizationAndTeamPage = () => {
                         handleAssignToTeam();
                       }}
                       disabled={!assignUserId}
+                      fullWidth={isMobile}
                     >
                       Assign
                     </Button>
@@ -463,9 +493,10 @@ const OrganizationAndTeamPage = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             bgcolor: "background.paper",
-            p: 4,
+            p: isMobile ? 2 : 4,
             borderRadius: 2,
-            minWidth: 350,
+            minWidth: isMobile ? "90vw" : 350,
+            width: isMobile ? "90vw" : undefined,
           }}
         >
           <Typography variant="h6" mb={2}>
@@ -499,9 +530,10 @@ const OrganizationAndTeamPage = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             bgcolor: "background.paper",
-            p: 4,
+            p: isMobile ? 2 : 4,
             borderRadius: 2,
-            minWidth: 350,
+            minWidth: isMobile ? "90vw" : 350,
+            width: isMobile ? "90vw" : undefined,
           }}
         >
           <Typography variant="h6" mb={2}>
