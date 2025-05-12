@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authenticate");
+const { checkCampaignLimit } = require("../middleware/checkLimit");
 const Campaign = require("../Models/Campaign");
 const transporter = require("../utils/email");
 
@@ -20,28 +21,33 @@ router.get("/", authenticate, async (req, res) => {
 });
 
 // Create a new campaign
-router.post("/create-campaign", authenticate, async (req, res) => {
-  try {
-    const { title, description, objective, startDate, endDate } = req.body;
-    if (!title || !description || !objective) {
-      return res.status(400).json({ msg: "All fields are required" });
+router.post(
+  "/create-campaign",
+  authenticate,
+  checkCampaignLimit,
+  async (req, res) => {
+    try {
+      const { title, description, objective, startDate, endDate } = req.body;
+      if (!title || !description || !objective) {
+        return res.status(400).json({ msg: "All fields are required" });
+      }
+      const newCampaign = new Campaign({
+        user: req.user.id,
+        organizationId: req.user.organizationId,
+        title,
+        description,
+        objective,
+        startDate,
+        endDate,
+      });
+      await newCampaign.save();
+      res.status(201).json({ msg: "Campaign created", campaign: newCampaign });
+    } catch (err) {
+      console.error("Error creating campaign:", err);
+      res.status(500).json({ msg: "Server error" });
     }
-    const newCampaign = new Campaign({
-      user: req.user.id,
-      organizationId: req.user.organizationId,
-      title,
-      description,
-      objective,
-      startDate,
-      endDate,
-    });
-    await newCampaign.save();
-    res.status(201).json({ msg: "Campaign created", campaign: newCampaign });
-  } catch (err) {
-    console.error("Error creating campaign:", err);
-    res.status(500).json({ msg: "Server error" });
   }
-});
+);
 
 // Delete a campaign
 router.delete("/campaign/:id", authenticate, async (req, res) => {
