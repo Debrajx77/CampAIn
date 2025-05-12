@@ -305,7 +305,7 @@ const OrganizationAndTeamPage = () => {
           Teams
         </Typography>
         <Grid container spacing={2}>
-          {teams.map((team) => (
+          {teams.filter(Boolean).map((team) => (
             <Grid item xs={12} sm={6} md={4} key={team._id}>
               <Card sx={{ bgcolor: "#23293a" }}>
                 <CardContent>
@@ -329,33 +329,31 @@ const OrganizationAndTeamPage = () => {
                     >
                       {(organization?.members || [])
                         .filter((orgMember) => {
-                          // Ensure team.members is always an array
-                          let teamMembersArr = [];
-                          if (Array.isArray(team?.members)) {
-                            teamMembersArr = team.members.map((member) => {
-                              // If member is an object with a user field
-                              if (
-                                member &&
-                                typeof member === "object" &&
-                                member.user
-                              ) {
-                                return member.user._id?.toString?.();
-                              }
-                              // If member is an object with _id field
-                              if (
-                                member &&
-                                typeof member === "object" &&
-                                member._id
-                              ) {
-                                return member._id?.toString?.();
-                              }
-                              // If member is a string (ObjectId)
-                              if (typeof member === "string") {
-                                return member;
-                              }
-                              return "";
-                            });
-                          }
+                          // Defensive: ensure team and team.members are valid
+                          const teamMembersArr = Array.isArray(
+                            team && team.members
+                          )
+                            ? team.members.map((member) => {
+                                if (
+                                  member &&
+                                  typeof member === "object" &&
+                                  member.user
+                                ) {
+                                  return member.user._id?.toString?.();
+                                }
+                                if (
+                                  member &&
+                                  typeof member === "object" &&
+                                  member._id
+                                ) {
+                                  return member._id?.toString?.();
+                                }
+                                if (typeof member === "string") {
+                                  return member;
+                                }
+                                return "";
+                              })
+                            : [];
                           return !teamMembersArr.includes(
                             orgMember.user._id?.toString()
                           );
