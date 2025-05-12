@@ -22,7 +22,7 @@ router.post(
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ msg: "User not found" });
 
-      team.members.push(user._id);
+      team.members.push({ user: user._id, role: req.body.role || "member" });
       await team.save();
       res.status(200).json({ msg: "Member added" });
     } catch (err) {
