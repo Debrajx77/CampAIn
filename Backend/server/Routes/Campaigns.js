@@ -21,7 +21,7 @@ router.get("/campaigns", authenticate, async (req, res) => {
 });
 
 // Create a new campaign
-router.post("/create-campaign", authenticate, async (req, res) => {
+router.post("/api/create-campaign", authenticate, async (req, res) => {
   try {
     const { title, description, objective, startDate, endDate } = req.body;
     if (!title || !description || !objective) {
