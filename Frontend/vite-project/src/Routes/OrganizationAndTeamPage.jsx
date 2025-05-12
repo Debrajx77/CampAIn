@@ -327,42 +327,43 @@ const OrganizationAndTeamPage = () => {
                       onChange={(e) => setAssignUserId(e.target.value)}
                       sx={{ bgcolor: "#181c24", minWidth: 120 }}
                     >
-                      {(organization?.members || [])
-                        .filter((orgMember) => {
-                          // Defensive: ensure team and team.members are valid
-                          const teamMembersArr = Array.isArray(
-                            team && team.members
-                          )
-                            ? team.members.map((member) => {
-                                if (
-                                  member &&
-                                  typeof member === "object" &&
-                                  member.user
-                                ) {
-                                  return member.user._id?.toString?.();
-                                }
-                                if (
-                                  member &&
-                                  typeof member === "object" &&
-                                  member._id
-                                ) {
-                                  return member._id?.toString?.();
-                                }
-                                if (typeof member === "string") {
-                                  return member;
-                                }
-                                return "";
-                              })
-                            : [];
-                          return !teamMembersArr.includes(
-                            orgMember.user._id?.toString()
-                          );
-                        })
-                        .map((m) => (
-                          <MenuItem key={m.user._id} value={m.user._id}>
-                            {m.user.name}
-                          </MenuItem>
-                        ))}
+                      {Array.isArray(organization?.members)
+                        ? organization.members
+                        : []
+                            .filter((orgMember) => {
+                              const teamMembersArr = Array.isArray(
+                                team && team.members
+                              )
+                                ? team.members.map((member) => {
+                                    if (
+                                      member &&
+                                      typeof member === "object" &&
+                                      member.user
+                                    ) {
+                                      return member.user._id?.toString?.();
+                                    }
+                                    if (
+                                      member &&
+                                      typeof member === "object" &&
+                                      member._id
+                                    ) {
+                                      return member._id?.toString?.();
+                                    }
+                                    if (typeof member === "string") {
+                                      return member;
+                                    }
+                                    return "";
+                                  })
+                                : [];
+                              return !teamMembersArr.includes(
+                                orgMember.user._id?.toString()
+                              );
+                            })
+                            .map((m) => (
+                              <MenuItem key={m.user._id} value={m.user._id}>
+                                {m.user.name}
+                              </MenuItem>
+                            ))}
                     </TextField>{" "}
                     <TextField
                       select
