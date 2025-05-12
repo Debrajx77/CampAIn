@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require("../middleware/authenticate");
-const { checkCampaignLimit } = require("../middleware/checkLimit");
+const {
+  checkCampaignLimit,
+  checkEmailLimit,
+} = require("../middleware/checkLimit");
 const Campaign = require("../Models/Campaign");
 const transporter = require("../utils/email");
+const EmailLog = require("../Models/EmailLog"); // Assuming you have an EmailLog model
 
 // Fetch all campaigns with optional search
 router.get("/", authenticate, async (req, res) => {
@@ -148,29 +152,36 @@ router.get("/:id/comments", authenticate, async (req, res) => {
 });
 
 // Send email campaign
-router.post("/campaign/:id/email", authenticate, async (req, res) => {
-  try {
-    const { recipients, subject, message } = req.body;
-    if (!recipients || !subject || !message) {
-      return res.status(400).json({ msg: "All fields are required" });
+router.post(
+  "/campaign/:id/email",
+  authenticate,
+  checkEmailLimit,
+  async (req, res) => {
+    try {
+      const { recipients, subject, message } = req.body;
+      if (!recipients || !subject || !message) {
+        return res.status(400).json({ msg: "All fields are required" });
+      }
+
+      const emailPromises = recipients.map((email) =>
+        transporter.sendMail({
+          from: '"CampAIn" <your-email@gmail.com>',
+          to: email,
+          subject,
+          html: `<p>${message}</p>`,
+        })
+      );
+
+      await Promise.all(emailPromises);
+      // After sending, log the email:
+      await EmailLog.create({ user: req.user.id, sentAt: new Date() });
+      res.json({ msg: "Email sent!" });
+    } catch (err) {
+      console.error("Error sending email campaign:", err.message);
+      res.status(500).json({ msg: "Server error" });
     }
-
-    const emailPromises = recipients.map((email) =>
-      transporter.sendMail({
-        from: '"CampAIn" <your-email@gmail.com>',
-        to: email,
-        subject,
-        html: `<p>${message}</p>`,
-      })
-    );
-
-    await Promise.all(emailPromises);
-    res.status(200).json({ msg: "Email campaign sent successfully!" });
-  } catch (err) {
-    console.error("Error sending email campaign:", err.message);
-    res.status(500).json({ msg: "Server error" });
   }
-});
+);
 
 // Fetch calendar data for campaigns
 router.get("/calendar", authenticate, async (req, res) => {

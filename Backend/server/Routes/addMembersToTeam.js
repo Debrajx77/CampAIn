@@ -4,14 +4,15 @@ const Team = require("../Models/Team");
 const User = require("../Models/user");
 const authenticate = require("../middleware/authenticate");
 const checkRole = require("../middleware/checkRole");
+const { checkTeamMemberLimit } = require("../middleware/checkLimit");
 
 const router = express.Router();
 
 // Add a member to the team
-router.put(
-  "/:teamId/add-member",
+router.post(
+  "/team/:teamId/add-member",
   authenticate,
-  checkRole("admin"),
+  checkTeamMemberLimit,
   async (req, res) => {
     try {
       const { userId } = req.body;
