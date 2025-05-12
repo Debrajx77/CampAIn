@@ -5,22 +5,21 @@ const Campaign = require("../Models/Campaign");
 const transporter = require("../utils/email");
 
 // Fetch all campaigns with optional search
-router.get("/campaigns", authenticate, async (req, res) => {
+router.get("/", authenticate, async (req, res) => {
   try {
     const search = req.query.search || "";
     const campaigns = await Campaign.find({
-      organizationId: req.user.organizationId, // Filter by organizationId
+      organizationId: req.user.organizationId,
       title: { $regex: search, $options: "i" },
     }).sort({ createdAt: -1 });
     res.json(campaigns);
   } catch (err) {
     console.error("Error fetching campaigns:", err);
-
     res.status(500).json({ msg: "Server error" });
   }
 });
 
-// Create a new campaign (fixed route path: removed /api prefix)
+// Create a new campaign
 router.post("/create-campaign", authenticate, async (req, res) => {
   try {
     const { title, description, objective, startDate, endDate } = req.body;
@@ -29,7 +28,7 @@ router.post("/create-campaign", authenticate, async (req, res) => {
     }
     const newCampaign = new Campaign({
       user: req.user.id,
-      organizationId: req.user.organizationId, // Add organizationId here
+      organizationId: req.user.organizationId,
       title,
       description,
       objective,
@@ -89,7 +88,7 @@ router.post("/campaign/:id/analytics", authenticate, async (req, res) => {
 });
 
 // Fetch campaign analytics
-router.get("/campaigns/analytics", authenticate, async (req, res) => {
+router.get("/analytics", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find(
       {},
@@ -191,7 +190,7 @@ router.post("/campaign/:id/email", authenticate, async (req, res) => {
 });
 
 // Fetch calendar data for campaigns
-router.get("/campaigns/calendar", authenticate, async (req, res) => {
+router.get("/calendar", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title startDate endDate");
     const calendarData = campaigns.map((c) => ({
@@ -207,7 +206,7 @@ router.get("/campaigns/calendar", authenticate, async (req, res) => {
 });
 
 // Fetch budget info for campaigns
-router.get("/campaigns/budgets", authenticate, async (req, res) => {
+router.get("/budgets", authenticate, async (req, res) => {
   try {
     const campaigns = await Campaign.find({}, "title objective spent");
     const budgets = campaigns.map((c) => ({
@@ -273,8 +272,9 @@ const analyzeCampaign = (campaign) => {
 
   return insights;
 };
+
 // Get AI insights for campaign optimization
-router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
+router.get("/campaign/:id/optimize", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
@@ -291,11 +291,6 @@ router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
     console.error("Error analyzing campaign:", err);
     res.status(500).json({ msg: "Server error" });
   }
-});
-
-router.post("/something", (req, res) => {
-  // ...some code...
-  res.json({ success: true });
 });
 
 module.exports = router;
