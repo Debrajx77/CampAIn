@@ -329,14 +329,23 @@ const OrganizationAndTeamPage = () => {
                     >
                       {(organization?.members || [])
                         .filter((orgMember) => {
-                          // Use the current team in the map, not selectedTeam
+                          // Always treat team.members as an array
                           const teamMembers = Array.isArray(team.members)
-                            ? team.members.map(
-                                (member) =>
-                                  typeof member === "object" && member.user
-                                    ? member.user._id?.toString?.()
-                                    : member?._id?.toString?.() // fallback if just ObjectId
-                              )
+                            ? team.members.map((member) => {
+                                // If member is an object with a user field
+                                if (
+                                  member &&
+                                  typeof member === "object" &&
+                                  member.user
+                                ) {
+                                  return member.user._id?.toString?.();
+                                }
+                                // If member is an objectId string or objectId
+                                return (
+                                  member?._id?.toString?.() ||
+                                  member?.toString?.()
+                                );
+                              })
                             : [];
                           return !teamMembers.includes(
                             orgMember.user._id.toString()
