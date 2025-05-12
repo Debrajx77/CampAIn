@@ -6,32 +6,27 @@ const Organization = require("../Models/Organization");
 const User = require("../Models/user");
 
 // Create an organization (admin only)
-router.post(
-  "/organization",
-  authenticate,
-  checkRole("admin"),
-  async (req, res) => {
-    try {
-      const { name } = req.body;
-      if (!name)
-        return res.status(400).json({ msg: "Organization name is required" });
+router.post("/", authenticate, checkRole("admin"), async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name)
+      return res.status(400).json({ msg: "Organization name is required" });
 
-      const newOrganization = new Organization({
-        name,
-        createdBy: req.user.id,
-        members: [req.user.id],
-      });
+    const newOrganization = new Organization({
+      name,
+      createdBy: req.user.id,
+      members: [req.user.id],
+    });
 
-      await newOrganization.save();
-      res
-        .status(201)
-        .json({ msg: "Organization created", organization: newOrganization });
-    } catch (err) {
-      console.error("Error creating organization:", err);
-      res.status(500).json({ msg: "Server error" });
-    }
+    await newOrganization.save();
+    res
+      .status(201)
+      .json({ msg: "Organization created", organization: newOrganization });
+  } catch (err) {
+    console.error("Error creating organization:", err);
+    res.status(500).json({ msg: "Server error" });
   }
-);
+});
 
 // Get organization details
 router.get("/organization", authenticate, async (req, res) => {
