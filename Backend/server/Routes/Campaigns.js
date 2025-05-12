@@ -15,6 +15,7 @@ router.get("/campaigns", authenticate, async (req, res) => {
     res.json(campaigns);
   } catch (err) {
     console.error("Error fetching campaigns:", err);
+
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -162,7 +163,7 @@ router.delete(
       res.status(500).json({ msg: "Server error" });
     }
   }
-});
+);
 
 // Send email campaign
 router.post("/campaign/:id/email", authenticate, async (req, res) => {
@@ -290,4 +291,9 @@ router.get("/campaigns/:id/optimize", authenticate, async (req, res) => {
     console.error("Error analyzing campaign:", err);
     res.status(500).json({ msg: "Server error" });
   }
+});
+
+router.post("/something", (req, res) => {
+  // ...some code...
+  res.json({ success: true });
 });
