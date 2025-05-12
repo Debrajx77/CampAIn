@@ -1,3 +1,4 @@
+// $javascript:CampAIn/Frontend/vite-project/src/Routes/OrganizationAndTeamPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -39,7 +40,11 @@ const OrganizationAndTeamPage = () => {
     severity: "success",
   });
 
-  // Fetch organization on mount
+  // New states for Create Team modal
+  const [openTeamModal, setOpenTeamModal] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+
+  // Fetch organization and teams on mount
   useEffect(() => {
     fetchOrganization();
     fetchTeams();
@@ -164,6 +169,27 @@ const OrganizationAndTeamPage = () => {
     }
   };
 
+  // New: Create Team
+  const handleCreateTeam = async () => {
+    try {
+      await axios.post("/api/team", { name: newTeamName });
+      setSnackbar({
+        open: true,
+        msg: "Team created!",
+        severity: "success",
+      });
+      setOpenTeamModal(false);
+      setNewTeamName("");
+      fetchTeams();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        msg: "Failed to create team",
+        severity: "error",
+      });
+    }
+  };
+
   // Plan limit logic
   const memberLimit = PLAN_LIMITS[organization?.plan || "free"];
   const atLimit = organization?.members?.length >= memberLimit;
@@ -182,16 +208,28 @@ const OrganizationAndTeamPage = () => {
         <Typography variant="h4" fontWeight={700}>
           Organization & Teams
         </Typography>
-        {!organization && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenOrgModal(true)}
-          >
-            Create Organization
-          </Button>
-        )}
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {!organization && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenOrgModal(true)}
+            >
+              Create Organization
+            </Button>
+          )}
+          {organization && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenTeamModal(true)}
+            >
+              Create Team
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {/* Organization Info */}
@@ -424,6 +462,42 @@ const OrganizationAndTeamPage = () => {
             fullWidth
             onClick={handleCreateOrganization}
             disabled={!newOrgName}
+          >
+            Create
+          </Button>
+        </Box>
+      </Modal>
+
+      {/* Create Team Modal */}
+      <Modal open={openTeamModal} onClose={() => setOpenTeamModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            p: 4,
+            borderRadius: 2,
+            minWidth: 350,
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            Create Team
+          </Typography>
+          <TextField
+            label="Team Name"
+            fullWidth
+            value={newTeamName}
+            onChange={(e) => setNewTeamName(e.target.value)}
+            sx={{ mb: 2, bgcolor: "#181c24" }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleCreateTeam}
+            disabled={!newTeamName}
           >
             Create
           </Button>
