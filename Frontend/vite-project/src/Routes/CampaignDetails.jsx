@@ -53,7 +53,7 @@ function CampaignDetails() {
   const fetchComments = async () => {
     try {
       const res = await fetch(
-        `https://campain-b2rr.onrender.com/api/campaign/${campaignId}/comments`,
+        `https://campain-b2rr.onrender.com/api/campaigns/${campaignId}/comments`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
