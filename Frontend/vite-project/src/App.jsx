@@ -17,6 +17,7 @@ import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import OrganizationAndTeamPage from "./Routes/OrganizationAndTeamPage";
 import Billing from "./components/Billing";
+import DashboardLayout from "./components/DashboardLayout";
 import "./index.css";
 
 const theme = createTheme({
@@ -49,30 +50,18 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/create-campaign"
-            element={
-              <PrivateRoute>
-                <CreateCampaign />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/campaigns"
-            element={
-              <PrivateRoute>
-                <CampaignList />
-              </PrivateRoute>
-            }
-          />
+          <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/campaigns" element={<CampaignList />} />
+            <Route path="/create-campaign" element={<CreateCampaign />} />
+            <Route path="/calendar" element={<CampaignCalendar />} />
+            <Route path="/email-campaign" element={<EmailCampaign />} />
+            <Route path="/budget-management" element={<BudgetManagement />} />
+            <Route path="/analytics" element={<CampaignAnalytics />} />
+            <Route path="/optimization" element={<CampaignOptimization />} />
+            <Route path="/org-team" element={<OrganizationAndTeamPage />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
           <Route
             path="/edit-campaign/:id"
             element={
@@ -81,56 +70,7 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/analytics"
-            element={
-              <PrivateRoute>
-                <CampaignAnalytics />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/email-campaign"
-            element={
-              <PrivateRoute>
-                <EmailCampaign />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <PrivateRoute>
-                <CampaignCalendar />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/budget-management"
-            element={
-              <PrivateRoute>
-                <BudgetManagement />
-              </PrivateRoute>
-            }
-          />
           <Route path="/campaign/:id" element={<CampaignDetails />} />
-          <Route
-            path="/campaign/:id/optimize"
-            element={
-              <PrivateRoute>
-                <CampaignOptimization />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/org-team"
-            element={
-              <PrivateRoute>
-                <OrganizationAndTeamPage />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/billing" element={<Billing />} />
         </Routes>
       </div>
     </div>
