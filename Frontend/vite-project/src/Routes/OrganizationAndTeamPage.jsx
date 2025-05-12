@@ -305,7 +305,7 @@ const OrganizationAndTeamPage = () => {
           Teams
         </Typography>
         <Grid container spacing={2}>
-          {teams.filter(Boolean).map((team) => (
+          {(Array.isArray(teams) ? teams : []).filter(Boolean).map((team) => (
             <Grid item xs={12} sm={6} md={4} key={team._id}>
               <Card sx={{ bgcolor: "#23293a" }}>
                 <CardContent>
