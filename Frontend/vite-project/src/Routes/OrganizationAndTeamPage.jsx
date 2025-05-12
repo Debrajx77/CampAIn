@@ -333,7 +333,7 @@ const OrganizationAndTeamPage = () => {
                   sx={{ bgcolor: "#181c24", minWidth: 150 }}
                 >
                   <MenuItem value="">None</MenuItem>
-                  {teams.map((team) => (
+                  {(Array.isArray(teams) ? teams : []).map((team) => (
                     <MenuItem key={team._id} value={team._id}>
                       {team.name}
                     </MenuItem>
