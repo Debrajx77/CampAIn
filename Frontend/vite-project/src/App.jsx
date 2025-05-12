@@ -45,7 +45,6 @@ const AppContent = () => {
 
   return (
     <div>
-      {!hideNavbarPaths.includes(location.pathname) && <Navigation />}
       <div style={{ paddingTop: "6rem" }}>
         <Routes>
           <Route path="/" element={<SignIn />} />
