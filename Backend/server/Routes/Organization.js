@@ -28,8 +28,8 @@ router.post("/", authenticate, checkRole("admin"), async (req, res) => {
   }
 });
 
-// Get organization details
-router.get("/organization", authenticate, async (req, res) => {
+// Get organization details for current user
+router.get("/", authenticate, async (req, res) => {
   try {
     const organization = await Organization.findOne({ members: req.user.id });
     if (!organization)
@@ -44,7 +44,7 @@ router.get("/organization", authenticate, async (req, res) => {
 
 // Add a member to the organization (admin only)
 router.put(
-  "/organization/:orgId/add-member",
+  "/:orgId/add-member",
   authenticate,
   checkRole("admin"),
   async (req, res) => {
@@ -66,29 +66,15 @@ router.put(
   }
 );
 
-// Create an organization
-router.post(
-  "/create-organization",
-  authenticate,
-  checkRole("admin"),
-  async (req, res) => {
-    const { name } = req.body;
-    const newOrganization = new Organization({ name });
-    await newOrganization.save();
-    res
-      .status(201)
-      .json({ msg: "Organization created", organization: newOrganization });
-  }
-);
-
-// Fetch all organizations
-router.get(
-  "/organizations",
-  authenticate,
-  checkRole("admin"),
-  async (req, res) => {
+// Fetch all organizations (admin only)
+router.get("/all", authenticate, checkRole("admin"), async (req, res) => {
+  try {
     const organizations = await Organization.find();
     res.json(organizations);
+  } catch (err) {
+    console.error("Error fetching organizations:", err);
+    res.status(500).json({ msg: "Server error" });
   }
-);
+});
+
 module.exports = router;
