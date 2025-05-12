@@ -328,24 +328,21 @@ const OrganizationAndTeamPage = () => {
                       sx={{ bgcolor: "#181c24", minWidth: 120 }}
                     >
                       {(organization?.members || [])
-                        .filter((m) => {
-                          const team = (teams || []).find(
-                            (t) => t._id === selectedTeam
-                          );
-                          if (!team || !Array.isArray(team.members))
-                            return true;
-                          return !team.members.some(
-                            (member) =>
-                              member.user &&
-                              member.user._id?.toString() ===
-                                m.user._id.toString()
-                          );
-                        })
+                        .filter(
+                          (m) =>
+                            !team.members.some(
+                              (member) =>
+                                (member.user &&
+                                  member.user._id === m.user._id) ||
+                                (typeof member === "string" &&
+                                  member === m.user._id)
+                            )
+                        )
                         .map((m) => (
                           <MenuItem key={m.user._id} value={m.user._id}>
                             {m.user.name}
                           </MenuItem>
-                        ))}
+                        ))}{" "}
                     </TextField>{" "}
                     <TextField
                       select
