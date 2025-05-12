@@ -47,7 +47,11 @@ const sidebarLinks = [
   { label: "Create Campaign", icon: <CreateIcon />, to: "/create-campaign" },
   { label: "Calendar", icon: <CalendarIcon />, to: "/calendar" },
   { label: "Email Campaigns", icon: <EmailIcon />, to: "/email-campaign" },
-  { label: "Budget Management", icon: <BudgetIcon />, to: "/budget-management" },
+  {
+    label: "Budget Management",
+    icon: <BudgetIcon />,
+    to: "/budget-management",
+  },
   { label: "Analytics", icon: <AnalyticsIcon />, to: "/analytics" },
   { label: "Optimization", icon: <OptimizationIcon />, to: "/optimization" },
   { label: "Team", icon: <TeamIcon />, to: "/org-team", adminOnly: true },
@@ -141,7 +145,13 @@ const DashboardLayout = () => {
   );
 
   return (
-    <Box sx={{ display: "flex", bgcolor: "background.default", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        bgcolor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
       {/* AppBar */}
       <AppBar
         position="fixed"
@@ -260,7 +270,10 @@ const DashboardLayout = () => {
             }}
           >
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Plan: {usage.plan} {usage.plan === "Pro" && <LockIcon fontSize="small" sx={{ color: "gold", ml: 0.5 }} />}
+              Plan: {usage.plan}{" "}
+              {usage.plan === "Pro" && (
+                <LockIcon fontSize="small" sx={{ color: "gold", ml: 0.5 }} />
+              )}
               <Button
                 size="small"
                 variant="contained"
