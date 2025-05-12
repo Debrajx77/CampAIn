@@ -202,14 +202,14 @@ const OrganizationAndTeamPage = () => {
             <Typography variant="body2" sx={{ color: "grey.400" }}>
               Plan:{" "}
               <Chip label={organization.plan} color="primary" size="small" />
-              {"  "}Members: {organization.members.length}/{memberLimit}
+              {"  "}Members: {organization?.members?.length || 0}/{memberLimit}
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Members
             </Typography>
             <Grid container spacing={2}>
-              {organization.members.map((m) => (
+              {(organization?.members || []).map((m) => (
                 <Grid item xs={12} sm={6} md={4} key={m.user._id}>
                   <Card sx={{ bgcolor: "#23293a" }}>
                     <CardContent>
@@ -314,7 +314,7 @@ const OrganizationAndTeamPage = () => {
                     <Typography fontWeight={600}>{team.name}</Typography>
                   </Box>
                   <Typography variant="body2" color="grey.400">
-                    Members: {team.members.length}
+                    Members: {team?.members?.length || 0}
                   </Typography>
                   <Divider sx={{ my: 1 }} />
                   <Typography variant="subtitle2">Assign Member</Typography>
