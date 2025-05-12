@@ -329,10 +329,8 @@ const OrganizationAndTeamPage = () => {
                     >
                       {(organization?.members || [])
                         .filter((orgMember) => {
-                          // Always treat team.members as an array
-                          const teamMembers = Array.isArray(team.members)
+                          const teamMembers = Array.isArray(team?.members)
                             ? team.members.map((member) => {
-                                // If member is an object with a user field
                                 if (
                                   member &&
                                   typeof member === "object" &&
@@ -340,15 +338,21 @@ const OrganizationAndTeamPage = () => {
                                 ) {
                                   return member.user._id?.toString?.();
                                 }
-                                // If member is an objectId string or objectId
-                                return (
-                                  member?._id?.toString?.() ||
-                                  member?.toString?.()
-                                );
+                                if (
+                                  member &&
+                                  typeof member === "object" &&
+                                  member._id
+                                ) {
+                                  return member._id?.toString?.();
+                                }
+                                if (typeof member === "string") {
+                                  return member;
+                                }
+                                return "";
                               })
                             : [];
                           return !teamMembers.includes(
-                            orgMember.user._id.toString()
+                            orgMember.user._id?.toString()
                           );
                         })
                         .map((m) => (
