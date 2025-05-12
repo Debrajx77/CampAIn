@@ -342,7 +342,7 @@ const OrganizationAndTeamPage = () => {
                           <MenuItem key={m.user._id} value={m.user._id}>
                             {m.user.name}
                           </MenuItem>
-                        ))}
+                        ))}{" "}
                     </TextField>
                     <TextField
                       select
