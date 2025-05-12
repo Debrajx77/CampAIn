@@ -127,7 +127,7 @@ router.post("/campaign/:id/comment", authenticate, async (req, res) => {
 });
 
 // Fetch comments for a campaign
-router.get("/campaign/:id/comments", authenticate, async (req, res) => {
+router.get("/:id/comments", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id).populate(
       "comments.user",
@@ -140,29 +140,6 @@ router.get("/campaign/:id/comments", authenticate, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
-
-// Delete a comment
-router.delete(
-  "/campaign/:campaignId/comment/:commentId",
-  authenticate,
-  async (req, res) => {
-    try {
-      const { campaignId, commentId } = req.params;
-      const campaign = await Campaign.findById(campaignId);
-      if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
-      const comment = campaign.comments.id(commentId);
-      if (!comment) return res.status(404).json({ msg: "Comment not found" });
-      if (comment.user.toString() !== req.user.id)
-        return res.status(403).json({ msg: "Not authorized" });
-      comment.remove();
-      await campaign.save();
-      res.json({ msg: "Comment deleted" });
-    } catch (err) {
-      console.error("Error deleting comment:", err);
-      res.status(500).json({ msg: "Server error" });
-    }
-  }
-);
 
 // Send email campaign
 router.post("/campaign/:id/email", authenticate, async (req, res) => {
@@ -274,7 +251,7 @@ const analyzeCampaign = (campaign) => {
 };
 
 // Get AI insights for campaign optimization
-router.get("/campaign/:id/optimize", authenticate, async (req, res) => {
+router.get("/:id/optimize", authenticate, async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ msg: "Campaign not found" });
