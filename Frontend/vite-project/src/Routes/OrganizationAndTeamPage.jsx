@@ -329,18 +329,17 @@ const OrganizationAndTeamPage = () => {
                     >
                       {(organization?.members || [])
                         .filter((orgMember) => {
-                          if (!selectedTeam) return true; // no team selected, show all
-                          const team = teams.find(
-                            (t) => t._id === selectedTeam
-                          );
-                          if (!team || !Array.isArray(team.members))
-                            return true;
-
-                          return !team.members.some(
-                            (member) =>
-                              member.user &&
-                              member.user._id.toString() ===
-                                orgMember.user._id.toString()
+                          // Use the current team in the map, not selectedTeam
+                          const teamMembers = Array.isArray(team.members)
+                            ? team.members.map(
+                                (member) =>
+                                  typeof member === "object" && member.user
+                                    ? member.user._id?.toString?.()
+                                    : member?._id?.toString?.() // fallback if just ObjectId
+                              )
+                            : [];
+                          return !teamMembers.includes(
+                            orgMember.user._id.toString()
                           );
                         })
                         .map((m) => (
