@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const connectDB = require("./config/db");
-const authenticate = require("./middleware/authenticate");
 const notificationsRouter = require("./Routes/Notifications");
 const organizationRouter = require("./Routes/Organization");
 const authRouter = require("./Routes/auth");
@@ -10,9 +9,7 @@ const createTeamRouter = require("./Routes/CreateTeam");
 const viewTeamRouter = require("./Routes/viewTeam");
 const addMembersToTeamRouter = require("./Routes/addMembersToTeam");
 const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
-const campaignsRouter = require("./Routes/CampaignRoutes");
-const campaignRouter = require("./Routes/campaign"); // Added campaign route for comments
-const campaignRoutes = require("./Routes/Campaigns");
+const campaignRoutes = require("./Routes/Campaigns"); // Main campaign router
 
 const app = express();
 const server = http.createServer(app);
@@ -33,9 +30,9 @@ const cors = require("cors");
 
 app.use(
   cors({
-    origin: "https://camp-a-in.vercel.app", // apne frontend ka URL yahan daalo
+    origin: "https://camp-a-in.vercel.app", // Your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // agar cookies/token bhejna hai to
+    credentials: true,
   })
 );
 
@@ -47,9 +44,9 @@ app.use("/api/team/create", createTeamRouter);
 app.use("/api/team/view", viewTeamRouter);
 app.use("/api/team/add-member", addMembersToTeamRouter);
 app.use("/api/team/remove-member", removeMembersFromTeamRouter);
-app.use("/api/campaigns", campaignsRouter);
-app.use("/api/campaign", campaignRouter); // Register campaign route for comments
-app.use("/api", campaignRoutes);
+
+// Only this line for all campaign endpoints:
+app.use("/api/campaigns", campaignRoutes);
 
 // Default route
 app.get("/", (req, res) => {
@@ -60,19 +57,16 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Example event: join a room
   socket.on("joinRoom", (room) => {
     socket.join(room);
     console.log(`Socket ${socket.id} joined room ${room}`);
   });
 
-  // Example event: leave a room
   socket.on("leaveRoom", (room) => {
     socket.leave(room);
     console.log(`Socket ${socket.id} left room ${room}`);
   });
 
-  // Example event: send message to a room
   socket.on("sendMessage", ({ room, message }) => {
     io.to(room).emit("receiveMessage", { message, sender: socket.id });
   });
