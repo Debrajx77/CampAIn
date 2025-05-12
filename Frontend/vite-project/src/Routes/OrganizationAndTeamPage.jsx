@@ -31,18 +31,17 @@ const OrganizationAndTeamPage = () => {
   const [newOrgName, setNewOrgName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("member");
+  const [inviteTeamId, setInviteTeamId] = useState("");
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [assignUserId, setAssignUserId] = useState("");
   const [assignRole, setAssignRole] = useState("member");
+  const [openTeamModal, setOpenTeamModal] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
   const [snackbar, setSnackbar] = useState({
     open: false,
     msg: "",
     severity: "success",
   });
-
-  // New states for Create Team modal
-  const [openTeamModal, setOpenTeamModal] = useState(false);
-  const [newTeamName, setNewTeamName] = useState("");
 
   // Fetch organization and teams on mount
   useEffect(() => {
@@ -89,12 +88,13 @@ const OrganizationAndTeamPage = () => {
     }
   };
 
-  // Invite/Add Member
+  // Invite/Add Member with optional team assignment
   const handleInviteMember = async () => {
     try {
       await axios.post("/api/organization/invite", {
         email: inviteEmail,
         role: inviteRole,
+        teamId: inviteTeamId || null,
       });
       setSnackbar({
         open: true,
@@ -102,7 +102,9 @@ const OrganizationAndTeamPage = () => {
         severity: "success",
       });
       setInviteEmail("");
+      setInviteTeamId("");
       fetchOrganization();
+      fetchTeams();
     } catch (error) {
       setSnackbar({
         open: true,
@@ -169,7 +171,7 @@ const OrganizationAndTeamPage = () => {
     }
   };
 
-  // New: Create Team
+  // Create Team
   const handleCreateTeam = async () => {
     try {
       await axios.post("/api/team", { name: newTeamName });
@@ -292,6 +294,7 @@ const OrganizationAndTeamPage = () => {
                 </Grid>
               ))}
             </Grid>
+
             {/* Invite/Add Member */}
             <Box sx={{ mt: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -318,11 +321,30 @@ const OrganizationAndTeamPage = () => {
                   <MenuItem value="member">Member</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
                 </TextField>
+
+                {/* Team select dropdown */}
+                <TextField
+                  select
+                  label="Team"
+                  size="small"
+                  value={inviteTeamId}
+                  onChange={(e) => setInviteTeamId(e.target.value)}
+                  disabled={atLimit || !teams.length}
+                  sx={{ bgcolor: "#181c24", minWidth: 150 }}
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {teams.map((team) => (
+                    <MenuItem key={team._id} value={team._id}>
+                      {team.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={handleInviteMember}
-                  disabled={atLimit}
+                  disabled={atLimit || !inviteEmail}
                 >
                   Invite/Add
                 </Button>
