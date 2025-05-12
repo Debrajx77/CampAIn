@@ -332,7 +332,7 @@ const OrganizationAndTeamPage = () => {
                         : []
                             .filter((orgMember) => {
                               const teamMembersArr = Array.isArray(
-                                team && team.members
+                                team?.members
                               )
                                 ? team.members.map((member) => {
                                     if (
