@@ -15,6 +15,7 @@ import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
 import CampaignOptimization from "./Routes/CampaignOptimization";
 import OrganizationAndTeamPage from "./Routes/OrganizationAndTeamPage";
+import Settings from "./Routes/Settings";
 import Billing from "./components/Billing";
 import DashboardLayout from "./components/DashboardLayout";
 import "./index.css";
