@@ -327,8 +327,17 @@ const OrganizationAndTeamPage = () => {
                       onChange={(e) => setAssignUserId(e.target.value)}
                       sx={{ bgcolor: "#181c24", minWidth: 120 }}
                     >
-                      {organization?.members
-                        .filter((m) => !team.members.includes(m.user._id))
+                      {(organization?.members || [])
+                        .filter(
+                          (m) =>
+                            !team.members.some(
+                              (member) =>
+                                (member.user &&
+                                  member.user._id === m.user._id) ||
+                                (typeof member === "string" &&
+                                  member === m.user._id)
+                            )
+                        )
                         .map((m) => (
                           <MenuItem key={m.user._id} value={m.user._id}>
                             {m.user.name}
