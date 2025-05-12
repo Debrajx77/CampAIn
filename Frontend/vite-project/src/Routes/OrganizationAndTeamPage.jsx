@@ -327,22 +327,26 @@ const OrganizationAndTeamPage = () => {
                       onChange={(e) => setAssignUserId(e.target.value)}
                       sx={{ bgcolor: "#181c24", minWidth: 120 }}
                     >
-                      {(organization?.members || [])
-                        .filter(
-                          (m) =>
-                            !team.members.some(
-                              (member) =>
-                                member.user &&
-                                member.user._id?.toString() ===
-                                  m.user._id.toString()
-                            )
-                        )
+                      {orgMembers
+                        .filter((m) => {
+                          const team = teamsSafe.find(
+                            (t) => t._id === selectedTeam
+                          );
+                          if (!team || !Array.isArray(team.members))
+                            return true;
+                          return !team.members.some(
+                            (member) =>
+                              member.user &&
+                              member.user._id?.toString() ===
+                                m.user._id.toString()
+                          );
+                        })
                         .map((m) => (
                           <MenuItem key={m.user._id} value={m.user._id}>
                             {m.user.name}
                           </MenuItem>
-                        ))}{" "}
-                    </TextField>
+                        ))}
+                    </TextField>{" "}
                     <TextField
                       select
                       size="small"
