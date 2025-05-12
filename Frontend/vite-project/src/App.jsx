@@ -10,7 +10,6 @@ import CampaignList from "./Routes/CampaignList";
 import EditCampaign from "./Routes/EditCampaign";
 import CampaignDetails from "./Routes/CampaignDetails";
 import CampaignAnalytics from "./Routes/CampaignAnalytics";
-import Navigation from "./components/Navigation";
 import EmailCampaign from "./Routes/EmailCampaign";
 import CampaignCalendar from "./Routes/CampaignCalendar";
 import BudgetManagement from "./Routes/BudgetManagement";
@@ -50,7 +49,13 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
+          <Route
+            element={
+              <PrivateRoute>
+                <DashboardLayout />
+              </PrivateRoute>
+            }
+          >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/campaigns" element={<CampaignList />} />
             <Route path="/create-campaign" element={<CreateCampaign />} />
