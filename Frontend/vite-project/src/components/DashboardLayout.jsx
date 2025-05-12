@@ -86,16 +86,18 @@ const DashboardLayout = () => {
   const drawer = (
     <Box
       sx={{
-        height: "100%",
+        height: "100vh", // Full viewport height
         bgcolor: "background.paper",
         color: "text.primary",
         display: "flex",
         flexDirection: "column",
+        borderRight: 1,
+        borderColor: "divider",
       }}
     >
       <Toolbar sx={{ minHeight: 64 }} />
       <Divider />
-      <List sx={{ flexGrow: 1 }}>
+      <List sx={{ flexGrow: 1, px: 1, py: 2 }}>
         {filteredLinks.map((item) => (
           <ListItem
             button
@@ -103,17 +105,22 @@ const DashboardLayout = () => {
             component={NavLink}
             to={item.to}
             sx={{
-              "&.active": {
-                bgcolor: "primary.dark",
+              "&.active, &.Mui-selected": {
+                bgcolor: "primary.main",
                 color: "primary.contrastText",
                 borderRadius: 2,
               },
               mb: 0.5,
-              mx: 1,
+              mx: 0.5,
+              px: 2,
+              py: 1,
+              transition: "background 0.2s",
             }}
             onClick={() => isMobile && setMobileOpen(false)}
           >
-            <ListItemIcon sx={{ color: "inherit" }}>{item.icon}</ListItemIcon>
+            <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>
+              {item.icon}
+            </ListItemIcon>
             <ListItemText primary={item.label} />
           </ListItem>
         ))}
@@ -212,6 +219,7 @@ const DashboardLayout = () => {
               bgcolor: "background.paper",
               color: "text.primary",
               boxSizing: "border-box",
+              borderRight: 0,
             },
           }}
         >

@@ -44,41 +44,37 @@ const AppContent = () => {
   const hideNavbarPaths = ["/", "/signup"];
 
   return (
-    <div>
-      <div style={{ paddingTop: "6rem" }}>
-        <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route
-            element={
-              <PrivateRoute>
-                <DashboardLayout />
-              </PrivateRoute>
-            }
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/campaigns" element={<CampaignList />} />
-            <Route path="/create-campaign" element={<CreateCampaign />} />
-            <Route path="/calendar" element={<CampaignCalendar />} />
-            <Route path="/email-campaign" element={<EmailCampaign />} />
-            <Route path="/budget-management" element={<BudgetManagement />} />
-            <Route path="/analytics" element={<CampaignAnalytics />} />
-            <Route path="/optimization" element={<CampaignOptimization />} />
-            <Route path="/org-team" element={<OrganizationAndTeamPage />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-          <Route
-            path="/edit-campaign/:id"
-            element={
-              <PrivateRoute>
-                <EditCampaign />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/campaign/:id" element={<CampaignDetails />} />
-        </Routes>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route
+        element={
+          <PrivateRoute>
+            <DashboardLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/campaigns" element={<CampaignList />} />
+        <Route path="/create-campaign" element={<CreateCampaign />} />
+        <Route path="/calendar" element={<CampaignCalendar />} />
+        <Route path="/email-campaign" element={<EmailCampaign />} />
+        <Route path="/budget-management" element={<BudgetManagement />} />
+        <Route path="/analytics" element={<CampaignAnalytics />} />
+        <Route path="/optimization" element={<CampaignOptimization />} />
+        <Route path="/org-team" element={<OrganizationAndTeamPage />} />
+        <Route path="/settings" element={<Settings />} />
+      </Route>
+      <Route
+        path="/edit-campaign/:id"
+        element={
+          <PrivateRoute>
+            <EditCampaign />
+          </PrivateRoute>
+        }
+      />
+      <Route path="/campaign/:id" element={<CampaignDetails />} />
+    </Routes>
   );
 };
 
