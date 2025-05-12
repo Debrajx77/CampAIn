@@ -216,7 +216,7 @@ function CampaignDetails() {
                   gap: "1rem",
                 }}
               >
-                {comments.map((comment) => (
+                {comments?.map((comment) => (
                   <motion.div
                     key={comment._id}
                     initial={{ opacity: 0, y: 20 }}
