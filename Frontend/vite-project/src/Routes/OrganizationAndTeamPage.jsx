@@ -332,10 +332,9 @@ const OrganizationAndTeamPage = () => {
                           (m) =>
                             !team.members.some(
                               (member) =>
-                                (member.user &&
-                                  member.user._id === m.user._id) ||
-                                (typeof member === "string" &&
-                                  member === m.user._id)
+                                member.user &&
+                                member.user._id.toString() ===
+                                  m.user._id.toString()
                             )
                         )
                         .map((m) => (
