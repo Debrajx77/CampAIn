@@ -329,29 +329,34 @@ const OrganizationAndTeamPage = () => {
                     >
                       {(organization?.members || [])
                         .filter((orgMember) => {
-                          const teamMembers = Array.isArray(team?.members)
-                            ? team.members.map((member) => {
-                                if (
-                                  member &&
-                                  typeof member === "object" &&
-                                  member.user
-                                ) {
-                                  return member.user._id?.toString?.();
-                                }
-                                if (
-                                  member &&
-                                  typeof member === "object" &&
-                                  member._id
-                                ) {
-                                  return member._id?.toString?.();
-                                }
-                                if (typeof member === "string") {
-                                  return member;
-                                }
-                                return "";
-                              })
-                            : [];
-                          return !teamMembers.includes(
+                          // Ensure team.members is always an array
+                          let teamMembersArr = [];
+                          if (Array.isArray(team?.members)) {
+                            teamMembersArr = team.members.map((member) => {
+                              // If member is an object with a user field
+                              if (
+                                member &&
+                                typeof member === "object" &&
+                                member.user
+                              ) {
+                                return member.user._id?.toString?.();
+                              }
+                              // If member is an object with _id field
+                              if (
+                                member &&
+                                typeof member === "object" &&
+                                member._id
+                              ) {
+                                return member._id?.toString?.();
+                              }
+                              // If member is a string (ObjectId)
+                              if (typeof member === "string") {
+                                return member;
+                              }
+                              return "";
+                            });
+                          }
+                          return !teamMembersArr.includes(
                             orgMember.user._id?.toString()
                           );
                         })
