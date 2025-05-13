@@ -1,11 +1,11 @@
 const express = require("express");
-const router = express.Router();
-const Campaign = require("../Models/Campaign"); // Assuming you have a Campaign model
+const router = express.Router(); // Assuming you have a Campaign model
+const MasterCampaign = require("../Models/MasterCampaign");
 
 // GET /api/campaigns - fetch all campaigns from DB
 router.get("/", async (req, res) => {
   try {
-    const campaigns = await Campaign.find();
+    const campaigns = await MasterCampaign.find();
     res.json(campaigns);
   } catch (err) {
     console.error("Error fetching campaigns:", err);
