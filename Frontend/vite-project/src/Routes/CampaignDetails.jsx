@@ -348,11 +348,7 @@ function CampaignDetails() {
       </Box>
 
       {statusMsg && (
-        <Snackbar
-          open
-          autoHideDuration={4000}
-          onClose={() => setStatusMsg("")}
-        >
+        <Snackbar open autoHideDuration={4000} onClose={() => setStatusMsg("")}>
           <Alert severity="success">{statusMsg}</Alert>
         </Snackbar>
       )}

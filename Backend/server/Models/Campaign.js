@@ -24,7 +24,11 @@ const CampaignSchema = new mongoose.Schema(
       },
     ],
     mailchimpCampaignId: { type: String },
-    deliveryStatus: { type: String, enum: ["pending", "sent", "failed"], default: "pending" },
+    deliveryStatus: {
+      type: String,
+      enum: ["pending", "sent", "failed"],
+      default: "pending",
+    },
     openRate: { type: Number, default: 0 },
     clickRate: { type: Number, default: 0 },
     bounceRate: { type: Number, default: 0 },
