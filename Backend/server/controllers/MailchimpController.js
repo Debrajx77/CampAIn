@@ -1,23 +1,15 @@
-const express = require("express");
-const router = express.Router();
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 const Campaign = require("../Models/Campaign");
-const { checkAuth } = require("../middleware/authenticate");
-const {
-  sendMailchimpCampaign,
-  getMailchimpPerformance,
-} = require("../controllers/MailchimpController");
 
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_SERVER_PREFIX, // e.g. "us21"
+  server: process.env.MAILCHIMP_SERVER_PREFIX, // e.g. "us2"
 });
 
-// Send campaign via Mailchimp
-router.post("/send-campaign", checkAuth, async (req, res) => {
+// Create, send Mailchimp campaign and update MongoDB
+const sendMailchimpCampaign = async (req, res) => {
   try {
-    const { campaignId, subject, content, listId, fromName, replyTo } =
-      req.body;
+    const { campaignId, subject, content, listId, fromName, replyTo } = req.body;
 
     // 1. Create Mailchimp campaign
     const mcCampaign = await mailchimp.campaigns.create({
@@ -32,9 +24,7 @@ router.post("/send-campaign", checkAuth, async (req, res) => {
     });
 
     // 2. Set campaign content
-    await mailchimp.campaigns.setContent(mcCampaign.id, {
-      html: content,
-    });
+    await mailchimp.campaigns.setContent(mcCampaign.id, { html: content });
 
     // 3. Send campaign
     await mailchimp.campaigns.send(mcCampaign.id);
@@ -58,10 +48,10 @@ router.post("/send-campaign", checkAuth, async (req, res) => {
     console.error("Mailchimp error:", err.response?.body || err.message);
     res.status(500).json({ success: false, error: err.message });
   }
-});
+};
 
-// Fetch campaign performance
-router.get("/performance/:campaignId", checkAuth, async (req, res) => {
+// Fetch Mailchimp campaign performance and update MongoDB
+const getMailchimpPerformance = async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.campaignId);
     if (!campaign || !campaign.mailchimpCampaignId)
@@ -86,6 +76,9 @@ router.get("/performance/:campaignId", checkAuth, async (req, res) => {
       .status(500)
       .json({ msg: "Failed to fetch performance", error: err.message });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  sendMailchimpCampaign,
+  getMailchimpPerformance,
+};
