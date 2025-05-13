@@ -1,176 +1,111 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  CircularProgress,
+  Button,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import axios from "axios";
 
-function CampaignList() {
+const CampaignList = () => {
   const [campaigns, setCampaigns] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const res = await axios.get("/api/campaigns");
+        setCampaigns(res.data);
+      } catch (err) {
+        setError("Failed to fetch campaigns");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchCampaigns();
   }, []);
 
-  const fetchCampaigns = async () => {
-    try {
-      const res = await fetch(
-        "https://campain-b2rr.onrender.com/api/campaigns",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-      console.log("Fetched campaigns:", data);
-
-      if (!res.ok) {
-        setError(data.msg || "Failed to fetch campaigns");
-        return;
-      }
-
-      if (Array.isArray(data)) {
-        setCampaigns(data);
-      } else {
-        setError("Invalid response format");
-      }
-    } catch (err) {
-      console.error("Error fetching campaigns:", err);
-      setError("Server error");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this campaign?"))
-      return;
-
-    try {
-      const res = await fetch(
-        `https://campain-b2rr.onrender.com/api/campaign/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.msg || "Failed to delete campaign");
-        return;
-      }
-
-      // Remove the deleted campaign from the state
-      setCampaigns((prevCampaigns) =>
-        prevCampaigns.filter((c) => c._id !== id)
-      );
-    } catch (err) {
-      console.error("Error deleting campaign:", err);
-      setError("Server error");
-    }
-  };
-
-  const updateAnalytics = async (id, type) => {
-    try {
-      await fetch(
-        `https://campain-b2rr.onrender.com/api/campaign/${id}/analytics`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ type }),
-        }
-      );
-    } catch (err) {
-      console.error("Error updating analytics:", err);
-    }
-  };
-
-  const filteredCampaigns = Array.isArray(campaigns)
-    ? campaigns.filter((campaign) =>
-        (campaign.title || "").toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
-
   return (
-    <div className="min-h-screen bg-neutral-950 text-white px-4 py-20">
-      <h1 className="text-3xl font-bold mb-6 text-purple-400">📋 Campaigns</h1>
-
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      <input
-        type="text"
-        placeholder="Search campaigns..."
-        className="mb-6 w-full p-3 rounded-lg bg-neutral-800 border border-neutral-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredCampaigns.map((campaign) => (
-          <div
-            key={campaign._id}
-            onClick={() => updateAnalytics(campaign._id, "click")}
-            className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-lg hover:shadow-purple-700/40 transition duration-300 flex flex-col"
-          >
-            <h2 className="text-xl font-semibold text-purple-300 mb-2">
-              {campaign.title}
-            </h2>
-            <p className="text-gray-400 mb-3">{campaign.description}</p>
-            <div className="text-sm text-gray-500 space-y-1 mb-4">
-              <p>💰 Budget: ${campaign.objective}</p>
-              <p>🖱️ Clicks: {campaign.clicks}</p>
-              <p>🎯 Conversions: {campaign.conversions}</p>
-            </div>
-
-            {/* Display optimization insights */}
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-gray-300">
-                Optimization Insights:
-              </h3>
-              {campaign.optimizationInsights &&
-              campaign.optimizationInsights.length > 0 ? (
-                campaign.optimizationInsights.map((insight, index) => (
-                  <p key={index} className="text-sm text-gray-400">
-                    📈 {insight}
-                  </p>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">No insights available.</p>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-6 flex space-x-4">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(campaign._id);
+    <Box sx={{ maxWidth: 1100, mx: "auto", p: { xs: 2, md: 4 } }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Typography variant="h4" fontWeight={700}>
+          Master Campaigns
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => navigate("/create-campaign")}
+          sx={{ borderRadius: 2, fontWeight: 600 }}
+        >
+          New Campaign
+        </Button>
+      </Box>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : campaigns.length === 0 ? (
+        <Typography>No campaigns found.</Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {campaigns.map((campaign) => (
+            <Grid item xs={12} sm={6} md={4} key={campaign._id}>
+              <Card
+                sx={{
+                  cursor: "pointer",
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  background: "#1e1e1e",
+                  color: "#fff",
+                  "&:hover": { boxShadow: 8, background: "#23234a" },
+                  minHeight: 180,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
-                className="py-2 px-4 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
+                onClick={() => navigate(`/campaign/${campaign._id}`)}
               >
-                Delete
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/campaign/${campaign._id}`);
-                }}
-                className="py-2 px-4 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
-              >
-                View Comments
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                <CardContent>
+                  <Typography variant="h6" fontWeight={600} mb={1}>
+                    {campaign.name}
+                  </Typography>
+                  <Typography variant="body2" color="gray" mb={1}>
+                    {campaign.description}
+                  </Typography>
+                  <Typography variant="body2" color="gray">
+                    Budget: ${campaign.budget}
+                  </Typography>
+                  <Typography variant="body2" color="gray">
+                    Status: {campaign.status}
+                  </Typography>
+                  <Typography variant="body2" color="gray">
+                    Duration: {campaign.startDate?.slice(0, 10)} -{" "}
+                    {campaign.endDate?.slice(0, 10)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
   );
-}
+};
 
 export default CampaignList;
