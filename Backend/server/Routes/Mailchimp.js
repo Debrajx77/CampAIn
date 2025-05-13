@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { checkAuth } = require("../middleware/authenticate");
+const { authenticate } = require("../middleware/authenticate");
 const {
   sendMailchimpCampaign,
   getMailchimpPerformance,
 } = require("../controllers/MailchimpController");
 
 // Use controller functions directly
-router.post("/send-campaign", checkAuth, sendMailchimpCampaign);
-router.get("/performance/:campaignId", checkAuth, getMailchimpPerformance);
+router.post("/send-campaign", authenticate, sendMailchimpCampaign);
+router.get("/performance/:campaignId", authenticate, getMailchimpPerformance);
 
 module.exports = router;
