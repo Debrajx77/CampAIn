@@ -22,7 +22,7 @@ const CampaignList = () => {
     const fetchCampaigns = async () => {
       try {
         const res = await axios.get("/api/campaigns");
-        setCampaigns(res.data);
+        setCampaigns(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         setError("Failed to fetch campaigns");
       } finally {
@@ -64,7 +64,7 @@ const CampaignList = () => {
         <Typography>No campaigns found.</Typography>
       ) : (
         <Grid container spacing={3}>
-          {(campaigns || []).map((campaign) => (
+          {(Array.isArray(campaigns) ? campaigns : []).map((campaign) => (
             <Grid item xs={12} sm={6} md={4} key={campaign._id}>
               <Card
                 sx={{
