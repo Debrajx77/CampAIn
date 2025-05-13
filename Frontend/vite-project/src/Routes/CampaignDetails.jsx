@@ -9,12 +9,15 @@ import {
   CardContent,
   CircularProgress,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { motion } from "framer-motion";
 import { io } from "socket.io-client";
 // Import jwtDecode correctly for decoding token
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 const socket = io("https://campain-b2rr.onrender.com", {
   transports: ["websocket"],
@@ -26,10 +29,18 @@ function CampaignDetails() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [performance, setPerformance] = useState(null);
+  const [statusMsg, setStatusMsg] = useState("");
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
   const userId = token ? jwtDecode(token)?.id : null;
+
+  // Example: You may want to fetch these from your campaign or user/org settings
+  const mailchimpListId = "YOUR_MAILCHIMP_LIST_ID";
+  const fromName = "Your Agency";
+  const replyTo = "reply@example.com";
 
   useEffect(() => {
     fetchComments();
@@ -129,6 +140,45 @@ function CampaignDetails() {
     } catch (err) {
       console.error("Error deleting comment:", err);
       setError("Server error");
+    }
+  };
+
+  const handleSendMailchimp = async () => {
+    setSending(true);
+    setStatusMsg("");
+    setError("");
+    try {
+      const res = await axios.post(
+        "/api/mailchimp/send-campaign",
+        {
+          campaignId,
+          subject: campaign.title,
+          content: campaign.description, // Or your campaign HTML
+          listId: mailchimpListId,
+          fromName,
+          replyTo,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      setStatusMsg("Mailchimp campaign sent!");
+      fetchPerformance();
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to send via Mailchimp");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const fetchPerformance = async () => {
+    try {
+      const res = await axios.get(`/api/mailchimp/performance/${campaignId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setPerformance(res.data);
+    } catch (err) {
+      setError("Failed to fetch performance");
     }
   };
 
@@ -285,6 +335,47 @@ function CampaignDetails() {
           View Optimization Insights
         </Link>
       </motion.div>
+
+      <Box sx={{ mt: 4 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSendMailchimp}
+          disabled={sending}
+        >
+          {sending ? <CircularProgress size={20} /> : "Send to Mailchimp"}
+        </Button>
+      </Box>
+
+      {statusMsg && (
+        <Snackbar
+          open
+          autoHideDuration={4000}
+          onClose={() => setStatusMsg("")}
+        >
+          <Alert severity="success">{statusMsg}</Alert>
+        </Snackbar>
+      )}
+      {error && (
+        <Snackbar open autoHideDuration={4000} onClose={() => setError("")}>
+          <Alert severity="error">{error}</Alert>
+        </Snackbar>
+      )}
+
+      {performance && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Mailchimp Performance
+          </Typography>
+          <Typography>
+            Open Rate: {(performance.openRate * 100).toFixed(2)}%
+          </Typography>
+          <Typography>
+            Click Rate: {(performance.clickRate * 100).toFixed(2)}%
+          </Typography>
+          <Typography>Bounces: {performance.bounceRate}</Typography>
+        </Box>
+      )}
     </Box>
   );
 }

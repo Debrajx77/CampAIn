@@ -23,6 +23,11 @@ const CampaignSchema = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },
     ],
+    mailchimpCampaignId: { type: String },
+    deliveryStatus: { type: String, enum: ["pending", "sent", "failed"], default: "pending" },
+    openRate: { type: Number, default: 0 },
+    clickRate: { type: Number, default: 0 },
+    bounceRate: { type: Number, default: 0 },
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt
 );
