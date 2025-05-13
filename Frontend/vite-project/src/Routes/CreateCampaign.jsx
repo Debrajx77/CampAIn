@@ -1,55 +1,57 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  useTheme,
+  useMediaQuery,
+  CardActionArea,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import GoogleIcon from "@mui/icons-material/Google";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
-function CreateCampaign() {
-  const [campaignName, setCampaignName] = useState("");
-  const [description, setDescription] = useState("");
-  const [budget, setBudget] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+const CAMPAIGN_TYPES = [
+  {
+    key: "email",
+    title: "Email Campaign",
+    description: "Send personalized emails to your audience.",
+    icon: <EmailIcon fontSize="large" color="primary" />,
+  },
+  {
+    key: "google",
+    title: "Google Ads",
+    description: "Reach customers with search and display ads.",
+    icon: <GoogleIcon fontSize="large" sx={{ color: "#4285F4" }} />,
+  },
+  {
+    key: "meta",
+    title: "Meta Ads",
+    description: "Advertise on Facebook and Instagram.",
+    icon: <FacebookIcon fontSize="large" sx={{ color: "#1877F3" }} />,
+  },
+  {
+    key: "linkedin",
+    title: "LinkedIn Ads",
+    description: "Target professionals on LinkedIn.",
+    icon: <LinkedInIcon fontSize="large" sx={{ color: "#0A66C2" }} />,
+  },
+  {
+    key: "whatsapp",
+    title: "WhatsApp Broadcast",
+    description: "Send bulk messages to WhatsApp users.",
+    icon: <WhatsAppIcon fontSize="large" sx={{ color: "#25D366" }} />,
+  },
+];
 
-  const handleCreateCampaign = async (e) => {
-    e.preventDefault();
-
-    if (new Date(startDate) > new Date(endDate)) {
-      setError("Start date cannot be after end date.");
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        "https://campain-b2rr.onrender.com/api/create-campaign",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            title: campaignName,
-            description,
-            objective: budget,
-            startDate,
-            endDate,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.msg || "Failed to create campaign");
-        return;
-      }
-
-      alert("Campaign created successfully!");
-      navigate("/campaigns");
-    } catch (err) {
-      console.error("Error creating campaign:", err);
-      setError("Server error");
-    }
-  };
+function CreateCampaignPage() {
+  const [selectedType, setSelectedType] = useState(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center px-4 py-8">
@@ -115,8 +117,26 @@ function CreateCampaign() {
           </button>
         </div>
       </form>
+
+      <Box
+        sx={{
+          mt: 4,
+          p: 3,
+          borderRadius: 2,
+          background: theme.palette.background.paper,
+          boxShadow: 2,
+          minWidth: isMobile ? "90vw" : 400,
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="h6" fontWeight={600} gutterBottom>
+          You selected:{" "}
+          {CAMPAIGN_TYPES.find((t) => t.key === selectedType)?.title}
+        </Typography>
+        <Typography color="text.secondary">– Form coming soon...</Typography>
+      </Box>
     </div>
   );
 }
 
-export default CreateCampaign;
+export default CreateCampaignPage;
