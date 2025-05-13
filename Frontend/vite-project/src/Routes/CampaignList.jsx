@@ -64,7 +64,7 @@ const CampaignList = () => {
         <Typography>No campaigns found.</Typography>
       ) : (
         <Grid container spacing={3}>
-          {campaigns.map((campaign) => (
+          {(campaigns || []).map((campaign) => (
             <Grid item xs={12} sm={6} md={4} key={campaign._id}>
               <Card
                 sx={{
