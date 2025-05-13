@@ -18,7 +18,9 @@ router.post("/create", async (req, res) => {
     await masterCampaign.save();
     res.status(201).json(masterCampaign);
   } catch (err) {
-    res.status(500).json({ msg: "Failed to create campaign", error: err.message });
+    res
+      .status(500)
+      .json({ msg: "Failed to create campaign", error: err.message });
   }
 });
 
@@ -47,6 +49,18 @@ router.post("/:campaignId/channels", async (req, res) => {
     res.status(201).json(channel);
   } catch (err) {
     res.status(500).json({ msg: "Failed to add channel", error: err.message });
+  }
+});
+
+// Get all master campaigns (for campaign list)
+router.get("/", async (req, res) => {
+  try {
+    const campaigns = await MasterCampaign.find();
+    res.json(campaigns); // <-- Return as array
+  } catch (err) {
+    res
+      .status(500)
+      .json({ msg: "Failed to fetch campaigns", error: err.message });
   }
 });
 
