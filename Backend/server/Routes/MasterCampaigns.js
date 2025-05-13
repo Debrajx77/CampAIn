@@ -64,4 +64,18 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get a single campaign by ID with populated channels
+router.get("/:id", async (req, res) => {
+  try {
+    const campaign = await MasterCampaign.findById(req.params.id).populate(
+      "channels"
+    );
+    res.json(campaign);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ msg: "Failed to fetch campaign", error: err.message });
+  }
+});
+
 module.exports = router;

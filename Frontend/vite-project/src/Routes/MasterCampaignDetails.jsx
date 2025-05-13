@@ -63,7 +63,6 @@ const dummyChannelDetails = (channel) => {
 const MasterCampaignDetails = () => {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
-  const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch campaign data
@@ -80,7 +79,6 @@ const MasterCampaignDetails = () => {
           ];
         }
         setCampaign(res.data);
-        setCampaigns(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         setCampaign(null);
       } finally {
@@ -163,8 +161,8 @@ const MasterCampaignDetails = () => {
         Channels
       </Typography>
       <Grid container spacing={3}>
-        {(Array.isArray(campaigns) ? campaigns : []).map((campaign) => (
-          <Grid item xs={12} sm={6} md={4} key={campaign._id}>
+        {(campaign.channels || []).map((channel, idx) => (
+          <Grid item xs={12} sm={6} md={4} key={idx}>
             <Card
               sx={{
                 borderRadius: 3,
