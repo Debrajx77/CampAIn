@@ -9,7 +9,8 @@ mailchimp.setConfig({
 // Create, send Mailchimp campaign and update MongoDB
 const sendMailchimpCampaign = async (req, res) => {
   try {
-    const { campaignId, subject, content, listId, fromName, replyTo } = req.body;
+    const { campaignId, subject, content, listId, fromName, replyTo } =
+      req.body;
 
     // 1. Create Mailchimp campaign
     const mcCampaign = await mailchimp.campaigns.create({
