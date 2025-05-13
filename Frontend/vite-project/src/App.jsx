@@ -8,7 +8,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import CreateCampaign from "./Routes/CreateCampaign";
 import CampaignList from "./Routes/CampaignList";
 import EditCampaign from "./Routes/EditCampaign";
-import CampaignDetails from "./Routes/CampaignDetails";
+import MasterCampaignDetails from "./Routes/MasterCampaignDetails";
 import CampaignAnalytics from "./Routes/CampaignAnalytics";
 import EmailCampaign from "./Routes/EmailCampaign";
 import CampaignCalendar from "./Routes/CampaignCalendar";
@@ -73,7 +73,7 @@ const AppContent = () => {
           </PrivateRoute>
         }
       />
-      <Route path="/campaign/:id" element={<CampaignDetails />} />
+      <Route path="/campaign/:id" element={<MasterCampaignDetails />} />
     </Routes>
   );
 };
