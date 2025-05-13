@@ -9,7 +9,7 @@ const createTeamRouter = require("./Routes/CreateTeam");
 const viewTeamRouter = require("./Routes/viewTeam");
 const addMembersToTeamRouter = require("./Routes/addMembersToTeam");
 const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
-const campaignRoutes = require("./Routes/Campaigns"); // Main campaign router
+const masterCampaignRoutes = require("./Routes/MasterCampaigns");
 const mailchimpRouter = require("./Routes/Mailchimp");
 
 const app = express();
@@ -48,7 +48,7 @@ app.use("/api/team/remove-member", removeMembersFromTeamRouter);
 app.use("/api/mailchimp", mailchimpRouter); // Mailchimp routes
 
 // Only this line for all campaign endpoints:
-app.use("/api/campaigns", campaignRoutes);
+app.use("/api/campaigns", masterCampaignRoutes);
 
 // Default route
 app.get("/", (req, res) => {

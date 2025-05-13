@@ -1,5 +1,5 @@
 const planLimits = require("../utils/planLimits");
-const Campaign = require("../Models/Campaign");
+const Campaign = require("../Models/MasterCampaign");
 const Team = require("../Models/Team");
 const EmailLog = require("../Models/EmailLog"); // You need to create this model
 

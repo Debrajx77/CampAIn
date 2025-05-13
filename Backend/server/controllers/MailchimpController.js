@@ -1,5 +1,5 @@
 const mailchimp = require("@mailchimp/mailchimp_marketing");
-const Campaign = require("../Models/Campaign");
+const Campaign = require("../Models/MasterCampaign");
 
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY,
