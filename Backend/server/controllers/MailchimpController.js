@@ -79,6 +79,9 @@ const getMailchimpPerformance = async (req, res) => {
   }
 };
 
+console.log("sendMailchimpCampaign:", sendMailchimpCampaign);
+console.log("getMailchimpPerformance:", getMailchimpPerformance);
+
 module.exports = {
   sendMailchimpCampaign,
   getMailchimpPerformance,
