@@ -183,12 +183,12 @@ const MasterCampaignDetails = () => {
           </Grid>
         </Grid>
       </Paper>
-
+      // ... existing code ...
       <Typography variant="h5" gutterBottom>
         Channels
       </Typography>
       <Grid container spacing={3}>
-        {campaign.channels.map((channel, index) => (
+        {(campaign.channels || []).map((channel, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <ChannelCard channel={channel} />
           </Grid>
@@ -197,5 +197,6 @@ const MasterCampaignDetails = () => {
     </Box>
   );
 };
+// ... existing code ...
 
 export default MasterCampaignDetails;
