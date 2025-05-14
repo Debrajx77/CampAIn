@@ -106,7 +106,9 @@ const MasterCampaignDetails = () => {
   useEffect(() => {
     const fetchCampaign = async () => {
       try {
-        const response = await axios.get(`{API_URL}/api/campaigns/${id}`);
+        const response = await axios.get(
+          `https://campain-b2rr.onrender.com/api/campaigns/${id}`
+        );
         setCampaign(response.data);
       } catch (err) {
         setError("Failed to fetch campaign details. Please try again later.");
