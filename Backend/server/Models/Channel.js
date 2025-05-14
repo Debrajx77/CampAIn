@@ -21,3 +21,5 @@ const Channel = new mongoose.Schema({
     ref: "MasterCampaign",
   },
 });
+
+module.exports = mongoose.model("Channel", Channel);
