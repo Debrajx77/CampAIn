@@ -21,9 +21,11 @@ const CampaignList = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const res = await axios.get("/api/campaigns");
+        const res = await axios.get(
+          "https://campain-b2rr.onrender.com/api/campaigns"
+        );
         setCampaigns(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
+      } catch (_err) {
         setError("Failed to fetch campaigns");
       } finally {
         setLoading(false);
