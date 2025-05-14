@@ -47,6 +47,11 @@ app.use("/api/team/add-member", addMembersToTeamRouter);
 app.use("/api/team/remove-member", removeMembersFromTeamRouter);
 app.use("/api/mailchimp", mailchimpRouter); // Mailchimp routes
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  res.status(500).json({ error: err.message });
+});
+
 // Only this line for all campaign endpoints:
 app.use("/api/campaigns", masterCampaignRoutes);
 
