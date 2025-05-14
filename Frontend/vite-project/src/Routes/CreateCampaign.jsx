@@ -22,6 +22,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import axios from "axios";
 
 // Channel definitions for easy extension
 const CHANNELS = [
@@ -59,13 +60,13 @@ const STEPS = [
   "Review & Launch",
 ];
 
+const API_URL = "https://campain-b2rr.onrender.com/api/campaigns";
+
 function CreateCampaignPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   // Step management
   const [step, setStep] = useState(0);
-
   // Master Campaign State
   const [masterCampaign, setMasterCampaign] = useState({
     name: "",
@@ -75,16 +76,14 @@ function CreateCampaignPage() {
     endDate: "",
     status: "Draft",
   });
-
   // Channel selection and configuration
   const [selectedChannels, setSelectedChannels] = useState([]);
   const [channelConfigs, setChannelConfigs] = useState({});
-
   // Channel currently being configured
   const [activeChannel, setActiveChannel] = useState(null);
 
   // Snackbar state
-  const [snackbar, setSnackbar] = useState({
+  const [toast, setToast] = useState({
     open: false,
     message: "",
     severity: "success",
@@ -101,21 +100,7 @@ function CreateCampaignPage() {
     );
   };
 
-  // Show snackbar
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  // Close snackbar
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
-  // Modified handleNext for draft notification
   const handleNext = () => {
-    if (step === 0) {
-      showSnackbar("Campaign drafted successfully", "info");
-    }
     if (step === 1 && selectedChannels.length > 0) {
       setActiveChannel(selectedChannels[0]);
     }
@@ -147,6 +132,45 @@ function CreateCampaignPage() {
     } else {
       setActiveChannel(null);
       setStep(3); // Move to Review
+    }
+  };
+
+  // Toast handlers
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToast({ ...toast, open: false });
+  };
+
+  // API call to create campaign
+  const handleActivateCampaign = async () => {
+    try {
+      const payload = {
+        name: masterCampaign.name,
+        description: masterCampaign.description,
+        budget: Number(masterCampaign.budget),
+        startDate: masterCampaign.startDate,
+        endDate: masterCampaign.endDate,
+        status: masterCampaign.status.toLowerCase(),
+      };
+
+      const response = await axios.post(`${API_URL}/create`, payload);
+
+      setToast({
+        open: true,
+        message: "Campaign created successfully!",
+        severity: "success",
+      });
+
+      console.log("Campaign created:", response.data);
+    } catch (error) {
+      console.error("Failed to create campaign:", error);
+      setToast({
+        open: true,
+        message: "Failed to create campaign",
+        severity: "error",
+      });
     }
   };
 
@@ -296,10 +320,7 @@ function CreateCampaignPage() {
         variant="contained"
         color="primary"
         sx={{ mt: 3 }}
-        onClick={() => {
-          showSnackbar("Campaign activated successfully", "success");
-          setMasterCampaign((prev) => ({ ...prev, status: "Active" }));
-        }}
+        onClick={handleActivateCampaign}
       >
         Activate Campaign
       </Button>
@@ -330,7 +351,6 @@ function CreateCampaignPage() {
           </Step>
         ))}
       </Stepper>
-
       {/* Step 1: Master Campaign */}
       {step === 0 && (
         <Box
@@ -420,7 +440,6 @@ function CreateCampaignPage() {
           </Button>
         </Box>
       )}
-
       {/* Step 2: Configure Channels */}
       {step === 1 && (
         <Box sx={{ width: "100%", maxWidth: 900 }}>
@@ -481,7 +500,6 @@ function CreateCampaignPage() {
           </Box>
         </Box>
       )}
-
       {/* Step 3: Channel Configuration */}
       {step === 2 && activeChannel && (
         <Box
@@ -510,23 +528,22 @@ function CreateCampaignPage() {
           </Box>
         </Box>
       )}
-
       {/* Step 4: Review & Launch */}
       {step === 3 && <ReviewSection />}
 
       {/* Snackbar for notifications */}
       <Snackbar
-        open={snackbar.open}
+        open={toast.open}
         autoHideDuration={3000}
-        onClose={handleSnackbarClose}
+        onClose={handleToastClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
+          onClose={handleToastClose}
+          severity={toast.severity}
           sx={{ width: "100%" }}
         >
-          {snackbar.message}
+          {toast.message}
         </Alert>
       </Snackbar>
     </Box>
