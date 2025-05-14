@@ -72,18 +72,29 @@ router.get("/", async (req, res) => {
 // Get a single campaign by ID with populated channels
 router.get("/:id", async (req, res) => {
   try {
-    const campaign = await MasterCampaign.findById(req.params.id).populate(
-      "channels"
-    );
+    const campaign = await MasterCampaign.findById(req.params.id).populate({
+      path: "channels",
+      select: "campaignType configuration status",
+    });
+
     if (!campaign) {
       return res.status(404).json({ msg: "Campaign not found" });
     }
-    res.json(campaign);
+
+    // Transform data for frontend compatibility
+    const transformedCampaign = {
+      ...campaign.toObject(),
+      channels: campaign.channels.map((channel) => ({
+        type: channel.campaignType,
+        ...channel.configuration,
+        id: channel._id,
+      })),
+    };
+
+    res.json(transformedCampaign);
   } catch (err) {
     res
       .status(500)
       .json({ msg: "Failed to fetch campaign", error: err.message });
   }
 });
-
-module.exports = router;
