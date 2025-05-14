@@ -14,6 +14,8 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -81,6 +83,13 @@ function CreateCampaignPage() {
   // Channel currently being configured
   const [activeChannel, setActiveChannel] = useState(null);
 
+  // Snackbar state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
   // Handlers
   const handleMasterChange = (e) => {
     setMasterCampaign({ ...masterCampaign, [e.target.name]: e.target.value });
@@ -92,7 +101,21 @@ function CreateCampaignPage() {
     );
   };
 
+  // Show snackbar
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  // Close snackbar
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Modified handleNext for draft notification
   const handleNext = () => {
+    if (step === 0) {
+      showSnackbar("Campaign drafted successfully", "info");
+    }
     if (step === 1 && selectedChannels.length > 0) {
       setActiveChannel(selectedChannels[0]);
     }
@@ -162,7 +185,9 @@ function CreateCampaignPage() {
               margin="normal"
               value={channelConfigs.email?.recipients || ""}
               onChange={(e) =>
-                handleChannelConfigChange("email", { recipients: e.target.value })
+                handleChannelConfigChange("email", {
+                  recipients: e.target.value,
+                })
               }
               helperText="Comma separated emails"
             />
@@ -189,7 +214,9 @@ function CreateCampaignPage() {
               margin="normal"
               value={channelConfigs.google?.keywords || ""}
               onChange={(e) =>
-                handleChannelConfigChange("google", { keywords: e.target.value })
+                handleChannelConfigChange("google", {
+                  keywords: e.target.value,
+                })
               }
               helperText="Comma separated"
             />
@@ -265,7 +292,15 @@ function CreateCampaignPage() {
           </Box>
         ))}
       </Box>
-      <Button variant="contained" color="primary" sx={{ mt: 3 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mt: 3 }}
+        onClick={() => {
+          showSnackbar("Campaign activated successfully", "success");
+          setMasterCampaign((prev) => ({ ...prev, status: "Active" }));
+        }}
+      >
         Activate Campaign
       </Button>
     </Box>
@@ -375,7 +410,11 @@ function CreateCampaignPage() {
             color="primary"
             sx={{ mt: 2 }}
             onClick={handleNext}
-            disabled={!masterCampaign.name || !masterCampaign.startDate || !masterCampaign.endDate}
+            disabled={
+              !masterCampaign.name ||
+              !masterCampaign.startDate ||
+              !masterCampaign.endDate
+            }
           >
             Next: Configure Channels
           </Button>
@@ -395,15 +434,13 @@ function CreateCampaignPage() {
                   elevation={selectedChannels.includes(type.key) ? 8 : 2}
                   sx={{
                     borderRadius: 3,
-                    border:
-                      selectedChannels.includes(type.key)
-                        ? `2px solid ${theme.palette.primary.main}`
-                        : "2px solid transparent",
+                    border: selectedChannels.includes(type.key)
+                      ? `2px solid ${theme.palette.primary.main}`
+                      : "2px solid transparent",
                     transition: "box-shadow 0.2s, border 0.2s",
-                    background:
-                      selectedChannels.includes(type.key)
-                        ? theme.palette.action.selected
-                        : theme.palette.background.paper,
+                    background: selectedChannels.includes(type.key)
+                      ? theme.palette.action.selected
+                      : theme.palette.background.paper,
                   }}
                 >
                   <CardActionArea onClick={() => handleChannelSelect(type.key)}>
@@ -465,7 +502,8 @@ function CreateCampaignPage() {
               color="primary"
               onClick={handleChannelConfigNext}
             >
-              {selectedChannels.indexOf(activeChannel) === selectedChannels.length - 1
+              {selectedChannels.indexOf(activeChannel) ===
+              selectedChannels.length - 1
                 ? "Review & Launch"
                 : "Next Channel"}
             </Button>
@@ -475,6 +513,22 @@ function CreateCampaignPage() {
 
       {/* Step 4: Review & Launch */}
       {step === 3 && <ReviewSection />}
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
