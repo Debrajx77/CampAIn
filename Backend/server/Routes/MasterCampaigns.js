@@ -84,6 +84,12 @@ router.get("/:id", async (req, res) => {
     // Transform data for frontend compatibility
     const transformedCampaign = {
       ...campaign.toObject(),
+      budget: campaign.budget.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      }),
+      status:
+        campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1),
       channels: campaign.channels.map((channel) => ({
         type: channel.campaignType,
         ...channel.configuration,

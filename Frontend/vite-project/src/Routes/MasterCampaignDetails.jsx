@@ -169,21 +169,25 @@ const MasterCampaignDetails = () => {
             <Typography variant="subtitle2">Budget</Typography>
             <Typography variant="body1">${campaign.budget}</Typography>
           </Grid>
+
           <Grid item xs={12} sm={6} md={3}>
             <Typography variant="subtitle2">Start Date</Typography>
             <Typography variant="body1">
-              {new Date(campaign.startDate).toLocaleDateString()}
+              {campaign.startDate
+                ? new Date(campaign.startDate).toLocaleDateString()
+                : "N/A"}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <Typography variant="subtitle2">End Date</Typography>
             <Typography variant="body1">
-              {new Date(campaign.endDate).toLocaleDateString()}
+              {campaign.endDate
+                ? new Date(campaign.endDate).toLocaleDateString()
+                : "N/A"}
             </Typography>
           </Grid>
         </Grid>
       </Paper>
-      // ... existing code ...
       <Typography variant="h5" gutterBottom>
         Channels
       </Typography>
