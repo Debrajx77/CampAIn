@@ -104,3 +104,5 @@ router.get("/:id", async (req, res) => {
       .json({ msg: "Failed to fetch campaign", error: err.message });
   }
 });
+
+module.exports = router;
