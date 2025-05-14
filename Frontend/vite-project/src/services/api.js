@@ -52,7 +52,7 @@ export const getAnalytics = async () => {
 };
 export const login = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, data);
+    const response = await axios.post(`${API_URL}/auth/login`, data);
     return response.data;
   } catch (error) {
     console.error("Error:", error);
@@ -62,7 +62,7 @@ export const login = async (data) => {
 
 export const createCampaign = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/create-campaign`, data);
+    const response = await axios.post(`${API_URL}/campaigns/create`, data);
     // Dispatch a custom event for campaign creation
     window.dispatchEvent(
       new CustomEvent("campaignCreated", { detail: response.data })
