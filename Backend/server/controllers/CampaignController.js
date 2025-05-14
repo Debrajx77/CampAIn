@@ -1,32 +1,92 @@
-const Campaign = require("../Models/Campaign");
+const MasterCampaign = require("../Models/MasterCampaign");
+const Channel = require("../Models/Channel");
 
-// Create a new campaign
-const createCampaign = async (req, res) => {
-  const { name, targetAudience, goal, startDate, endDate } = req.body;
-
+// Create a new Master Campaign
+const createMasterCampaign = async (req, res) => {
   try {
-    const newCampaign = new Campaign({
+    const { name, description, budget, startDate, endDate, status } = req.body;
+
+    const masterCampaign = new MasterCampaign({
       name,
-      targetAudience,
-      goal,
-      startDate,
-      endDate,
+      description,
+      budget,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status: status.toLowerCase(),
     });
-    await newCampaign.save();
-    res.status(201).json(newCampaign);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+
+    await masterCampaign.save();
+    res.status(201).json(masterCampaign);
+  } catch (err) {
+    console.error("Failed to create master campaign:", err);
+    res
+      .status(500)
+      .json({ msg: "Failed to create campaign", error: err.message });
   }
 };
 
-// Get all campaigns
-const getCampaigns = async (req, res) => {
+// Get all Master Campaigns
+const getMasterCampaigns = async (req, res) => {
   try {
-    const campaigns = await Campaign.find();
+    const campaigns = await MasterCampaign.find().populate("channels");
     res.status(200).json(campaigns);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    console.error("Failed to fetch master campaigns:", err);
+    res
+      .status(500)
+      .json({ msg: "Failed to fetch campaigns", error: err.message });
   }
 };
 
-module.exports = { createCampaign, getCampaigns };
+// Get a single Master Campaign by ID with populated channels
+const getMasterCampaignById = async (req, res) => {
+  try {
+    const campaign = await MasterCampaign.findById(req.params.id).populate(
+      "channels"
+    );
+    if (!campaign) {
+      return res.status(404).json({ msg: "Campaign not found" });
+    }
+    res.json(campaign);
+  } catch (err) {
+    console.error("Failed to fetch master campaign:", err);
+    res
+      .status(500)
+      .json({ msg: "Failed to fetch campaign", error: err.message });
+  }
+};
+
+// Add a new channel to an existing Master Campaign
+const addChannelToCampaign = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+    const { campaignType, configuration, status } = req.body;
+
+    const channel = new Channel({
+      campaignType,
+      configuration,
+      status,
+      masterCampaign: campaignId,
+    });
+
+    await channel.save();
+
+    await MasterCampaign.findByIdAndUpdate(
+      campaignId,
+      { $push: { channels: channel._id } },
+      { new: true }
+    );
+
+    res.status(201).json(channel);
+  } catch (err) {
+    console.error("Failed to add channel:", err);
+    res.status(500).json({ msg: "Failed to add channel", error: err.message });
+  }
+};
+
+module.exports = {
+  createMasterCampaign,
+  getMasterCampaigns,
+  getMasterCampaignById,
+  addChannelToCampaign,
+};

@@ -3,17 +3,21 @@ const router = express.Router();
 const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
 
-// Create a new Master Campaign
+// Create a new Master Campaign (Draft or Active)
 router.post("/create", async (req, res) => {
   try {
     const { name, description, budget, startDate, endDate, status } = req.body;
+    // Ensure required fields are present
+    if (!name || !description || !budget || !startDate || !endDate) {
+      return res.status(400).json({ msg: "All fields are required" });
+    }
     const masterCampaign = new MasterCampaign({
       name,
       description,
       budget,
-      startDate,
-      endDate,
-      status,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status: status ? status.toLowerCase() : "draft",
     });
     await masterCampaign.save();
     res.status(201).json(masterCampaign);
@@ -34,7 +38,7 @@ router.post("/:campaignId/channels", async (req, res) => {
     const channel = new Channel({
       campaignType,
       configuration,
-      status,
+      status: status ? status.toLowerCase() : "draft",
       masterCampaign: campaignId,
     });
     await channel.save();
@@ -55,8 +59,9 @@ router.post("/:campaignId/channels", async (req, res) => {
 // Get all master campaigns (for campaign list)
 router.get("/", async (req, res) => {
   try {
-    const campaigns = await MasterCampaign.find();
-    res.json(campaigns); // <-- Return as array
+    // Populate channels for list if you want to show channel info in list
+    const campaigns = await MasterCampaign.find().populate("channels");
+    res.json(campaigns);
   } catch (err) {
     res
       .status(500)
@@ -70,6 +75,9 @@ router.get("/:id", async (req, res) => {
     const campaign = await MasterCampaign.findById(req.params.id).populate(
       "channels"
     );
+    if (!campaign) {
+      return res.status(404).json({ msg: "Campaign not found" });
+    }
     res.json(campaign);
   } catch (err) {
     res
