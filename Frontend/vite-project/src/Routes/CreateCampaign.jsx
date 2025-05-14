@@ -422,8 +422,8 @@ function CreateCampaignPage() {
             margin="normal"
             select
           >
-            <MenuItem value="Draft">Draft</MenuItem>
-            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="draft">Draft</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
           </TextField>
           <Button
             variant="contained"
