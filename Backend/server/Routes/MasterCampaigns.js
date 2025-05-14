@@ -6,7 +6,8 @@ const Channel = require("../Models/Channel");
 // Create a new Master Campaign (Draft or Active)
 router.post("/create", async (req, res) => {
   try {
-    const { name, description, budget, startDate, endDate, status } = req.body;
+    const { name, description, budget, startDate, endDate, status, channels } =
+      req.body;
     // Ensure required fields are present
     if (!name || !description || !budget || !startDate || !endDate) {
       return res.status(400).json({ msg: "All fields are required" });
@@ -20,6 +21,22 @@ router.post("/create", async (req, res) => {
       status: status ? status.toLowerCase() : "draft",
     });
     await masterCampaign.save();
+
+    // If channels are provided, create them and link to campaign
+    if (Array.isArray(channels) && channels.length > 0) {
+      for (const ch of channels) {
+        const channel = new Channel({
+          campaignType: ch.campaignType,
+          configuration: ch.configuration,
+          status: ch.status || "draft",
+          masterCampaign: masterCampaign._id,
+        });
+        await channel.save();
+        masterCampaign.channels.push(channel._id);
+      }
+      await masterCampaign.save();
+    }
+
     res.status(201).json(masterCampaign);
   } catch (err) {
     res

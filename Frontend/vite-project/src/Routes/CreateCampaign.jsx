@@ -75,6 +75,10 @@ function CreateCampaignPage() {
     startDate: "",
     endDate: "",
     status: "Draft",
+    channels: [
+      { campaignType: "email", configuration: {}, status: "draft" },
+      { campaignType: "google", configuration: {}, status: "draft" },
+    ],
   });
   // Channel selection and configuration
   const [selectedChannels, setSelectedChannels] = useState([]);
