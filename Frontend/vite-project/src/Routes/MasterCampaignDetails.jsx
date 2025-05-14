@@ -7,84 +7,114 @@ import {
   Grid,
   Button,
   CircularProgress,
+  Paper,
+  Divider,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-// Map channel type to icon and label
 const CHANNEL_META = {
   email: {
-    icon: <EmailIcon color="primary" fontSize="large" />,
+    icon: <EmailIcon fontSize="large" sx={{ color: "#D44638" }} />,
     label: "Email Campaign",
   },
   google: {
-    icon: <GoogleIcon sx={{ color: "#4285F4" }} fontSize="large" />,
+    icon: <GoogleIcon fontSize="large" sx={{ color: "#4285F4" }} />,
     label: "Google Ads",
   },
   meta: {
-    icon: <FacebookIcon sx={{ color: "#1877F3" }} fontSize="large" />,
+    icon: <FacebookIcon fontSize="large" sx={{ color: "#1877F2" }} />,
     label: "Meta Ads",
   },
 };
 
-const dummyChannelDetails = (channel) => {
-  switch (channel.type) {
-    case "email":
-      return (
-        <>
-          <Typography variant="body2">Subject: {channel.subject}</Typography>
-          <Typography variant="body2">Sent: {channel.sent}</Typography>
-          <Typography variant="body2">Open Rate: {channel.openRate}</Typography>
-        </>
-      );
-    case "google":
-      return (
-        <>
-          <Typography variant="body2">Clicks: {channel.clicks}</Typography>
-          <Typography variant="body2">Budget: ${channel.budget}</Typography>
-        </>
-      );
-    case "meta":
-      return (
-        <>
-          <Typography variant="body2">Reach: {channel.reach}</Typography>
-          <Typography variant="body2">CTR: {channel.ctr}</Typography>
-        </>
-      );
-    default:
-      return <Typography variant="body2">No details</Typography>;
-  }
+const ChannelCard = ({ channel }) => {
+  const meta = CHANNEL_META[channel.type] || {};
+
+  const renderChannelDetails = () => {
+    switch (channel.type) {
+      case "email":
+        return (
+          <>
+            <Typography variant="body2">Subject: {channel.subject}</Typography>
+            <Typography variant="body2">Sent: {channel.sent}</Typography>
+            <Typography variant="body2">
+              Open Rate: {channel.openRate}
+            </Typography>
+          </>
+        );
+      case "google":
+        return (
+          <>
+            <Typography variant="body2">Clicks: {channel.clicks}</Typography>
+            <Typography variant="body2">
+              Budget Used: ${channel.budgetUsed}
+            </Typography>
+            <Typography variant="body2">CTR: {channel.ctr}</Typography>
+          </>
+        );
+      case "meta":
+        return (
+          <>
+            <Typography variant="body2">Reach: {channel.reach}</Typography>
+            <Typography variant="body2">
+              Budget Used: ${channel.budgetUsed}
+            </Typography>
+            <Typography variant="body2">
+              Impressions: {channel.impressions}
+            </Typography>
+          </>
+        );
+      default:
+        return <Typography variant="body2">No details available</Typography>;
+    }
+  };
+
+  return (
+    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <CardContent sx={{ flexGrow: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          {meta.icon}
+          <Typography variant="h6" sx={{ ml: 1 }}>
+            {meta.label}
+          </Typography>
+        </Box>
+        {renderChannelDetails()}
+      </CardContent>
+      <Divider />
+      <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+        <Button variant="outlined" size="small">
+          View Details
+        </Button>
+        <Button variant="contained" size="small">
+          Edit
+        </Button>
+      </Box>
+    </Card>
+  );
 };
 
 const MasterCampaignDetails = () => {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch campaign data
   useEffect(() => {
     const fetchCampaign = async () => {
       try {
-        const res = await axios.get(`/api/campaigns/${id}`);
-        // For demo, if no channels, use dummy data
-        if (!res.data.channels || res.data.channels.length === 0) {
-          res.data.channels = [
-            { type: "email", subject: "50% Off!", sent: 5000, openRate: "45%" },
-            { type: "google", clicks: 1200, budget: 400 },
-            { type: "meta", reach: 20000, ctr: "3.5%" },
-          ];
-        }
-        setCampaign(res.data);
+        const response = await axios.get(`/api/campaigns/${id}`);
+        setCampaign(response.data);
       } catch (err) {
-        setCampaign(null);
+        setError("Failed to fetch campaign details. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchCampaign();
   }, [id]);
 
@@ -92,10 +122,10 @@ const MasterCampaignDetails = () => {
     return (
       <Box
         sx={{
-          minHeight: "60vh",
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
         <CircularProgress />
@@ -103,115 +133,67 @@ const MasterCampaignDetails = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
   if (!campaign) {
     return (
-      <Box sx={{ p: 4 }}>
-        <Typography color="error">Failed to load campaign.</Typography>
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography>Campaign not found.</Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", p: { xs: 2, md: 4 } }}>
-      {/* Master Campaign Overview */}
-      <Box
-        sx={{
-          mb: 4,
-          p: 3,
-          borderRadius: 3,
-          boxShadow: 3,
-          background: "#fff",
-        }}
-      >
-        <Typography variant="h4" fontWeight={700} mb={1}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h4" gutterBottom>
           {campaign.name}
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary" mb={2}>
+        <Typography variant="body1" paragraph>
           {campaign.description}
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Budget
-            </Typography>
-            <Typography variant="h6">${campaign.budget}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Duration
-            </Typography>
-            <Typography variant="h6">
-              {campaign.startDate?.slice(0, 10)} -{" "}
-              {campaign.endDate?.slice(0, 10)}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Status
-            </Typography>
-            <Typography variant="h6" sx={{ textTransform: "capitalize" }}>
+            <Typography variant="subtitle2">Status</Typography>
+            <Typography variant="body1" sx={{ textTransform: "capitalize" }}>
               {campaign.status}
             </Typography>
           </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Budget</Typography>
+            <Typography variant="body1">${campaign.budget}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">Start Date</Typography>
+            <Typography variant="body1">
+              {new Date(campaign.startDate).toLocaleDateString()}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Typography variant="subtitle2">End Date</Typography>
+            <Typography variant="body1">
+              {new Date(campaign.endDate).toLocaleDateString()}
+            </Typography>
+          </Grid>
         </Grid>
-      </Box>
+      </Paper>
 
-      {/* Channels Section */}
-      <Typography variant="h5" fontWeight={600} mb={2}>
+      <Typography variant="h5" gutterBottom>
         Channels
       </Typography>
       <Grid container spacing={3}>
-        {(campaign.channels || []).map((channel, idx) => (
-          <Grid item xs={12} sm={6} md={4} key={idx}>
-            <Card
-              sx={{
-                borderRadius: 3,
-                boxShadow: 2,
-                p: 2,
-                minHeight: 220,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  {CHANNEL_META[channel.type]?.icon || <EmailIcon />}
-                  <Typography variant="h6" fontWeight={600} ml={1}>
-                    {CHANNEL_META[channel.type]?.label || channel.type}
-                  </Typography>
-                </Box>
-                {dummyChannelDetails(channel)}
-              </CardContent>
-              <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-                <Button variant="outlined" size="small">
-                  👁 View Details
-                </Button>
-                <Button variant="contained" size="small" color="primary">
-                  ✏ Edit
-                </Button>
-              </Box>
-            </Card>
+        {campaign.channels.map((channel, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <ChannelCard channel={channel} />
           </Grid>
         ))}
       </Grid>
-
-      {/* Add Channel Button */}
-      <Box sx={{ mt: 4, textAlign: "center" }}>
-        <Button
-          variant="outlined"
-          startIcon={<AddIcon />}
-          sx={{
-            px: 4,
-            py: 1.5,
-            fontWeight: 600,
-            borderRadius: 2,
-            boxShadow: 1,
-          }}
-        >
-          Add Channel
-        </Button>
-      </Box>
     </Box>
   );
 };
