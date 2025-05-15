@@ -57,15 +57,13 @@ const EmailSection = ({ onChange, lists = [] }) => {
 
   // Reset existingList if audienceType changes or lists change
   useEffect(() => {
-    // Only run this effect if audienceType or lists change
     if (audienceType !== "existing") {
       if (existingList !== "") setExistingList("");
       return;
     }
-    // Only reset if existingList is not valid and not already blank
     if (Array.isArray(lists) && lists.length > 0) {
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
-      if (existingList && !validIds.includes(String(existingList))) {
+      if (existingList && !validIds.includes(existingList)) {
         setExistingList("");
       }
     } else if (existingList !== "") {
@@ -141,7 +139,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
           {Array.isArray(lists) &&
             lists.filter(Boolean).length > 0 &&
             lists.filter(Boolean).map((list) => (
-              <MenuItem key={list.id} value={list.id}>
+              <MenuItem key={String(list.id)} value={String(list.id)}>
                 {list.name}
               </MenuItem>
             ))}
