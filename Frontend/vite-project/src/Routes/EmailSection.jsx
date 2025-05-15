@@ -28,6 +28,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
   const [manualEmails, setManualEmails] = useState("");
   const [csvFile, setCsvFile] = useState(null);
   const [existingList, setExistingList] = useState(""); // For dropdown if you fetch lists
+  const [emailLists, setEmailLists] = useState([]); // New state for email lists
 
   // Notify parent on change
   useEffect(() => {
@@ -62,7 +63,8 @@ const EmailSection = ({ onChange, lists = [] }) => {
       lists.filter(Boolean).length > 0
     ) {
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
-      if (existingList !== "" && !validIds.includes(String(existingList))) {
+      // Sirf tabhi setExistingList("") call karo jab existingList ki value valid nahi hai aur blank nahi hai
+      if (existingList && !validIds.includes(String(existingList))) {
         setExistingList("");
       }
     }
