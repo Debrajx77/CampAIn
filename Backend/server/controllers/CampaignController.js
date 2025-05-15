@@ -4,7 +4,8 @@ const Channel = require("../Models/Channel");
 // Create a new Master Campaign
 const createMasterCampaign = async (req, res) => {
   try {
-    const { name, description, budget, startDate, endDate, status } = req.body;
+    const { name, description, budget, startDate, endDate, status, channels } =
+      req.body;
 
     const masterCampaign = new MasterCampaign({
       name,
@@ -16,6 +17,22 @@ const createMasterCampaign = async (req, res) => {
     });
 
     await masterCampaign.save();
+
+    // Channels create karo agar bheje gaye hain
+    if (Array.isArray(channels) && channels.length > 0) {
+      for (const ch of channels) {
+        const channel = new Channel({
+          campaignType: ch.campaignType,
+          configuration: ch.configuration,
+          status: ch.status || "draft",
+          masterCampaign: masterCampaign._id,
+        });
+        await channel.save();
+        masterCampaign.channels.push(channel._id);
+      }
+      await masterCampaign.save();
+    }
+
     res.status(201).json(masterCampaign);
   } catch (err) {
     console.error("Failed to create master campaign:", err);
