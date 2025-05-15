@@ -67,7 +67,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
       }
     }
     // eslint-disable-next-line
-  }, [audienceType, lists]);
+  }, [audienceType, lists, existingList]);
 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
