@@ -69,7 +69,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
     } else if (existingList !== "") {
       setExistingList("");
     }
-    // eslint-disable-next-line
   }, [audienceType, JSON.stringify(lists)]);
 
   return (
@@ -126,8 +125,8 @@ const EmailSection = ({ onChange, lists = [] }) => {
         <TextField
           select
           label="Select Existing List"
-          value={existingList}
-          onChange={(e) => setExistingList(e.target.value)}
+          value={lists && lists.length > 0 ? existingList : ""}
+          onChange={(e) => setExistingList(String(e.target.value))}
           fullWidth
           margin="normal"
         >
