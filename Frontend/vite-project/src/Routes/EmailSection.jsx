@@ -113,7 +113,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
           fullWidth
           margin="normal"
         >
-          {/* Always render at least one MenuItem */}
           {Array.isArray(lists) && lists.filter(Boolean).length > 0
             ? lists
                 .filter(Boolean)
@@ -122,11 +121,12 @@ const EmailSection = ({ onChange, lists = [] }) => {
                     {list.name}
                   </MenuItem>
                 ))
-            : [
-                <MenuItem disabled value="" key="no-lists">
-                  No lists found
-                </MenuItem>,
-              ]}
+            : (
+              <MenuItem disabled value="">
+                No lists found
+              </MenuItem>
+            )
+          }
         </TextField>
       )}
 
