@@ -75,7 +75,6 @@ function CreateCampaignPage() {
     startDate: "",
     endDate: "",
     status: "Draft",
-    channels,
   });
   // Channel selection and configuration
   const [selectedChannels, setSelectedChannels] = useState([]);
