@@ -97,14 +97,11 @@ const EmailSection = ({ onChange, lists = [] }) => {
         fullWidth
         margin="normal"
       >
-        {AUDIENCE_OPTIONS.map((opt) => {
-          if (!opt) return null;
-          return (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </MenuItem>
-          );
-        })}
+        {AUDIENCE_OPTIONS.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       {audienceType === "existing" && (
@@ -116,17 +113,20 @@ const EmailSection = ({ onChange, lists = [] }) => {
           fullWidth
           margin="normal"
         >
-          {Array.isArray(lists) && lists.filter(Boolean).length > 0 ? (
-            lists.filter(Boolean).map((list) => (
-              <MenuItem key={list.id} value={list.id}>
-                {list.name}
-              </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled value="">
-              No lists found
-            </MenuItem>
-          )}
+          {/* Always render at least one MenuItem */}
+          {Array.isArray(lists) && lists.filter(Boolean).length > 0
+            ? lists
+                .filter(Boolean)
+                .map((list) => (
+                  <MenuItem key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))
+            : [
+                <MenuItem disabled value="" key="no-lists">
+                  No lists found
+                </MenuItem>,
+              ]}
         </TextField>
       )}
 
