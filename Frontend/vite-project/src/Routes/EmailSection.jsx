@@ -57,12 +57,13 @@ const EmailSection = ({ onChange, lists = [] }) => {
 
   // Reset existingList if audienceType changes or lists change
   useEffect(() => {
+    // Only run this effect if audienceType or lists change
     if (audienceType !== "existing") {
       if (existingList !== "") setExistingList("");
       return;
     }
-    // If audienceType is "existing", ensure existingList is valid
-    if (lists && lists.length > 0) {
+    // Only reset if existingList is not valid and not already blank
+    if (Array.isArray(lists) && lists.length > 0) {
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
       if (existingList && !validIds.includes(String(existingList))) {
         setExistingList("");
@@ -71,7 +72,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
       setExistingList("");
     }
     // eslint-disable-next-line
-  }, [audienceType, lists]);
+  }, [audienceType, JSON.stringify(lists)]);
 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>

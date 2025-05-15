@@ -90,6 +90,9 @@ function CreateCampaignPage() {
     severity: "success",
   });
 
+  // Sahi
+  const [emailLists, setEmailLists] = useState([]);
+
   // Handlers
   const handleMasterChange = (e) => {
     setMasterCampaign({ ...masterCampaign, [e.target.name]: e.target.value });
@@ -190,6 +193,7 @@ function CreateCampaignPage() {
       case "email":
         return (
           <EmailSection
+            lists={emailLists}
             onChange={(data) => handleChannelConfigChange("email", data)}
             value={channelConfigs.email || {}}
           />
