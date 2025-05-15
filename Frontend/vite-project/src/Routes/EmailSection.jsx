@@ -61,12 +61,12 @@ const EmailSection = ({ onChange, lists = [] }) => {
       Array.isArray(lists) &&
       lists.filter(Boolean).length > 0
     ) {
-      // If current value is not in the list, reset to ""
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
-      if (!validIds.includes(String(existingList))) {
+      if (existingList !== "" && !validIds.includes(String(existingList))) {
         setExistingList("");
       }
     }
+    // eslint-disable-next-line
   }, [audienceType, lists]);
 
   return (
