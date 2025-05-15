@@ -97,11 +97,14 @@ const EmailSection = ({ onChange }) => {
         fullWidth
         margin="normal"
       >
-        {AUDIENCE_OPTIONS.map((opt) => (
-          <MenuItem key={opt.value} value={opt.value}>
-            {opt.label}
-          </MenuItem>
-        ))}
+        {AUDIENCE_OPTIONS.map((opt) => {
+          if (!opt) return null;
+          return (
+            <MenuItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </MenuItem>
+          );
+        })}
       </TextField>
 
       {audienceType === "existing" && (
