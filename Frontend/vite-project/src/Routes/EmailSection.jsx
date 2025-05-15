@@ -54,6 +54,21 @@ const EmailSection = ({ onChange, lists = [] }) => {
     onChange,
   ]);
 
+  // Validate existing list selection
+  useEffect(() => {
+    if (
+      audienceType === "existing" &&
+      Array.isArray(lists) &&
+      lists.filter(Boolean).length > 0
+    ) {
+      // If current value is not in the list, reset to ""
+      const validIds = lists.filter(Boolean).map((l) => String(l.id));
+      if (!validIds.includes(String(existingList))) {
+        setExistingList("");
+      }
+    }
+  }, [audienceType, lists]);
+
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" mb={2}>
