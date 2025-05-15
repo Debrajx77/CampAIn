@@ -261,7 +261,7 @@ function CreateCampaignPage() {
           </Box>
         );
       default:
-        return null;
+        return null; // <-- Always return something!
     }
   };
 
