@@ -116,17 +116,21 @@ const EmailSection = ({ onChange, lists = [] }) => {
           fullWidth
           margin="normal"
         >
-          {lists.length === 0 ? (
-            <MenuItem disabled>No lists found</MenuItem>
-          ) : (
-            lists.map((list) =>
-              list ? (
-                <MenuItem key={list.id} value={list.id}>
-                  {list.name}
-                </MenuItem>
-              ) : null
-            )
+          {/* Always render at least one MenuItem */}
+          {(!lists || lists.length === 0) && (
+            <MenuItem disabled value="">
+              No lists found
+            </MenuItem>
           )}
+          {Array.isArray(lists) &&
+            lists.map(
+              (list) =>
+                list && (
+                  <MenuItem key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                )
+            )}
         </TextField>
       )}
 
