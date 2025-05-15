@@ -23,6 +23,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
+import EmailSection from "./EmailSection";
 
 // Channel definitions for easy extension
 const CHANNELS = [
@@ -189,6 +190,10 @@ function CreateCampaignPage() {
       case "email":
         return (
           <Box>
+            <EmailSection
+              onChange={(data) => handleChannelConfigChange("email", data)}
+              value={channelConfigs.email || {}}
+            />
             <Typography variant="h6" mb={2}>
               Email Campaign Setup
             </Typography>
