@@ -189,47 +189,10 @@ function CreateCampaignPage() {
     switch (channelKey) {
       case "email":
         return (
-          <Box>
-            <EmailSection
-              onChange={(data) => handleChannelConfigChange("email", data)}
-              value={channelConfigs.email || {}}
-            />
-            <Typography variant="h6" mb={2}>
-              Email Campaign Setup
-            </Typography>
-            <TextField
-              label="Subject"
-              fullWidth
-              margin="normal"
-              value={channelConfigs.email?.subject || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("email", { subject: e.target.value })
-              }
-            />
-            <TextField
-              label="Template"
-              fullWidth
-              margin="normal"
-              multiline
-              rows={3}
-              value={channelConfigs.email?.template || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("email", { template: e.target.value })
-              }
-            />
-            <TextField
-              label="Recipients"
-              fullWidth
-              margin="normal"
-              value={channelConfigs.email?.recipients || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("email", {
-                  recipients: e.target.value,
-                })
-              }
-              helperText="Comma separated emails"
-            />
-          </Box>
+          <EmailSection
+            onChange={(data) => handleChannelConfigChange("email", data)}
+            value={channelConfigs.email || {}}
+          />
         );
       case "google":
         return (
