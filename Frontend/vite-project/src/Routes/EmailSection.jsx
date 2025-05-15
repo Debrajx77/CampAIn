@@ -27,12 +27,11 @@ const EmailSection = ({ onChange, lists = [] }) => {
   const [audienceType, setAudienceType] = useState("existing");
   const [manualEmails, setManualEmails] = useState("");
   const [csvFile, setCsvFile] = useState(null);
-  const [existingList, setExistingList] = useState(""); // For dropdown if you fetch lists
-  const [emailLists, setEmailLists] = useState([]); // New state for email lists
+  const [existingList, setExistingList] = useState("");
 
   // Notify parent on change
   useEffect(() => {
-    onChange &&
+    if (onChange) {
       onChange({
         subject,
         fromEmail,
@@ -43,6 +42,8 @@ const EmailSection = ({ onChange, lists = [] }) => {
         csvFile,
         existingList,
       });
+    }
+    // eslint-disable-next-line
   }, [
     subject,
     fromEmail,
@@ -52,24 +53,25 @@ const EmailSection = ({ onChange, lists = [] }) => {
     manualEmails,
     csvFile,
     existingList,
-    onChange,
   ]);
 
-  // Validate existing list selection
+  // Reset existingList if audienceType changes or lists change
   useEffect(() => {
-    if (
-      audienceType === "existing" &&
-      Array.isArray(lists) &&
-      lists.filter(Boolean).length > 0
-    ) {
+    if (audienceType !== "existing") {
+      if (existingList !== "") setExistingList("");
+      return;
+    }
+    // If audienceType is "existing", ensure existingList is valid
+    if (lists && lists.length > 0) {
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
-      // Sirf tabhi setExistingList("") call karo jab existingList ki value valid nahi hai aur blank nahi hai
       if (existingList && !validIds.includes(String(existingList))) {
         setExistingList("");
       }
+    } else if (existingList !== "") {
+      setExistingList("");
     }
     // eslint-disable-next-line
-  }, [audienceType, lists, existingList]);
+  }, [audienceType, lists]);
 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
@@ -130,7 +132,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
           fullWidth
           margin="normal"
         >
-          {/* Always show a default option */}
           <MenuItem value="">
             {Array.isArray(lists) && lists.filter(Boolean).length > 0
               ? "Select a list"
