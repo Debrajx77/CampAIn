@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Grid,
   Card,
@@ -24,6 +24,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
 import EmailSection from "./EmailSection";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 // Channel definitions for easy extension
 const CHANNELS = [
@@ -186,13 +188,161 @@ function CreateCampaignPage() {
 
   // Channel Config Forms (modular, easy to extend)
   const ChannelConfigForm = ({ channelKey }) => {
+    // Email channel local state
+    const [subject, setSubject] = useState(channelConfigs.email?.subject || "");
+    const [fromEmail] = useState("youragency@email.com");
+    const [replyTo, setReplyTo] = useState(
+      channelConfigs.email?.replyTo || "support@email.com"
+    );
+    const [emailBody, setEmailBody] = useState(
+      channelConfigs.email?.emailBody || ""
+    );
+    const [audienceType, setAudienceType] = useState(
+      channelConfigs.email?.audienceType || "existing"
+    );
+    const [existingList, setExistingList] = useState(
+      channelConfigs.email?.existingList || ""
+    );
+    const [csvFile, setCsvFile] = useState(null);
+    const [csvFileName, setCsvFileName] = useState("");
+    const [manualEmails, setManualEmails] = useState(
+      channelConfigs.email?.manualEmails || ""
+    );
+
+    // For CSV upload
+    const fileInputRef = useRef();
+
+    // Update parent config on any change
+    useEffect(() => {
+      if (channelKey === "email") {
+        handleChannelConfigChange("email", {
+          subject,
+          fromEmail,
+          replyTo,
+          emailBody,
+          audienceType,
+          existingList,
+          csvFile,
+          manualEmails,
+        });
+      }
+      // eslint-disable-next-line
+    }, [
+      subject,
+      fromEmail,
+      replyTo,
+      emailBody,
+      audienceType,
+      existingList,
+      csvFile,
+      manualEmails,
+    ]);
+
     switch (channelKey) {
       case "email":
         return (
-          <EmailSection
-            onChange={(data) => handleChannelConfigChange("email", data)}
-            value={channelConfigs.email || {}}
-          />
+          <Box>
+            <Typography variant="h6" mb={2}>
+              Email Details
+            </Typography>
+            <TextField
+              label="Subject"
+              fullWidth
+              margin="normal"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <TextField
+              label="From"
+              fullWidth
+              margin="normal"
+              value={fromEmail}
+              disabled
+            />
+            <TextField
+              label="Reply To"
+              fullWidth
+              margin="normal"
+              value={replyTo}
+              onChange={(e) => setReplyTo(e.target.value)}
+            />
+
+            <Typography variant="h6" mt={4} mb={2}>
+              Compose Email
+            </Typography>
+            <ReactQuill value={emailBody} onChange={setEmailBody} />
+
+            <Typography variant="h6" mt={4} mb={2}>
+              Audience Selection
+            </Typography>
+            <TextField
+              select
+              label="Audience Type"
+              value={audienceType}
+              onChange={(e) => setAudienceType(e.target.value)}
+              fullWidth
+              margin="normal"
+            >
+              <MenuItem value="existing">Existing List</MenuItem>
+              <MenuItem value="csv">Upload CSV</MenuItem>
+              <MenuItem value="manual">Manual Entry</MenuItem>
+            </TextField>
+
+            {audienceType === "existing" && (
+              <TextField
+                select
+                label="Select Existing List"
+                value={existingList}
+                onChange={(e) => setExistingList(e.target.value)}
+                fullWidth
+                margin="normal"
+              >
+                {/* TODO: Replace with your real lists */}
+                <MenuItem value="list1">List 1</MenuItem>
+                <MenuItem value="list2">List 2</MenuItem>
+              </TextField>
+            )}
+
+            {audienceType === "csv" && (
+              <Box mt={2}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  onClick={() =>
+                    fileInputRef.current && fileInputRef.current.click()
+                  }
+                >
+                  Upload CSV
+                  <input
+                    type="file"
+                    accept=".csv"
+                    hidden
+                    ref={fileInputRef}
+                    onChange={(e) => {
+                      if (e.target.files[0]) {
+                        setCsvFile(e.target.files[0]);
+                        setCsvFileName(e.target.files[0].name);
+                      }
+                    }}
+                  />
+                </Button>
+                {csvFileName && <Typography mt={1}>{csvFileName}</Typography>}
+              </Box>
+            )}
+
+            {audienceType === "manual" && (
+              <TextField
+                label="Manual Emails"
+                fullWidth
+                margin="normal"
+                multiline
+                rows={3}
+                placeholder="Enter comma separated emails"
+                value={manualEmails}
+                onChange={(e) => setManualEmails(e.target.value)}
+              />
+            )}
+          </Box>
         );
       case "google":
         return (
