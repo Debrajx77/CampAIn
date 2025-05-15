@@ -4,9 +4,14 @@ const Channel = new mongoose.Schema({
   campaignType: { type: String, required: true }, // Should store 'email', 'google', or 'meta'
   configuration: {
     // Email
-    subject: { type: String, default: "" },
-    sent: { type: Number, default: 0 },
-    openRate: { type: String, default: "0%" },
+    subject: String,
+    fromEmail: String,
+    replyTo: String,
+    emailBody: String,
+    audienceType: String, // "existing", "csv", "manual"
+    existingList: String, // For existing list
+    csvFileUrl: String, // For uploaded CSV
+    manualEmails: String,
     // Google
     clicks: { type: Number, default: 0 },
     budgetUsed: { type: Number, default: 0 },

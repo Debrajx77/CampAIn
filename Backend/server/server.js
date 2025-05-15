@@ -11,6 +11,7 @@ const addMembersToTeamRouter = require("./Routes/addMembersToTeam");
 const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
 const masterCampaignRoutes = require("./Routes/MasterCampaigns");
 const mailchimpRouter = require("./Routes/Mailchimp");
+const audienceRoutes = require("./Routes/Audience");
 
 const app = express();
 const server = http.createServer(app);
@@ -46,6 +47,8 @@ app.use("/api/team/view", viewTeamRouter);
 app.use("/api/team/add-member", addMembersToTeamRouter);
 app.use("/api/team/remove-member", removeMembersFromTeamRouter);
 app.use("/api/mailchimp", mailchimpRouter); // Mailchimp routes
+app.use("/api/audience", audienceRoutes);
+app.use("/uploads", express.static("uploads")); // To serve uploaded files
 
 // Error handling middleware
 app.use((err, req, res, next) => {
