@@ -113,20 +113,19 @@ const EmailSection = ({ onChange, lists = [] }) => {
           fullWidth
           margin="normal"
         >
-          {Array.isArray(lists) && lists.filter(Boolean).length > 0
-            ? lists
-                .filter(Boolean)
-                .map((list) => (
-                  <MenuItem key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))
-            : (
-              <MenuItem disabled value="">
-                No lists found
+          {/* Always show a default option */}
+          <MenuItem value="">
+            {Array.isArray(lists) && lists.filter(Boolean).length > 0
+              ? "Select a list"
+              : "No lists found"}
+          </MenuItem>
+          {Array.isArray(lists) &&
+            lists.filter(Boolean).length > 0 &&
+            lists.filter(Boolean).map((list) => (
+              <MenuItem key={list.id} value={list.id}>
+                {list.name}
               </MenuItem>
-            )
-          }
+            ))}
         </TextField>
       )}
 
