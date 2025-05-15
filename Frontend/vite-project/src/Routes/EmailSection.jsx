@@ -1,8 +1,15 @@
 // EmailSection.jsx
-import React, { useState } from "react";
-import { Box, Typography, TextField, Button, MenuItem, Paper } from "@mui/material";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  MenuItem,
+  Paper,
+} from "@mui/material";
+import { Editor, EditorState } from "draft-js";
+import "draft-js/dist/Draft.css";
 
 const AUDIENCE_OPTIONS = [
   { value: "existing", label: "Existing List" },
@@ -14,26 +21,38 @@ const EmailSection = ({ onChange }) => {
   const [subject, setSubject] = useState("");
   const [fromEmail] = useState("youragency@email.com");
   const [replyTo, setReplyTo] = useState("support@email.com");
-  const [emailBody, setEmailBody] = useState("");
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
   const [audienceType, setAudienceType] = useState("existing");
   const [manualEmails, setManualEmails] = useState("");
   const [csvFile, setCsvFile] = useState(null);
   const [existingList, setExistingList] = useState(""); // For dropdown if you fetch lists
 
   // Notify parent on change
-  React.useEffect(() => {
+  useEffect(() => {
     onChange &&
       onChange({
         subject,
         fromEmail,
         replyTo,
-        emailBody,
+        emailBody: editorState.getCurrentContent().getPlainText(),
         audienceType,
         manualEmails,
         csvFile,
         existingList,
       });
-  }, [subject, fromEmail, replyTo, emailBody, audienceType, manualEmails, csvFile, existingList, onChange]);
+  }, [
+    subject,
+    fromEmail,
+    replyTo,
+    editorState,
+    audienceType,
+    manualEmails,
+    csvFile,
+    existingList,
+    onChange,
+  ]);
 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
@@ -45,7 +64,7 @@ const EmailSection = ({ onChange }) => {
         fullWidth
         margin="normal"
         value={subject}
-        onChange={e => setSubject(e.target.value)}
+        onChange={(e) => setSubject(e.target.value)}
       />
       <TextField
         label="From"
@@ -59,13 +78,13 @@ const EmailSection = ({ onChange }) => {
         fullWidth
         margin="normal"
         value={replyTo}
-        onChange={e => setReplyTo(e.target.value)}
+        onChange={(e) => setReplyTo(e.target.value)}
       />
 
       <Typography variant="h6" mt={4} mb={2}>
         Compose Email
       </Typography>
-      <ReactQuill value={emailBody} onChange={setEmailBody} />
+      <Editor editorState={editorState} onChange={setEditorState} />
 
       <Typography variant="h6" mt={4} mb={2}>
         Audience Selection
@@ -74,11 +93,11 @@ const EmailSection = ({ onChange }) => {
         select
         label="Audience Type"
         value={audienceType}
-        onChange={e => setAudienceType(e.target.value)}
+        onChange={(e) => setAudienceType(e.target.value)}
         fullWidth
         margin="normal"
       >
-        {AUDIENCE_OPTIONS.map(opt => (
+        {AUDIENCE_OPTIONS.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
             {opt.label}
           </MenuItem>
@@ -90,7 +109,7 @@ const EmailSection = ({ onChange }) => {
           select
           label="Select Existing List"
           value={existingList}
-          onChange={e => setExistingList(e.target.value)}
+          onChange={(e) => setExistingList(e.target.value)}
           fullWidth
           margin="normal"
         >
@@ -108,7 +127,7 @@ const EmailSection = ({ onChange }) => {
               type="file"
               accept=".csv"
               hidden
-              onChange={e => setCsvFile(e.target.files[0])}
+              onChange={(e) => setCsvFile(e.target.files[0])}
             />
           </Button>
           {csvFile && <Typography mt={1}>{csvFile.name}</Typography>}
@@ -124,7 +143,7 @@ const EmailSection = ({ onChange }) => {
           rows={3}
           placeholder="Enter comma separated emails"
           value={manualEmails}
-          onChange={e => setManualEmails(e.target.value)}
+          onChange={(e) => setManualEmails(e.target.value)}
         />
       )}
     </Paper>
