@@ -75,10 +75,7 @@ function CreateCampaignPage() {
     startDate: "",
     endDate: "",
     status: "Draft",
-    channels: [
-      { campaignType: "email", configuration: {}, status: "draft" },
-      { campaignType: "google", configuration: {}, status: "draft" },
-    ],
+    channels,
   });
   // Channel selection and configuration
   const [selectedChannels, setSelectedChannels] = useState([]);
@@ -165,6 +162,8 @@ function CreateCampaignPage() {
         status: masterCampaign.status.toLowerCase(),
         channels,
       };
+
+      console.log("Payload being sent:", payload);
 
       const response = await axios.post(`${API_URL}/create`, payload);
 
