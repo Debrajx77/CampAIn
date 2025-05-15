@@ -150,6 +150,12 @@ function CreateCampaignPage() {
   // API call to create campaign
   const handleActivateCampaign = async () => {
     try {
+      const channels = selectedChannels.map((key) => ({
+        campaignType: key,
+        configuration: channelConfigs[key] || {},
+        status: "draft",
+      }));
+
       const payload = {
         name: masterCampaign.name,
         description: masterCampaign.description,
@@ -157,6 +163,7 @@ function CreateCampaignPage() {
         startDate: masterCampaign.startDate,
         endDate: masterCampaign.endDate,
         status: masterCampaign.status.toLowerCase(),
+        channels,
       };
 
       const response = await axios.post(`${API_URL}/create`, payload);
