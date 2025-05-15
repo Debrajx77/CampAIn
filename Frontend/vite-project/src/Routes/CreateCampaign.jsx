@@ -489,7 +489,7 @@ function CreateCampaignPage() {
             textAlign: "center",
           }}
         >
-          {ChannelConfigForm({ channelKey: activeChannel })}
+          <ChannelConfigForm channelKey={activeChannel} />
           <Box display="flex" justifyContent="space-between" mt={3}>
             <Button onClick={handleBack}>Back</Button>
             <Button
