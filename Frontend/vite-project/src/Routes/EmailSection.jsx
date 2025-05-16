@@ -71,6 +71,13 @@ const EmailSection = ({ onChange, lists = [] }) => {
     }
   }, [audienceType, JSON.stringify(lists)]);
 
+  // Helper: Only allow value that exists in MenuItems or ""
+  const getSafeExistingListValue = () => {
+    if (!Array.isArray(lists) || lists.length === 0) return "";
+    const validIds = lists.filter(Boolean).map((l) => String(l.id));
+    return validIds.includes(existingList) ? existingList : "";
+  };
+
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" mb={2}>
@@ -125,7 +132,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
         <TextField
           select
           label="Select Existing List"
-          value={lists && lists.length > 0 ? existingList : ""}
+          value={getSafeExistingListValue()}
           onChange={(e) => setExistingList(String(e.target.value))}
           fullWidth
           margin="normal"
