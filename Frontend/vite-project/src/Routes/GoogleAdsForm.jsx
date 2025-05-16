@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import GoogleAudienceSection from "./src/Routes/GoogleAudienceSection"; // Import the Google Audience Section
+import GoogleAdsAudienceSection from "./GoogleAdsAudienceSection"; // Import the Google Audience Section
 
 const GoogleAdsForm = ({
   onSubmit,
@@ -105,7 +105,7 @@ const GoogleAdsForm = ({
           )}
 
           {/* Integrate Google Audience Section */}
-          <GoogleAudienceSection />
+          <GoogleAdsAudienceSection />
 
           <Button
             variant="outlined"
