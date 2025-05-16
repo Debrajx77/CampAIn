@@ -108,7 +108,15 @@ const EmailSection = ({ onChange, lists = [] }) => {
           backgroundColor: "#fafafa",
         }}
       >
-        <Editor editorState={editorState} onChange={setEditorState} />
+        <Editor
+          editorState={editorState}
+          onChange={setEditorState}
+          placeholder="Compose your email here..."
+          editorKey="editor"
+          spellCheck={true}
+          textAlignment="left"
+          stripPastedStyles={true}
+        />
       </Box>
 
       <Typography variant="h6" mt={4} mb={2}>
