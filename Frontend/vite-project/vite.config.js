@@ -17,5 +17,6 @@ export default defineConfig({
       },
     },
     sourcemap: true, // ✅ Enable source maps for debugging
+    chunkSizeWarningLimit: 2000, // Increase chunk size warning limit
   },
 });

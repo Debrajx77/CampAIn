@@ -23,7 +23,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
-import EmailSection from "./EmailSection";
 
 // Channel definitions for easy extension
 const CHANNELS = [
@@ -530,5 +529,7 @@ function CreateCampaignPage() {
     </Box>
   );
 }
+
+const EmailSection = React.lazy(() => import("./EmailSection"));
 
 export default CreateCampaignPage;
