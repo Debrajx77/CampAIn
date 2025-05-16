@@ -8,13 +8,41 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 
-const GoogleAdsForm = ({ onSubmit }) => {
+const GoogleAdsForm = ({
+  onSubmit,
+  campaignId,
+  setConfiguredChannels,
+  toast,
+}) => {
   const [adTitle, setAdTitle] = useState("");
   const [adDescription, setAdDescription] = useState("");
   const [audienceType, setAudienceType] = useState("existing");
   const [selectedList, setSelectedList] = useState("");
   const [csvFile, setCsvFile] = useState(null);
+
+  // New state for Google Audience
+  const [demographics, setDemographics] = useState({
+    ageRange: [],
+    gender: [],
+    parentalStatus: [],
+  });
+  const [locationTargeting, setLocationTargeting] = useState({
+    country: "",
+    cityOrRegion: "",
+    radiusKm: 0,
+  });
+  const [languages, setLanguages] = useState([]);
+  const [interests, setInterests] = useState([]);
+  const [inMarketSegments, setInMarketSegments] = useState([]);
+  const [customAudience, setCustomAudience] = useState({
+    keywords: [],
+    urls: [],
+    apps: [],
+  });
+  const [deviceTargeting, setDeviceTargeting] = useState([]);
+  const [remarketing, setRemarketing] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,6 +56,37 @@ const GoogleAdsForm = ({ onSubmit }) => {
       formData.append("list", selectedList);
     }
     onSubmit(formData);
+  };
+
+  const handleSaveGoogleAds = async () => {
+    try {
+      const googleAdsData = {
+        title: adTitle,
+        description: adDescription,
+        audienceType,
+        list: selectedList,
+        csv: csvFile,
+        demographics,
+        locationTargeting,
+        languages,
+        interests,
+        inMarketSegments,
+        customAudience,
+        deviceTargeting,
+        remarketing,
+      };
+
+      await axios.post("/api/campaigns/save-google-ads", {
+        campaignId,
+        googleAds: googleAdsData,
+      });
+
+      setConfiguredChannels((prev) => ({ ...prev, googleAds: true }));
+      toast.success("Google Ads configuration saved.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save Google Ads.");
+    }
   };
 
   return (
@@ -92,8 +151,167 @@ const GoogleAdsForm = ({ onSubmit }) => {
             </div>
           )}
 
+          {/* Google Audience Section */}
+          <div>
+            <Typography>Demographics</Typography>
+            <TextField
+              label="Age Range"
+              value={demographics.ageRange.join(", ")}
+              onChange={(e) =>
+                setDemographics({
+                  ...demographics,
+                  ageRange: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="Gender"
+              value={demographics.gender.join(", ")}
+              onChange={(e) =>
+                setDemographics({
+                  ...demographics,
+                  gender: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="Parental Status"
+              value={demographics.parentalStatus.join(", ")}
+              onChange={(e) =>
+                setDemographics({
+                  ...demographics,
+                  parentalStatus: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Location Targeting</Typography>
+            <TextField
+              label="Country"
+              value={locationTargeting.country}
+              onChange={(e) =>
+                setLocationTargeting({
+                  ...locationTargeting,
+                  country: e.target.value,
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="City or Region"
+              value={locationTargeting.cityOrRegion}
+              onChange={(e) =>
+                setLocationTargeting({
+                  ...locationTargeting,
+                  cityOrRegion: e.target.value,
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="Radius (Km)"
+              type="number"
+              value={locationTargeting.radiusKm}
+              onChange={(e) =>
+                setLocationTargeting({
+                  ...locationTargeting,
+                  radiusKm: e.target.value,
+                })
+              }
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Languages</Typography>
+            <TextField
+              value={languages.join(", ")}
+              onChange={(e) => setLanguages(e.target.value.split(", "))}
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Interests</Typography>
+            <TextField
+              value={interests.join(", ")}
+              onChange={(e) => setInterests(e.target.value.split(", "))}
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>In-Market Segments</Typography>
+            <TextField
+              value={inMarketSegments.join(", ")}
+              onChange={(e) => setInMarketSegments(e.target.value.split(", "))}
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Custom Audience</Typography>
+            <TextField
+              label="Keywords"
+              value={customAudience.keywords.join(", ")}
+              onChange={(e) =>
+                setCustomAudience({
+                  ...customAudience,
+                  keywords: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="URLs"
+              value={customAudience.urls.join(", ")}
+              onChange={(e) =>
+                setCustomAudience({
+                  ...customAudience,
+                  urls: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+            <TextField
+              label="Apps"
+              value={customAudience.apps.join(", ")}
+              onChange={(e) =>
+                setCustomAudience({
+                  ...customAudience,
+                  apps: e.target.value.split(", "),
+                })
+              }
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Device Targeting</Typography>
+            <TextField
+              value={deviceTargeting.join(", ")}
+              onChange={(e) => setDeviceTargeting(e.target.value.split(", "))}
+              fullWidth
+            />
+          </div>
+          <div>
+            <Typography>Remarketing</Typography>
+            <TextField
+              value={remarketing.join(", ")}
+              onChange={(e) => setRemarketing(e.target.value.split(", "))}
+              fullWidth
+            />
+          </div>
+
           <Button type="submit" variant="contained" color="primary">
             Launch Ad
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleSaveGoogleAds}
+            sx={{ mt: 2 }}
+          >
+            Save Configuration
           </Button>
         </form>
       </CardContent>

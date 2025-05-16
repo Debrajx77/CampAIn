@@ -147,6 +147,12 @@ function CreateCampaignPage() {
   });
   const [selected, setSelected] = useState("");
 
+  const [configuredChannels, setConfiguredChannels] = useState({
+    googleAds: false,
+    email: false,
+    facebook: false,
+  });
+
   const options = [
     { id: "1", name: "List 1" },
     { id: "2", name: "List 2" },
@@ -243,43 +249,82 @@ function CreateCampaignPage() {
     return validIds.includes(selected) ? selected : "";
   };
 
-  const ReviewSection = () => (
-    <Box>
-      <Typography variant="h6" mb={2}>
-        Review & Launch
-      </Typography>
-      <Typography fontWeight={600}>Master Campaign</Typography>
-      <Typography>Name: {masterCampaign.name}</Typography>
-      <Typography>Description: {masterCampaign.description}</Typography>
-      <Typography>
-        Budget: {masterCampaign.budget} | Status: {masterCampaign.status}
-      </Typography>
-      <Typography>
-        Duration: {masterCampaign.startDate} to {masterCampaign.endDate}
-      </Typography>
-      <Box mt={2}>
-        <Typography fontWeight={600}>Channels</Typography>
-        {selectedChannels.map((key) => (
-          <Box key={key} mb={1}>
-            <Typography>
-              {CHANNELS.find((c) => c.key === key)?.title}:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {JSON.stringify(channelConfigs[key], null, 2)}
-            </Typography>
-          </Box>
-        ))}
+  const ReviewSection = () => {
+    const handleLaunchAllChannels = async () => {
+      try {
+        const channels = selectedChannels.map((key) => ({
+          campaignType: key,
+          configuration: channelConfigs[key] || {},
+          status: "active", // Change status to active for launching
+        }));
+
+        const payload = {
+          name: masterCampaign.name,
+          description: masterCampaign.description,
+          budget: Number(masterCampaign.budget),
+          startDate: masterCampaign.startDate,
+          endDate: masterCampaign.endDate,
+          status: masterCampaign.status.toLowerCase(),
+          channels,
+        };
+
+        const response = await axios.post(`${API_URL}/launch`, payload);
+
+        setToast({
+          open: true,
+          message: "All channels launched successfully!",
+          severity: "success",
+        });
+        console.log("Channels launched:", response.data);
+      } catch (error) {
+        console.error("Failed to launch channels:", error);
+        setToast({
+          open: true,
+          message: "Failed to launch channels",
+          severity: "error",
+        });
+      }
+    };
+
+    return (
+      <Box>
+        <Typography variant="h6" mb={2}>
+          Review & Launch
+        </Typography>
+        <Typography fontWeight={600}>Master Campaign</Typography>
+        <Typography>Name: {masterCampaign.name}</Typography>
+        <Typography>Description: {masterCampaign.description}</Typography>
+        <Typography>
+          Budget: {masterCampaign.budget} | Status: {masterCampaign.status}
+        </Typography>
+        <Typography>
+          Duration: {masterCampaign.startDate} to {masterCampaign.endDate}
+        </Typography>
+        <Box mt={2}>
+          <Typography fontWeight={600}>Channels</Typography>
+          {selectedChannels.map((key) => (
+            <Box key={key} mb={1}>
+              <Typography>
+                {CHANNELS.find((c) => c.key === key)?.title}:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {JSON.stringify(channelConfigs[key], null, 2)}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 3 }}
+          onClick={handleLaunchAllChannels}
+          disabled={!Object.values(configuredChannels).every(Boolean)}
+        >
+          Launch All Channels
+        </Button>
       </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ mt: 3 }}
-        onClick={handleActivateCampaign}
-      >
-        Activate Campaign
-      </Button>
-    </Box>
-  );
+    );
+  };
 
   return (
     <Box
