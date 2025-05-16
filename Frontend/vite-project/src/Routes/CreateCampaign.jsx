@@ -26,7 +26,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
 
 const EmailSection = React.lazy(() => import("./EmailSection"));
-import GoogleAdsForm from "./src/Routes/GoogleAdsForm";
+import GoogleAdsForm from "./GoogleAdsForm";
 
 const CHANNELS = [
   {
