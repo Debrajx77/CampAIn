@@ -61,12 +61,13 @@ const STEPS = [
   "Channel Setup",
   "Review & Launch",
 ];
+
 const API_URL = "https://campain-b2rr.onrender.com/api/campaigns";
 
 const ChannelConfigForm = ({
   channelKey,
-  channelConfigs, // Add as prop
-  handleChannelConfigChange, // Add as prop
+  channelConfigs,
+  handleChannelConfigChange,
 }) => {
   switch (channelKey) {
     case "email":
@@ -99,9 +100,7 @@ const ChannelConfigForm = ({
             margin="normal"
             value={channelConfigs.google?.keywords || ""}
             onChange={(e) =>
-              handleChannelConfigChange("google", {
-                keywords: e.target.value,
-              })
+              handleChannelConfigChange("google", { keywords: e.target.value })
             }
             helperText="Comma separated"
           />
@@ -178,7 +177,7 @@ function CreateCampaignPage() {
   const options = [
     { id: "1", name: "List 1" },
     { id: "2", name: "List 2" },
-  ]; // Sample options
+  ];
 
   const handleMasterChange = (e) => {
     setMasterCampaign({ ...masterCampaign, [e.target.name]: e.target.value });
@@ -197,25 +196,16 @@ function CreateCampaignPage() {
     setStep((s) => s + 1);
   };
 
-  const handleBack = () =>  {step === 2 && activeChannel && (
-    <Box
-      sx={{
-        p: 3,
-        borderRadius: 2,
-        background: theme.palette.background.paper,
-        boxShadow: 2,
-        minWidth: isMobile ? "90vw" : 400,
-      }}
-    >
-      <ChannelConfigForm 
-        channelKey={activeChannel}
-        channelConfigs={channelConfigs}                // Pass state as prop
-        handleChannelConfigChange={handleChannelConfigChange}  // Pass handler
-      />
-      {/* ... rest of step 3 code ... */}
-    </Box>
-  )}
-}
+  const handleBack = () => {
+    if (step === 2 && activeChannel) {
+      const idx = selectedChannels.indexOf(activeChannel);
+      if (idx > 0) {
+        setActiveChannel(selectedChannels[idx - 1]);
+        return;
+      }
+    }
+    setStep((s) => s - 1);
+  };
 
   const handleChannelConfigChange = (channelKey, config) => {
     setChannelConfigs((prev) => ({
@@ -230,7 +220,7 @@ function CreateCampaignPage() {
       setActiveChannel(selectedChannels[idx + 1]);
     } else {
       setActiveChannel(null);
-      setStep(3); // Move to Review
+      setStep(3);
     }
   };
 
@@ -341,7 +331,6 @@ function CreateCampaignPage() {
         ))}
       </Stepper>
 
-      {/* Step 1 */}
       {step === 0 && (
         <Box
           sx={{
@@ -444,7 +433,6 @@ function CreateCampaignPage() {
         </Box>
       )}
 
-      {/* Step 2 */}
       {step === 1 && (
         <Box sx={{ width: "100%", maxWidth: 900 }}>
           <Typography variant="h5" fontWeight={600} mb={2} align="center">
@@ -504,7 +492,6 @@ function CreateCampaignPage() {
         </Box>
       )}
 
-      {/* Step 3 */}
       {step === 2 && activeChannel && (
         <Box
           sx={{
@@ -515,7 +502,11 @@ function CreateCampaignPage() {
             minWidth: isMobile ? "90vw" : 400,
           }}
         >
-          <ChannelConfigForm channelKey={activeChannel} />
+          <ChannelConfigForm
+            channelKey={activeChannel}
+            channelConfigs={channelConfigs}
+            handleChannelConfigChange={handleChannelConfigChange}
+          />
           <Box display="flex" justifyContent="space-between" mt={3}>
             <Button onClick={handleBack}>Back</Button>
             <Button
@@ -532,7 +523,6 @@ function CreateCampaignPage() {
         </Box>
       )}
 
-      {/* Step 4 */}
       {step === 3 && <ReviewSection />}
 
       <Snackbar
