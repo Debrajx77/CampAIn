@@ -9,7 +9,7 @@ import {
   Textarea,
   Select,
   SelectItem,
-} from "@/components/ui";
+} from "@mui/material";
 
 const GoogleAdsForm = ({ onSubmit }) => {
   const [adTitle, setAdTitle] = useState("");
