@@ -1,4 +1,3 @@
-// EmailSection.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -30,19 +29,16 @@ const EmailSection = ({ onChange, lists = [] }) => {
   const [existingList, setExistingList] = useState("");
 
   useEffect(() => {
-    if (onChange) {
-      onChange({
-        subject,
-        fromEmail,
-        replyTo,
-        emailBody: editorState.getCurrentContent().getPlainText(),
-        audienceType,
-        manualEmails,
-        csvFile,
-        existingList,
-      });
-    }
-    // eslint-disable-next-line
+    onChange?.({
+      subject,
+      fromEmail,
+      replyTo,
+      emailBody: editorState.getCurrentContent().getPlainText(),
+      audienceType,
+      manualEmails,
+      csvFile,
+      existingList,
+    });
   }, [
     subject,
     fromEmail,
@@ -52,22 +48,20 @@ const EmailSection = ({ onChange, lists = [] }) => {
     manualEmails,
     csvFile,
     existingList,
+    onChange,
   ]);
 
   useEffect(() => {
-    if (audienceType !== "existing") {
-      if (existingList !== "") setExistingList("");
-      return;
+    if (audienceType !== "existing" && existingList !== "") {
+      setExistingList("");
     }
-    if (Array.isArray(lists) && lists.length > 0) {
+    if (audienceType === "existing") {
       const validIds = lists.filter(Boolean).map((l) => String(l.id));
       if (existingList && !validIds.includes(existingList)) {
         setExistingList("");
       }
-    } else if (existingList !== "") {
-      setExistingList("");
     }
-  }, [audienceType, JSON.stringify(lists)]);
+  }, [audienceType, existingList, lists]);
 
   const getSafeExistingListValue = () => {
     if (!Array.isArray(lists) || lists.length === 0) return "";

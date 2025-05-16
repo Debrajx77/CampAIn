@@ -85,6 +85,12 @@ function CreateCampaignPage() {
     message: "",
     severity: "success",
   });
+  const [selected, setSelected] = useState("");
+
+  const options = [
+    { id: "1", name: "List 1" },
+    { id: "2", name: "List 2" },
+  ]; // Sample options
 
   const handleMasterChange = (e) => {
     setMasterCampaign({ ...masterCampaign, [e.target.name]: e.target.value });
@@ -170,6 +176,11 @@ function CreateCampaignPage() {
         severity: "error",
       });
     }
+  };
+
+  const getSafeValue = () => {
+    const validIds = options.map((o) => String(o.id));
+    return validIds.includes(selected) ? selected : "";
   };
 
   const ChannelConfigForm = ({ channelKey }) => {
@@ -389,6 +400,20 @@ function CreateCampaignPage() {
           >
             <MenuItem value="draft">Draft</MenuItem>
             <MenuItem value="active">Active</MenuItem>
+          </TextField>
+          <TextField
+            select
+            label="Select List"
+            value={getSafeValue()}
+            onChange={(e) => setSelected(String(e.target.value))}
+            fullWidth
+          >
+            <MenuItem value="">Select a list</MenuItem>
+            {options.map((opt) => (
+              <MenuItem key={opt.id} value={String(opt.id)}>
+                {opt.name}
+              </MenuItem>
+            ))}
           </TextField>
           <Button
             variant="contained"
