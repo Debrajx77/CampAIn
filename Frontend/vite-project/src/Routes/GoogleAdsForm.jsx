@@ -1,14 +1,12 @@
-// Folder: frontend/components/campaigns/GoogleAdsForm.jsx
 import React, { useState } from "react";
 import {
   Card,
   CardContent,
-  Input,
-  Label,
   Button,
-  Textarea,
+  TextField,
   Select,
-  SelectItem,
+  MenuItem,
+  Typography,
 } from "@mui/material";
 
 const GoogleAdsForm = ({ onSubmit }) => {
@@ -37,51 +35,66 @@ const GoogleAdsForm = ({ onSubmit }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Ad Title</Label>
-            <Input
+            <Typography>Ad Title</Typography>
+            <TextField
               value={adTitle}
               onChange={(e) => setAdTitle(e.target.value)}
               required
+              fullWidth
             />
           </div>
           <div>
-            <Label>Ad Description</Label>
-            <Textarea
+            <Typography>Ad Description</Typography>
+            <TextField
               value={adDescription}
               onChange={(e) => setAdDescription(e.target.value)}
               required
+              fullWidth
+              multiline
+              rows={4}
             />
           </div>
           <div>
-            <Label>Audience</Label>
-            <Select value={audienceType} onValueChange={setAudienceType}>
-              <SelectItem value="existing">Use Existing List</SelectItem>
-              <SelectItem value="csv">Upload CSV</SelectItem>
-              <SelectItem value="manual">Create Manual List</SelectItem>
+            <Typography>Audience</Typography>
+            <Select
+              value={audienceType}
+              onChange={(e) => setAudienceType(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="existing">Use Existing List</MenuItem>
+              <MenuItem value="csv">Upload CSV</MenuItem>
+              <MenuItem value="manual">Create Manual List</MenuItem>
             </Select>
           </div>
 
           {audienceType === "existing" && (
             <div>
-              <Label>Select Audience List</Label>
-              <Select value={selectedList} onValueChange={setSelectedList}>
-                <SelectItem value="fashion">Fashion Users</SelectItem>
-                <SelectItem value="tech">Tech Buyers</SelectItem>
+              <Typography>Select Audience List</Typography>
+              <Select
+                value={selectedList}
+                onChange={(e) => setSelectedList(e.target.value)}
+                fullWidth
+              >
+                <MenuItem value="fashion">Fashion Users</MenuItem>
+                <MenuItem value="tech">Tech Buyers</MenuItem>
               </Select>
             </div>
           )}
 
           {audienceType === "csv" && (
             <div>
-              <Label>Upload CSV</Label>
-              <Input
+              <Typography>Upload CSV</Typography>
+              <TextField
                 type="file"
                 onChange={(e) => setCsvFile(e.target.files[0])}
+                fullWidth
               />
             </div>
           )}
 
-          <Button type="submit">Launch Ad</Button>
+          <Button type="submit" variant="contained" color="primary">
+            Launch Ad
+          </Button>
         </form>
       </CardContent>
     </Card>
