@@ -117,9 +117,9 @@ const EmailSection = ({ onChange, lists = [] }) => {
       <Box
         sx={{
           border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "12px",
-          backgroundColor: "#fafafa",
+          borderRadius: "6px",
+          backgroundColor: "#f9f9f9", // Light grey
+          padding: 2,
         }}
       >
         <Box sx={{ mb: 1, display: "flex", gap: 1 }}>
@@ -146,13 +146,17 @@ const EmailSection = ({ onChange, lists = [] }) => {
             </IconButton>
           </Tooltip>
         </Box>
+
         <Box
           sx={{
-            minHeight: "120px",
+            minHeight: "150px",
+            padding: "12px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: "#fff", // Pure white inside the editor
             cursor: "text",
           }}
           onClick={() => {
-            // focus editor when box is clicked
             document.querySelector("[data-editor]")?.focus();
           }}
         >
