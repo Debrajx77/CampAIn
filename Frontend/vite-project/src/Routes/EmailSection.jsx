@@ -154,6 +154,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
             border: "1px solid #ddd",
             borderRadius: "4px",
             backgroundColor: "#fff", // Pure white inside the editor
+            color: "#000",
             cursor: "text",
           }}
           onClick={() => {
