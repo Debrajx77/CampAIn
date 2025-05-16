@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import GoogleAudienceSection from "./GoogleAudienceSection"; // Import the Google Audience Section
 
 const GoogleAdsForm = ({
   onSubmit,
@@ -20,29 +21,6 @@ const GoogleAdsForm = ({
   const [adDescription, setAdDescription] = useState("");
   const [audienceType, setAudienceType] = useState("existing");
   const [selectedList, setSelectedList] = useState("");
-  const [csvFile, setCsvFile] = useState(null);
-
-  // New state for Google Audience
-  const [demographics, setDemographics] = useState({
-    ageRange: [],
-    gender: [],
-    parentalStatus: [],
-  });
-  const [locationTargeting, setLocationTargeting] = useState({
-    country: "",
-    cityOrRegion: "",
-    radiusKm: 0,
-  });
-  const [languages, setLanguages] = useState([]);
-  const [interests, setInterests] = useState([]);
-  const [inMarketSegments, setInMarketSegments] = useState([]);
-  const [customAudience, setCustomAudience] = useState({
-    keywords: [],
-    urls: [],
-    apps: [],
-  });
-  const [deviceTargeting, setDeviceTargeting] = useState([]);
-  const [remarketing, setRemarketing] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,11 +28,7 @@ const GoogleAdsForm = ({
     formData.append("title", adTitle);
     formData.append("description", adDescription);
     formData.append("audienceType", audienceType);
-    if (audienceType === "csv") {
-      formData.append("csv", csvFile);
-    } else {
-      formData.append("list", selectedList);
-    }
+    formData.append("list", selectedList);
     onSubmit(formData);
   };
 
@@ -65,15 +39,6 @@ const GoogleAdsForm = ({
         description: adDescription,
         audienceType,
         list: selectedList,
-        csv: csvFile,
-        demographics,
-        locationTargeting,
-        languages,
-        interests,
-        inMarketSegments,
-        customAudience,
-        deviceTargeting,
-        remarketing,
       };
 
       await axios.post("/api/campaigns/save-google-ads", {
@@ -121,7 +86,6 @@ const GoogleAdsForm = ({
               fullWidth
             >
               <MenuItem value="existing">Use Existing List</MenuItem>
-              <MenuItem value="csv">Upload CSV</MenuItem>
               <MenuItem value="manual">Create Manual List</MenuItem>
             </Select>
           </div>
@@ -140,171 +104,9 @@ const GoogleAdsForm = ({
             </div>
           )}
 
-          {audienceType === "csv" && (
-            <div>
-              <Typography>Upload CSV</Typography>
-              <TextField
-                type="file"
-                onChange={(e) => setCsvFile(e.target.files[0])}
-                fullWidth
-              />
-            </div>
-          )}
+          {/* Integrate Google Audience Section */}
+          <GoogleAudienceSection />
 
-          {/* Google Audience Section */}
-          <div>
-            <Typography>Demographics</Typography>
-            <TextField
-              label="Age Range"
-              value={demographics.ageRange.join(", ")}
-              onChange={(e) =>
-                setDemographics({
-                  ...demographics,
-                  ageRange: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="Gender"
-              value={demographics.gender.join(", ")}
-              onChange={(e) =>
-                setDemographics({
-                  ...demographics,
-                  gender: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="Parental Status"
-              value={demographics.parentalStatus.join(", ")}
-              onChange={(e) =>
-                setDemographics({
-                  ...demographics,
-                  parentalStatus: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Location Targeting</Typography>
-            <TextField
-              label="Country"
-              value={locationTargeting.country}
-              onChange={(e) =>
-                setLocationTargeting({
-                  ...locationTargeting,
-                  country: e.target.value,
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="City or Region"
-              value={locationTargeting.cityOrRegion}
-              onChange={(e) =>
-                setLocationTargeting({
-                  ...locationTargeting,
-                  cityOrRegion: e.target.value,
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="Radius (Km)"
-              type="number"
-              value={locationTargeting.radiusKm}
-              onChange={(e) =>
-                setLocationTargeting({
-                  ...locationTargeting,
-                  radiusKm: e.target.value,
-                })
-              }
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Languages</Typography>
-            <TextField
-              value={languages.join(", ")}
-              onChange={(e) => setLanguages(e.target.value.split(", "))}
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Interests</Typography>
-            <TextField
-              value={interests.join(", ")}
-              onChange={(e) => setInterests(e.target.value.split(", "))}
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>In-Market Segments</Typography>
-            <TextField
-              value={inMarketSegments.join(", ")}
-              onChange={(e) => setInMarketSegments(e.target.value.split(", "))}
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Custom Audience</Typography>
-            <TextField
-              label="Keywords"
-              value={customAudience.keywords.join(", ")}
-              onChange={(e) =>
-                setCustomAudience({
-                  ...customAudience,
-                  keywords: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="URLs"
-              value={customAudience.urls.join(", ")}
-              onChange={(e) =>
-                setCustomAudience({
-                  ...customAudience,
-                  urls: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-            <TextField
-              label="Apps"
-              value={customAudience.apps.join(", ")}
-              onChange={(e) =>
-                setCustomAudience({
-                  ...customAudience,
-                  apps: e.target.value.split(", "),
-                })
-              }
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Device Targeting</Typography>
-            <TextField
-              value={deviceTargeting.join(", ")}
-              onChange={(e) => setDeviceTargeting(e.target.value.split(", "))}
-              fullWidth
-            />
-          </div>
-          <div>
-            <Typography>Remarketing</Typography>
-            <TextField
-              value={remarketing.join(", ")}
-              onChange={(e) => setRemarketing(e.target.value.split(", "))}
-              fullWidth
-            />
-          </div>
-
-          <Button type="submit" variant="contained" color="primary">
-            Launch Ad
-          </Button>
           <Button
             variant="outlined"
             color="secondary"
