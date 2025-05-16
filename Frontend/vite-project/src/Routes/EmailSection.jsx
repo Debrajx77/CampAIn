@@ -6,9 +6,15 @@ import {
   Button,
   MenuItem,
   Paper,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Editor, EditorState } from "draft-js";
+import { Editor, EditorState, RichUtils, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
+import FormatBoldIcon from "@mui/icons-material/FormatBold";
+import FormatItalicIcon from "@mui/icons-material/FormatItalic";
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 const AUDIENCE_OPTIONS = [
   { value: "existing", label: "Existing List" },
@@ -33,7 +39,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
       subject,
       fromEmail,
       replyTo,
-      emailBody: editorState.getCurrentContent().getPlainText(),
+      emailBody: convertToRaw(editorState.getCurrentContent()),
       audienceType,
       manualEmails,
       csvFile,
@@ -69,6 +75,14 @@ const EmailSection = ({ onChange, lists = [] }) => {
     return validIds.includes(existingList) ? existingList : "";
   };
 
+  const handleStyleClick = (style) => {
+    setEditorState(RichUtils.toggleInlineStyle(editorState, style));
+  };
+
+  const handleBlockTypeClick = (blockType) => {
+    setEditorState(RichUtils.toggleBlockType(editorState, blockType));
+  };
+
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" mb={2}>
@@ -99,24 +113,56 @@ const EmailSection = ({ onChange, lists = [] }) => {
       <Typography variant="h6" mt={4} mb={2}>
         Compose Email
       </Typography>
+
       <Box
         sx={{
           border: "1px solid #ccc",
           borderRadius: "4px",
           padding: "12px",
-          minHeight: "120px",
           backgroundColor: "#fafafa",
         }}
       >
-        <Editor
-          editorState={editorState}
-          onChange={setEditorState}
-          placeholder="Compose your email here..."
-          editorKey="editor"
-          spellCheck={true}
-          textAlignment="left"
-          stripPastedStyles={true}
-        />
+        <Box sx={{ mb: 1, display: "flex", gap: 1 }}>
+          <Tooltip title="Bold">
+            <IconButton onClick={() => handleStyleClick("BOLD")}>
+              <FormatBoldIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Italic">
+            <IconButton onClick={() => handleStyleClick("ITALIC")}>
+              <FormatItalicIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Underline">
+            <IconButton onClick={() => handleStyleClick("UNDERLINE")}>
+              <FormatUnderlinedIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Bullet List">
+            <IconButton
+              onClick={() => handleBlockTypeClick("unordered-list-item")}
+            >
+              <FormatListBulletedIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            minHeight: "120px",
+            cursor: "text",
+          }}
+          onClick={() => {
+            // focus editor when box is clicked
+            document.querySelector("[data-editor]")?.focus();
+          }}
+        >
+          <Editor
+            editorState={editorState}
+            onChange={setEditorState}
+            placeholder="Compose your email here..."
+            spellCheck
+          />
+        </Box>
       </Box>
 
       <Typography variant="h6" mt={4} mb={2}>
