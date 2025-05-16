@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
+const protect = require("../middleware/protect");
 
 // Create a new Master Campaign (Draft or Active)
 router.post("/create", async (req, res) => {
