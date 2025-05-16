@@ -29,7 +29,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
   const [csvFile, setCsvFile] = useState(null);
   const [existingList, setExistingList] = useState("");
 
-  // Notify parent on change
   useEffect(() => {
     if (onChange) {
       onChange({
@@ -55,7 +54,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
     existingList,
   ]);
 
-  // Reset existingList if audienceType changes or lists change
   useEffect(() => {
     if (audienceType !== "existing") {
       if (existingList !== "") setExistingList("");
@@ -71,7 +69,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
     }
   }, [audienceType, JSON.stringify(lists)]);
 
-  // Helper: Only allow value that exists in MenuItems or ""
   const getSafeExistingListValue = () => {
     if (!Array.isArray(lists) || lists.length === 0) return "";
     const validIds = lists.filter(Boolean).map((l) => String(l.id));
@@ -108,7 +105,17 @@ const EmailSection = ({ onChange, lists = [] }) => {
       <Typography variant="h6" mt={4} mb={2}>
         Compose Email
       </Typography>
-      <Editor editorState={editorState} onChange={setEditorState} />
+      <Box
+        sx={{
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          padding: "12px",
+          minHeight: "120px",
+          backgroundColor: "#fafafa",
+        }}
+      >
+        <Editor editorState={editorState} onChange={setEditorState} />
+      </Box>
 
       <Typography variant="h6" mt={4} mb={2}>
         Audience Selection
@@ -143,7 +150,6 @@ const EmailSection = ({ onChange, lists = [] }) => {
               : "No lists found"}
           </MenuItem>
           {Array.isArray(lists) &&
-            lists.filter(Boolean).length > 0 &&
             lists.filter(Boolean).map((list) => (
               <MenuItem key={String(list.id)} value={String(list.id)}>
                 {list.name}
@@ -163,7 +169,9 @@ const EmailSection = ({ onChange, lists = [] }) => {
               onChange={(e) => setCsvFile(e.target.files[0])}
             />
           </Button>
-          {csvFile && <Typography mt={1}>{csvFile.name}</Typography>}
+          {csvFile?.name && (
+            <Typography mt={1}>{String(csvFile.name)}</Typography>
+          )}
         </Box>
       )}
 
