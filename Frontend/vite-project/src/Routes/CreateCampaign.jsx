@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import {
   Grid,
   Card,
@@ -16,6 +16,7 @@ import {
   StepLabel,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -24,7 +25,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import axios from "axios";
 
-// Channel definitions for easy extension
+const EmailSection = React.lazy(() => import("./EmailSection"));
+
 const CHANNELS = [
   {
     key: "email",
@@ -59,40 +61,31 @@ const STEPS = [
   "Channel Setup",
   "Review & Launch",
 ];
-
 const API_URL = "https://campain-b2rr.onrender.com/api/campaigns";
 
 function CreateCampaignPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  // Step management
+
   const [step, setStep] = useState(0);
-  // Master Campaign State
   const [masterCampaign, setMasterCampaign] = useState({
     name: "",
     description: "",
     budget: "",
     startDate: "",
     endDate: "",
-    status: "Draft",
+    status: "draft",
   });
-  // Channel selection and configuration
+
   const [selectedChannels, setSelectedChannels] = useState([]);
   const [channelConfigs, setChannelConfigs] = useState({});
-  // Channel currently being configured
   const [activeChannel, setActiveChannel] = useState(null);
-
-  // Snackbar state
   const [toast, setToast] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  // Sahi
-  const [emailLists, setEmailLists] = useState([]);
-
-  // Handlers
   const handleMasterChange = (e) => {
     setMasterCampaign({ ...masterCampaign, [e.target.name]: e.target.value });
   };
@@ -138,15 +131,11 @@ function CreateCampaignPage() {
     }
   };
 
-  // Toast handlers
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  const handleToastClose = (_, reason) => {
+    if (reason === "clickaway") return;
     setToast({ ...toast, open: false });
   };
 
-  // API call to create campaign
   const handleActivateCampaign = async () => {
     try {
       const channels = selectedChannels.map((key) => ({
@@ -165,8 +154,6 @@ function CreateCampaignPage() {
         channels,
       };
 
-      console.log("Payload being sent:", payload);
-
       const response = await axios.post(`${API_URL}/create`, payload);
 
       setToast({
@@ -174,7 +161,6 @@ function CreateCampaignPage() {
         message: "Campaign created successfully!",
         severity: "success",
       });
-
       console.log("Campaign created:", response.data);
     } catch (error) {
       console.error("Failed to create campaign:", error);
@@ -186,16 +172,16 @@ function CreateCampaignPage() {
     }
   };
 
-  // Channel Config Forms (modular, easy to extend)
   const ChannelConfigForm = ({ channelKey }) => {
     switch (channelKey) {
       case "email":
         return (
-          <EmailSection
-            lists={emailLists}
-            onChange={(data) => handleChannelConfigChange("email", data)}
-            value={channelConfigs.email || {}}
-          />
+          <Suspense fallback={<CircularProgress />}>
+            <EmailSection
+              onChange={(data) => handleChannelConfigChange("email", data)}
+              value={channelConfigs.email || {}}
+            />
+          </Suspense>
         );
       case "google":
         return (
@@ -264,11 +250,12 @@ function CreateCampaignPage() {
           </Box>
         );
       default:
-        return null; // <-- Always return something!
+        return (
+          <Typography>No configuration available for this channel.</Typography>
+        );
     }
   };
 
-  // Review Section
   const ReviewSection = () => (
     <Box>
       <Typography variant="h6" mb={2}>
@@ -307,12 +294,10 @@ function CreateCampaignPage() {
     </Box>
   );
 
-  // Main Render
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        background: theme.palette.background.default,
         py: 6,
         px: 2,
         display: "flex",
@@ -331,7 +316,8 @@ function CreateCampaignPage() {
           </Step>
         ))}
       </Stepper>
-      {/* Step 1: Master Campaign */}
+
+      {/* Step 1 */}
       {step === 0 && (
         <Box
           sx={{
@@ -340,7 +326,6 @@ function CreateCampaignPage() {
             background: theme.palette.background.paper,
             boxShadow: 2,
             minWidth: isMobile ? "90vw" : 400,
-            textAlign: "center",
           }}
         >
           <Typography variant="h5" fontWeight={600} mb={2}>
@@ -420,7 +405,8 @@ function CreateCampaignPage() {
           </Button>
         </Box>
       )}
-      {/* Step 2: Configure Channels */}
+
+      {/* Step 2 */}
       {step === 1 && (
         <Box sx={{ width: "100%", maxWidth: 900 }}>
           <Typography variant="h5" fontWeight={600} mb={2} align="center">
@@ -436,7 +422,6 @@ function CreateCampaignPage() {
                     border: selectedChannels.includes(type.key)
                       ? `2px solid ${theme.palette.primary.main}`
                       : "2px solid transparent",
-                    transition: "box-shadow 0.2s, border 0.2s",
                     background: selectedChannels.includes(type.key)
                       ? theme.palette.action.selected
                       : theme.palette.background.paper,
@@ -480,7 +465,8 @@ function CreateCampaignPage() {
           </Box>
         </Box>
       )}
-      {/* Step 3: Channel Configuration */}
+
+      {/* Step 3 */}
       {step === 2 && activeChannel && (
         <Box
           sx={{
@@ -489,7 +475,6 @@ function CreateCampaignPage() {
             background: theme.palette.background.paper,
             boxShadow: 2,
             minWidth: isMobile ? "90vw" : 400,
-            textAlign: "center",
           }}
         >
           <ChannelConfigForm channelKey={activeChannel} />
@@ -508,10 +493,10 @@ function CreateCampaignPage() {
           </Box>
         </Box>
       )}
-      {/* Step 4: Review & Launch */}
+
+      {/* Step 4 */}
       {step === 3 && <ReviewSection />}
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={toast.open}
         autoHideDuration={3000}
@@ -529,7 +514,5 @@ function CreateCampaignPage() {
     </Box>
   );
 }
-
-const EmailSection = React.lazy(() => import("./EmailSection"));
 
 export default CreateCampaignPage;
