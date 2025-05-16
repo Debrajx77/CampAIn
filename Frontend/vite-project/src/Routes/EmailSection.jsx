@@ -7,14 +7,10 @@ import {
   MenuItem,
   Paper,
   IconButton,
-  Tooltip,
+  Stack,
 } from "@mui/material";
-import { Editor, EditorState, RichUtils, convertToRaw } from "draft-js";
+import { Editor, EditorState, RichUtils } from "draft-js";
 import "draft-js/dist/Draft.css";
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 const AUDIENCE_OPTIONS = [
   { value: "existing", label: "Existing List" },
@@ -39,7 +35,7 @@ const EmailSection = ({ onChange, lists = [] }) => {
       subject,
       fromEmail,
       replyTo,
-      emailBody: convertToRaw(editorState.getCurrentContent()),
+      emailBody: editorState.getCurrentContent().getPlainText(),
       audienceType,
       manualEmails,
       csvFile,
@@ -75,12 +71,8 @@ const EmailSection = ({ onChange, lists = [] }) => {
     return validIds.includes(existingList) ? existingList : "";
   };
 
-  const handleStyleClick = (style) => {
+  const handleStyleToggle = (style) => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, style));
-  };
-
-  const handleBlockTypeClick = (blockType) => {
-    setEditorState(RichUtils.toggleBlockType(editorState, blockType));
   };
 
   return (
@@ -110,64 +102,51 @@ const EmailSection = ({ onChange, lists = [] }) => {
         onChange={(e) => setReplyTo(e.target.value)}
       />
 
-      <Typography variant="h6" mt={4} mb={2}>
+      <Typography variant="h6" mt={4} mb={1}>
         Compose Email
       </Typography>
 
+      {/* === Toolbar === */}
+      <Stack direction="row" spacing={1} mb={1}>
+        <Button
+          variant="outlined"
+          onClick={() => handleStyleToggle("BOLD")}
+          size="small"
+        >
+          Bold
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => handleStyleToggle("ITALIC")}
+          size="small"
+        >
+          Italic
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => handleStyleToggle("UNDERLINE")}
+          size="small"
+        >
+          Underline
+        </Button>
+      </Stack>
+
+      {/* === Draft.js Editor === */}
       <Box
         sx={{
           border: "1px solid #ccc",
-          borderRadius: "6px",
-          backgroundColor: "#f9f9f9", // Light grey
-          padding: 2,
+          borderRadius: "4px",
+          padding: "12px",
+          minHeight: "120px",
+          backgroundColor: "#fff",
+          color: "#000",
         }}
       >
-        <Box sx={{ mb: 1, display: "flex", gap: 1 }}>
-          <Tooltip title="Bold">
-            <IconButton onClick={() => handleStyleClick("BOLD")}>
-              <FormatBoldIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Italic">
-            <IconButton onClick={() => handleStyleClick("ITALIC")}>
-              <FormatItalicIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Underline">
-            <IconButton onClick={() => handleStyleClick("UNDERLINE")}>
-              <FormatUnderlinedIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Bullet List">
-            <IconButton
-              onClick={() => handleBlockTypeClick("unordered-list-item")}
-            >
-              <FormatListBulletedIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        <Box
-          sx={{
-            minHeight: "150px",
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            backgroundColor: "#fff", // Pure white inside the editor
-            color: "#000",
-            cursor: "text",
-          }}
-          onClick={() => {
-            document.querySelector("[data-editor]")?.focus();
-          }}
-        >
-          <Editor
-            editorState={editorState}
-            onChange={setEditorState}
-            placeholder="Compose your email here..."
-            spellCheck
-          />
-        </Box>
+        <Editor
+          editorState={editorState}
+          onChange={setEditorState}
+          placeholder="Compose your email here..."
+        />
       </Box>
 
       <Typography variant="h6" mt={4} mb={2}>
