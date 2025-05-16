@@ -63,6 +63,90 @@ const STEPS = [
 ];
 const API_URL = "https://campain-b2rr.onrender.com/api/campaigns";
 
+const ChannelConfigForm = ({ channelKey }) => {
+  switch (channelKey) {
+    case "email":
+      return (
+        <Suspense fallback={<CircularProgress />}>
+          <EmailSection
+            onChange={(data) => handleChannelConfigChange("email", data)}
+            value={channelConfigs.email || {}}
+          />
+        </Suspense>
+      );
+    case "google":
+      return (
+        <Box>
+          <Typography variant="h6" mb={2}>
+            Google Ads Setup
+          </Typography>
+          <TextField
+            label="Ad Title"
+            fullWidth
+            margin="normal"
+            value={channelConfigs.google?.adTitle || ""}
+            onChange={(e) =>
+              handleChannelConfigChange("google", { adTitle: e.target.value })
+            }
+          />
+          <TextField
+            label="Keywords"
+            fullWidth
+            margin="normal"
+            value={channelConfigs.google?.keywords || ""}
+            onChange={(e) =>
+              handleChannelConfigChange("google", {
+                keywords: e.target.value,
+              })
+            }
+            helperText="Comma separated"
+          />
+          <TextField
+            label="Budget"
+            fullWidth
+            margin="normal"
+            type="number"
+            value={channelConfigs.google?.budget || ""}
+            onChange={(e) =>
+              handleChannelConfigChange("google", { budget: e.target.value })
+            }
+          />
+        </Box>
+      );
+    case "meta":
+      return (
+        <Box>
+          <Typography variant="h6" mb={2}>
+            Meta Ads Setup
+          </Typography>
+          <TextField
+            label="Audience"
+            fullWidth
+            margin="normal"
+            value={channelConfigs.meta?.audience || ""}
+            onChange={(e) =>
+              handleChannelConfigChange("meta", { audience: e.target.value })
+            }
+          />
+          <TextField
+            label="Budget"
+            fullWidth
+            margin="normal"
+            type="number"
+            value={channelConfigs.meta?.budget || ""}
+            onChange={(e) =>
+              handleChannelConfigChange("meta", { budget: e.target.value })
+            }
+          />
+        </Box>
+      );
+    default:
+      return (
+        <Typography>No configuration available for this channel.</Typography>
+      );
+  }
+};
+
 function CreateCampaignPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -181,90 +265,6 @@ function CreateCampaignPage() {
   const getSafeValue = () => {
     const validIds = options.map((o) => String(o.id));
     return validIds.includes(selected) ? selected : "";
-  };
-
-  const ChannelConfigForm = ({ channelKey }) => {
-    switch (channelKey) {
-      case "email":
-        return (
-          <Suspense fallback={<CircularProgress />}>
-            <EmailSection
-              onChange={(data) => handleChannelConfigChange("email", data)}
-              value={channelConfigs.email || {}}
-            />
-          </Suspense>
-        );
-      case "google":
-        return (
-          <Box>
-            <Typography variant="h6" mb={2}>
-              Google Ads Setup
-            </Typography>
-            <TextField
-              label="Ad Title"
-              fullWidth
-              margin="normal"
-              value={channelConfigs.google?.adTitle || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("google", { adTitle: e.target.value })
-              }
-            />
-            <TextField
-              label="Keywords"
-              fullWidth
-              margin="normal"
-              value={channelConfigs.google?.keywords || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("google", {
-                  keywords: e.target.value,
-                })
-              }
-              helperText="Comma separated"
-            />
-            <TextField
-              label="Budget"
-              fullWidth
-              margin="normal"
-              type="number"
-              value={channelConfigs.google?.budget || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("google", { budget: e.target.value })
-              }
-            />
-          </Box>
-        );
-      case "meta":
-        return (
-          <Box>
-            <Typography variant="h6" mb={2}>
-              Meta Ads Setup
-            </Typography>
-            <TextField
-              label="Audience"
-              fullWidth
-              margin="normal"
-              value={channelConfigs.meta?.audience || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("meta", { audience: e.target.value })
-              }
-            />
-            <TextField
-              label="Budget"
-              fullWidth
-              margin="normal"
-              type="number"
-              value={channelConfigs.meta?.budget || ""}
-              onChange={(e) =>
-                handleChannelConfigChange("meta", { budget: e.target.value })
-              }
-            />
-          </Box>
-        );
-      default:
-        return (
-          <Typography>No configuration available for this channel.</Typography>
-        );
-    }
   };
 
   const ReviewSection = () => (
