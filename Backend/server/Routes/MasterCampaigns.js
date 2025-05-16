@@ -122,4 +122,22 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Create or update Google Ads under a Master Campaign
+router.post("/:id/google-ads", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = {
+      "channels.googleAds": req.body,
+    };
+
+    const updated = await MasterCampaign.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 module.exports = router;

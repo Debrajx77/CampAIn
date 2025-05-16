@@ -14,6 +14,25 @@ const MasterCampaignSchema = new mongoose.Schema(
     },
     channels: [
       {
+        googleAds: {
+          headline: String,
+          description: String,
+          audience: [String],
+          budget: Number,
+          startDate: Date,
+          endDate: Date,
+          status: {
+            type: String,
+            enum: ["draft", "active", "paused"],
+            default: "draft",
+          },
+          performance: {
+            clicks: Number,
+            impressions: Number,
+            conversions: Number,
+            cost: Number,
+          },
+        },
         type: mongoose.Schema.Types.ObjectId,
         ref: "Channel",
       },
