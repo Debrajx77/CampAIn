@@ -63,7 +63,11 @@ const STEPS = [
 ];
 const API_URL = "https://campain-b2rr.onrender.com/api/campaigns";
 
-const ChannelConfigForm = ({ channelKey }) => {
+const ChannelConfigForm = ({
+  channelKey,
+  channelConfigs, // Add as prop
+  handleChannelConfigChange, // Add as prop
+}) => {
   switch (channelKey) {
     case "email":
       return (
@@ -193,16 +197,25 @@ function CreateCampaignPage() {
     setStep((s) => s + 1);
   };
 
-  const handleBack = () => {
-    if (step === 2 && activeChannel) {
-      const idx = selectedChannels.indexOf(activeChannel);
-      if (idx > 0) {
-        setActiveChannel(selectedChannels[idx - 1]);
-        return;
-      }
-    }
-    setStep((s) => s - 1);
-  };
+  const handleBack = () =>  {step === 2 && activeChannel && (
+    <Box
+      sx={{
+        p: 3,
+        borderRadius: 2,
+        background: theme.palette.background.paper,
+        boxShadow: 2,
+        minWidth: isMobile ? "90vw" : 400,
+      }}
+    >
+      <ChannelConfigForm 
+        channelKey={activeChannel}
+        channelConfigs={channelConfigs}                // Pass state as prop
+        handleChannelConfigChange={handleChannelConfigChange}  // Pass handler
+      />
+      {/* ... rest of step 3 code ... */}
+    </Box>
+  )}
+}
 
   const handleChannelConfigChange = (channelKey, config) => {
     setChannelConfigs((prev) => ({
