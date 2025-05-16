@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import GoogleAudienceSection from "./GoogleAudienceSection"; // Import the Google Audience Section
+import GoogleAudienceSection from "./src/Routes/GoogleAudienceSection"; // Import the Google Audience Section
 
 const GoogleAdsForm = ({
   onSubmit,
