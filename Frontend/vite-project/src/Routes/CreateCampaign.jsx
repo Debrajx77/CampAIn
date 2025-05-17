@@ -27,6 +27,7 @@ import axios from "axios";
 
 const EmailSection = React.lazy(() => import("./EmailSection"));
 import GoogleAdsForm from "./GoogleAdsForm";
+import MetaAdsAudiencePanel from "./src/Routes/MetaAdsAudiencePanel";
 
 const CHANNELS = [
   {
@@ -95,24 +96,9 @@ const ChannelConfigForm = ({
           <Typography variant="h6" mb={2}>
             Meta Ads Setup
           </Typography>
-          <TextField
-            label="Audience"
-            fullWidth
-            margin="normal"
-            value={channelConfigs.meta?.audience || ""}
-            onChange={(e) =>
-              handleChannelConfigChange("meta", { audience: e.target.value })
-            }
-          />
-          <TextField
-            label="Budget"
-            fullWidth
-            margin="normal"
-            type="number"
-            value={channelConfigs.meta?.budget || ""}
-            onChange={(e) =>
-              handleChannelConfigChange("meta", { budget: e.target.value })
-            }
+          <MetaAdsAudiencePanel
+            onChange={(data) => handleChannelConfigChange("meta", data)}
+            value={channelConfigs.meta || {}}
           />
         </Box>
       );

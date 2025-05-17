@@ -24,6 +24,20 @@ const GoogleAdsAudienceSchema = new mongoose.Schema({
   remarketing: [String], // e.g., ['past_visitors', 'abandoned_forms']
 });
 
+// Define MetaAdsSchema
+const MetaAdsSchema = new mongoose.Schema({
+  audienceType: String,
+  existingList: String,
+  manualAudience: {
+    age: [String],
+    gender: [String],
+    location: String,
+    interests: [String],
+    behaviors: [String],
+    device: [String],
+  },
+});
+
 // Define EmailSchema
 const EmailSchema = new mongoose.Schema({
   subject: String,
@@ -46,7 +60,7 @@ const CampaignSchema = new mongoose.Schema({
   // Save config data for each channel separately
   googleAds: GoogleAdsAudienceSchema,
   email: EmailSchema,
-  facebookAds: mongoose.Schema.Types.Mixed, // Optional if not implemented yet
+  metaAds: MetaAdsSchema,
 
   createdAt: { type: Date, default: Date.now },
 });
