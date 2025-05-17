@@ -8,7 +8,7 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import WhatsAppAudienceSection from "./WhatsAppAudienceSection";
+import WhatsAppAudienceSection from "./WhatsappAudienceSection";
 
 const WhatsAppForm = ({ campaignId, setConfiguredChannels, toast }) => {
   const [message, setMessage] = useState("");
