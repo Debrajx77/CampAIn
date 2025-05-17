@@ -8,8 +8,10 @@ import {
   Grid,
   CircularProgress,
   Button,
+  IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
 const CampaignList = () => {
@@ -19,20 +21,37 @@ const CampaignList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const res = await axios.get(
-          "https://campain-b2rr.onrender.com/api/campaigns"
-        );
-        setCampaigns(Array.isArray(res.data) ? res.data : []);
-      } catch (_err) {
-        setError("Failed to fetch campaigns");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCampaigns();
   }, []);
+
+  const fetchCampaigns = async () => {
+    try {
+      const res = await axios.get(
+        "https://campain-b2rr.onrender.com/api/campaigns"
+      );
+      setCampaigns(Array.isArray(res.data) ? res.data : []);
+    } catch (_err) {
+      setError("Failed to fetch campaigns");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this campaign?"
+    );
+    if (!confirm) return;
+
+    try {
+      await axios.delete(
+        `https://campain-b2rr.onrender.com/api/campaigns/${id}`
+      );
+      setCampaigns((prev) => prev.filter((c) => c._id !== id));
+    } catch (err) {
+      alert("Failed to delete campaign");
+    }
+  };
 
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", p: { xs: 2, md: 4 } }}>
@@ -56,6 +75,7 @@ const CampaignList = () => {
           New Campaign
         </Button>
       </Box>
+
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
           <CircularProgress />
@@ -66,10 +86,11 @@ const CampaignList = () => {
         <Typography>No campaigns found.</Typography>
       ) : (
         <Grid container spacing={3}>
-          {(Array.isArray(campaigns) ? campaigns : []).map((campaign) => (
+          {campaigns.map((campaign) => (
             <Grid item xs={12} sm={6} md={4} key={campaign._id}>
               <Card
                 sx={{
+                  position: "relative",
                   cursor: "pointer",
                   borderRadius: 3,
                   boxShadow: 3,
@@ -81,9 +102,26 @@ const CampaignList = () => {
                   flexDirection: "column",
                   justifyContent: "center",
                 }}
-                onClick={() => navigate(`/campaign/${campaign._id}`)}
               >
-                <CardContent>
+                {/* Delete Button */}
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    color: "#f44336",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(campaign._id);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+
+                <CardContent
+                  onClick={() => navigate(`/campaign/${campaign._id}`)}
+                >
                   <Typography variant="h6" fontWeight={600} mb={1}>
                     {campaign.name}
                   </Typography>
