@@ -27,7 +27,7 @@ import axios from "axios";
 
 const EmailSection = React.lazy(() => import("./EmailSection"));
 import GoogleAdsForm from "./GoogleAdsForm";
-import MetaAdsAudiencePanel from "./src/Routes/MetaAdsAudiencePanel";
+import MetaAdsAudiencePanel from "./MetaAdsAudiencePanel";
 
 const CHANNELS = [
   {
