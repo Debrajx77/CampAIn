@@ -121,7 +121,7 @@ const ChannelConfigForm = ({
           <Typography variant="h6" mb={2}>
             WhatsApp Broadcast Setup
           </Typography>
-          <WhatsAppForm
+          <WhatsappForm
             onChange={(data) => handleChannelConfigChange("whatsapp", data)}
             value={channelConfigs.whatsapp || {}}
           />
