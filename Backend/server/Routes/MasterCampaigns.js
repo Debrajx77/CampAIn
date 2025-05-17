@@ -207,6 +207,17 @@ router.post("/save-whatsapp", protect, async (req, res) => {
   }
 });
 
-router.delete("/:id", deleteCampaign);
+router.delete("/:id", async (req, res) => {
+  try {
+    const campaign = await MasterCampaign.findByIdAndDelete(req.params.id);
+    if (!campaign) {
+      return res.status(404).json({ msg: "Campaign not found" });
+    }
+    res.json({ msg: "Campaign deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
 
 module.exports = router;

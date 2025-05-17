@@ -49,13 +49,25 @@ const CampaignList = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(
+      const response = await axios.delete(
         `https://campain-b2rr.onrender.com/api/campaigns/${deleteId}`
       );
-      setCampaigns((prev) => prev.filter((c) => c._id !== deleteId));
-      setSnackbarOpen(true);
+
+      if (response.status === 200) {
+        setCampaigns((prev) => prev.filter((c) => c._id !== deleteId));
+        setSnackbarOpen(true);
+      } else {
+        throw new Error("Failed to delete campaign");
+      }
     } catch (err) {
-      alert("Failed to delete campaign");
+      console.error("Error deleting campaign:", err);
+      if (err.response?.status === 404) {
+        alert("Campaign not found. It may have been already deleted.");
+        // Remove the campaign from the local state if it's not found on the server
+        setCampaigns((prev) => prev.filter((c) => c._id !== deleteId));
+      } else {
+        alert("Failed to delete campaign. Please try again.");
+      }
     } finally {
       setOpenModal(false);
       setDeleteId(null);

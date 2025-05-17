@@ -102,14 +102,16 @@ const addChannelToCampaign = async (req, res) => {
 };
 
 // In server/controllers/campaignController.js
-export const deleteCampaign = async (req, res) => {
+const deleteCampaign = async (req, res) => {
   try {
-    const campaign = await Campaign.findByIdAndDelete(req.params.id);
-    if (!campaign)
+    const campaign = await MasterCampaign.findByIdAndDelete(req.params.id);
+    if (!campaign) {
       return res.status(404).json({ message: "Campaign not found" });
-    res.status(200).json({ message: "Campaign deleted" });
+    }
+    res.status(200).json({ message: "Campaign deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error deleting campaign:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
@@ -134,4 +136,5 @@ module.exports = {
   getMasterCampaigns,
   getMasterCampaignById,
   addChannelToCampaign,
+  deleteCampaign,
 };
