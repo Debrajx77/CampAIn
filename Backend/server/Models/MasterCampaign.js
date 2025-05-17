@@ -1,124 +1,36 @@
 const mongoose = require("mongoose");
 
-// Google Ads Audience Schema
-const GoogleAdsAudienceSchema = new mongoose.Schema(
+const ChannelSchema = new mongoose.Schema(
   {
-    demographics: {
-      ageRange: [String],
-      gender: [String],
-      parentalStatus: [String],
-    },
-    locationTargeting: {
-      country: String,
-      cityOrRegion: String,
-      radiusKm: Number,
-    },
-    languages: [String],
-    interests: [String],
-    inMarketSegments: [String],
-    customAudience: {
-      keywords: [String],
-      urls: [String],
-      apps: [String],
-    },
-    deviceTargeting: [String],
-    remarketing: [String],
-  },
-  { _id: false }
-);
-
-// Meta Ads Schema
-const MetaAdsSchema = new mongoose.Schema(
-  {
-    audienceType: String,
-    existingList: String,
-    manualAudience: {
-      age: [String],
-      gender: [String],
-      location: String,
-      interests: [String],
-      behaviors: [String],
-      device: [String],
-    },
-  },
-  { _id: false }
-);
-
-// Email Marketing Schema
-const EmailSchema = new mongoose.Schema(
-  {
-    subject: String,
-    fromEmail: String,
-    replyTo: String,
-    emailBody: String,
-    audienceType: String,
-    manualEmails: String,
-    csvFile: String,
-    existingList: String,
-  },
-  { _id: false }
-);
-
-const LinkedInAdsSchema = new mongoose.Schema({
-  headline: String,
-  description: String,
-  audienceType: String,
-  existingList: String,
-  manualAudience: {
-    age: [String],
-    gender: [String],
-    location: String,
-    industries: [String],
-    jobTitles: [String],
-  },
-});
-
-const WhatsAppSchema = new mongoose.Schema({
-  message: String,
-  audienceType: String,
-  existingList: String,
-  manualAudience: {
-    phoneNumbers: String,
-    tags: String,
-  },
-});
-
-// Individual Channel Schema
-const CampaignSchema = new mongoose.Schema(
-  {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    campaignName: { type: String, required: true },
+    campaignType: { type: String, required: true }, // e.g., 'googleAds', 'metaAds'
+    configuration: { type: mongoose.Schema.Types.Mixed }, // Flexible config
     status: { type: String, default: "draft" },
-    master: { type: Boolean, default: true },
-
-    // Per-channel configuration
-    googleAds: GoogleAdsAudienceSchema,
-    email: EmailSchema,
-    metaAds: MetaAdsSchema,
-    linkedInAds: LinkedInAdsSchema,
-    whatsapp: WhatsAppSchema,
-
-    createdAt: { type: Date, default: Date.now },
+    masterCampaign: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MasterCampaign",
+    },
   },
-  { _id: true }
+  { timestamps: true }
 );
 
-// Master Campaign Schema
 const MasterCampaignSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    description: { type: String, required: true },
-    budget: { type: Number, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
+    description: String,
+    budget: Number,
+    startDate: Date,
+    endDate: Date,
     status: {
       type: String,
       enum: ["draft", "active", "completed"],
       default: "draft",
     },
-    channels: [CampaignSchema], // Inline subdocs for each ad channel (Google, Meta, Email)
+    channels: [{ type: mongoose.Schema.Types.ObjectId, ref: "Channel" }],
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("MasterCampaign", MasterCampaignSchema);
+const MasterCampaign = mongoose.model("MasterCampaign", MasterCampaignSchema);
+const Channel = mongoose.model("Channel", ChannelSchema);
+
+module.exports = { MasterCampaign, Channel };
