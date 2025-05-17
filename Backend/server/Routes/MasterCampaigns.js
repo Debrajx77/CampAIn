@@ -4,11 +4,20 @@ const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
 const protect = require("../middleware/protect");
 
-// Create a new Master Campaign
+// Create a new Master Campaign (supports A/B testing)
 router.post("/create", async (req, res) => {
   try {
-    const { name, description, budget, startDate, endDate, status, channels } =
-      req.body;
+    const {
+      name,
+      description,
+      budget,
+      startDate,
+      endDate,
+      status,
+      channels,
+      isABTesting,
+      variants,
+    } = req.body;
 
     if (!name || !description || !budget || !startDate || !endDate) {
       return res.status(400).json({ msg: "All fields are required" });
@@ -21,11 +30,11 @@ router.post("/create", async (req, res) => {
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       status: status ? status.toLowerCase() : "draft",
+      isABTesting: isABTesting || false,
     });
 
-    await masterCampaign.save();
-
-    if (Array.isArray(channels) && channels.length > 0) {
+    // Normal channels
+    if (!isABTesting && Array.isArray(channels) && channels.length > 0) {
       for (const ch of channels) {
         const channel = new Channel({
           campaignType: ch.campaignType,
@@ -36,8 +45,22 @@ router.post("/create", async (req, res) => {
         await channel.save();
         masterCampaign.channels.push(channel._id);
       }
-      await masterCampaign.save();
     }
+
+    // A/B variants
+    if (isABTesting && Array.isArray(variants)) {
+      masterCampaign.variants = variants.map((variant) => ({
+        name: variant.name,
+        description: variant.description,
+        budget: variant.budget,
+        startDate: variant.startDate,
+        endDate: variant.endDate,
+        status: variant.status || "draft",
+        channels: variant.channels,
+      }));
+    }
+
+    await masterCampaign.save();
 
     res.status(201).json(masterCampaign);
   } catch (err) {
@@ -155,7 +178,7 @@ router.post("/save-google-ads", protect, async (req, res) => {
   }
 });
 
-// ✅ Save Meta Ads configuration
+// Save Meta Ads configuration
 router.post("/save-meta-ads", protect, async (req, res) => {
   const { campaignId, metaAds } = req.body;
   try {
@@ -177,7 +200,7 @@ router.post("/save-linkedin-ads", protect, async (req, res) => {
   const { campaignId, linkedInAds } = req.body;
 
   try {
-    const campaign = await Campaign.findById(campaignId);
+    const campaign = await MasterCampaign.findById(campaignId);
     if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
     campaign.linkedInAds = linkedInAds;
@@ -190,11 +213,12 @@ router.post("/save-linkedin-ads", protect, async (req, res) => {
   }
 });
 
+// Save WhatsApp Broadcast
 router.post("/save-whatsapp", protect, async (req, res) => {
   const { campaignId, whatsapp } = req.body;
 
   try {
-    const campaign = await Campaign.findById(campaignId);
+    const campaign = await MasterCampaign.findById(campaignId);
     if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
     campaign.whatsapp = whatsapp;
@@ -207,6 +231,7 @@ router.post("/save-whatsapp", protect, async (req, res) => {
   }
 });
 
+// Delete a master campaign
 router.delete("/:id", async (req, res) => {
   try {
     const campaign = await MasterCampaign.findByIdAndDelete(req.params.id);

@@ -1,12 +1,71 @@
 const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
 
-// Create a new Master Campaign
+// Create a new Master Campaign (with A/B Testing support)
 const createMasterCampaign = async (req, res) => {
   try {
-    const { name, description, budget, startDate, endDate, status, channels } =
-      req.body;
+    const {
+      isABTesting = false,
+      variants = [],
+      name,
+      description,
+      budget,
+      startDate,
+      endDate,
+      status,
+      channels,
+    } = req.body;
 
+    // ✅ A/B Testing Mode
+    if (isABTesting) {
+      if (!Array.isArray(variants) || variants.length < 2) {
+        return res
+          .status(400)
+          .json({ msg: "At least 2 variants required for A/B testing" });
+      }
+
+      const masterCampaign = new MasterCampaign({
+        name,
+        description,
+        isABTesting: true,
+        variants: [],
+        status: "ab_testing",
+      });
+
+      await masterCampaign.save();
+
+      for (const variant of variants) {
+        const variantChannels = [];
+
+        if (Array.isArray(variant.channels)) {
+          for (const ch of variant.channels) {
+            const channel = new Channel({
+              campaignType: ch.campaignType,
+              configuration: ch.configuration,
+              status: ch.status || "draft",
+              masterCampaign: masterCampaign._id,
+            });
+            await channel.save();
+            variantChannels.push(channel._id);
+          }
+        }
+
+        masterCampaign.variants.push({
+          name: variant.name,
+          description: variant.description,
+          budget: variant.budget,
+          startDate: new Date(variant.startDate),
+          endDate: new Date(variant.endDate),
+          status: variant.status || "draft",
+          channels: variantChannels,
+        });
+      }
+
+      await masterCampaign.save();
+      return res.status(201).json(masterCampaign);
+    }
+
+    // ✅ Normal Campaign Mode
     const masterCampaign = new MasterCampaign({
       name,
       description,
@@ -18,7 +77,6 @@ const createMasterCampaign = async (req, res) => {
 
     await masterCampaign.save();
 
-    // Channels create karo agar bheje gaye hain
     if (Array.isArray(channels) && channels.length > 0) {
       for (const ch of channels) {
         const channel = new Channel({
@@ -45,7 +103,9 @@ const createMasterCampaign = async (req, res) => {
 // Get all Master Campaigns
 const getMasterCampaigns = async (req, res) => {
   try {
-    const campaigns = await MasterCampaign.find().populate("channels");
+    const campaigns = await MasterCampaign.find()
+      .populate("channels")
+      .populate("variants.channels");
     res.status(200).json(campaigns);
   } catch (err) {
     console.error("Failed to fetch master campaigns:", err);
@@ -58,9 +118,9 @@ const getMasterCampaigns = async (req, res) => {
 // Get a single Master Campaign by ID with populated channels
 const getMasterCampaignById = async (req, res) => {
   try {
-    const campaign = await MasterCampaign.findById(req.params.id).populate(
-      "channels"
-    );
+    const campaign = await MasterCampaign.findById(req.params.id)
+      .populate("channels")
+      .populate("variants.channels");
     if (!campaign) {
       return res.status(404).json({ msg: "Campaign not found" });
     }
@@ -101,7 +161,7 @@ const addChannelToCampaign = async (req, res) => {
   }
 };
 
-// In server/controllers/campaignController.js
+// Delete a Master Campaign
 const deleteCampaign = async (req, res) => {
   try {
     const campaign = await MasterCampaign.findByIdAndDelete(req.params.id);
@@ -115,6 +175,7 @@ const deleteCampaign = async (req, res) => {
   }
 };
 
+// Legacy Meta Ads logic (if used)
 exports.saveMetaAds = async (req, res) => {
   const { campaignId, metaAds } = req.body;
   try {

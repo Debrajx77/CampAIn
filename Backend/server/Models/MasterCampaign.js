@@ -59,48 +59,69 @@ const EmailSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const LinkedInAdsSchema = new mongoose.Schema({
-  headline: String,
-  description: String,
-  audienceType: String,
-  existingList: String,
-  manualAudience: {
-    age: [String],
-    gender: [String],
-    location: String,
-    industries: [String],
-    jobTitles: [String],
+const LinkedInAdsSchema = new mongoose.Schema(
+  {
+    headline: String,
+    description: String,
+    audienceType: String,
+    existingList: String,
+    manualAudience: {
+      age: [String],
+      gender: [String],
+      location: String,
+      industries: [String],
+      jobTitles: [String],
+    },
   },
-});
+  { _id: false }
+);
 
-const WhatsAppSchema = new mongoose.Schema({
-  message: String,
-  audienceType: String,
-  existingList: String,
-  manualAudience: {
-    phoneNumbers: String,
-    tags: String,
+const WhatsAppSchema = new mongoose.Schema(
+  {
+    message: String,
+    audienceType: String,
+    existingList: String,
+    manualAudience: {
+      phoneNumbers: String,
+      tags: String,
+    },
   },
-});
+  { _id: false }
+);
 
-// Individual Channel Schema
+// Individual Channel Schema (used inside MasterCampaign.channels[] and variants[].channels[])
 const CampaignSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     campaignName: { type: String, required: true },
     status: { type: String, default: "draft" },
     master: { type: Boolean, default: true },
-
-    // Per-channel configuration
     googleAds: GoogleAdsAudienceSchema,
     email: EmailSchema,
     metaAds: MetaAdsSchema,
     linkedInAds: LinkedInAdsSchema,
     whatsapp: WhatsAppSchema,
-
     createdAt: { type: Date, default: Date.now },
   },
   { _id: true }
+);
+
+// A/B Variant Schema
+const VariantSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String },
+    budget: { type: Number },
+    startDate: { type: Date },
+    endDate: { type: Date },
+    status: {
+      type: String,
+      enum: ["draft", "active", "completed"],
+      default: "draft",
+    },
+    channels: [CampaignSchema],
+  },
+  { _id: false }
 );
 
 // Master Campaign Schema
@@ -113,10 +134,12 @@ const MasterCampaignSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
     status: {
       type: String,
-      enum: ["draft", "active", "completed"],
+      enum: ["draft", "active", "completed", "ab_testing"],
       default: "draft",
     },
-    channels: [CampaignSchema], // Inline subdocs for each ad channel (Google, Meta, Email)
+    isABTesting: { type: Boolean, default: false },
+    channels: [CampaignSchema], // For normal campaign
+    variants: [VariantSchema], // For A/B testing mode
   },
   { timestamps: true }
 );

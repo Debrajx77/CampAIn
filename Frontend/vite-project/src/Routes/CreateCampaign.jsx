@@ -31,6 +31,9 @@ import MetaAdsForm from "./MetaAdsForm";
 import LinkedInAdsForm from "./LinkedInAdsForm";
 import WhatsappForm from "./WhatsappForm";
 import ReviewAndLaunch from "./ReviewAndLaunch";
+import CampaignForm from "./CampaignForm";
+
+import { Switch, FormControlLabel } from "@mui/material";
 const CHANNELS = [
   {
     key: "email",
@@ -136,6 +139,34 @@ const ChannelConfigForm = ({
 };
 
 function CreateCampaignPage() {
+  // Add state initialization for variant data here
+  const [variantAData, setVariantAData] = useState({
+    name: "",
+    description: "",
+    // Add other fields if needed (budget, startDate, etc.)
+  });
+
+  const [variantBData, setVariantBData] = useState({
+    name: "",
+    description: "",
+  });
+
+  const [isABTesting, setIsABTesting] = useState(false);
+
+  // Add the handleSubmit function here
+  const handleSubmit = async () => {
+    const payload = {
+      isABTesting,
+      variants: isABTesting ? [variantAData, variantBData] : [variantAData],
+    };
+
+    try {
+      const res = await axios.post("/api/campaigns", payload);
+      console.log("Campaign created", res.data);
+    } catch (err) {
+      console.error("Failed to create campaign", err);
+    }
+  };
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -320,6 +351,8 @@ function CreateCampaignPage() {
     );
   };
 
+  const [isABTesting, setIsABTesting] = useState(false);
+
   return (
     <Box
       sx={{
@@ -331,6 +364,16 @@ function CreateCampaignPage() {
         alignItems: "center",
       }}
     >
+      <FormControlLabel
+        control={
+          <Switch
+            checked={isABTesting}
+            onChange={() => setIsABTesting(!isABTesting)}
+          />
+        }
+        label="Enable A/B Testing"
+        sx={{ ml: "auto" }} // to push it to right
+      />
       <Stepper
         activeStep={step}
         alternativeLabel
@@ -342,7 +385,34 @@ function CreateCampaignPage() {
           </Step>
         ))}
       </Stepper>
-
+      <Typography variant="h6" fontWeight={600} mb={2}>
+        Variant A (Main Campaign)
+      </Typography>
+      <CampaignForm
+        variant="A"
+        formData={variantAData}
+        setFormData={setVariantAData}
+      />
+      {isABTesting && (
+        <Box mt={5}>
+          <Typography variant="h6" fontWeight={600} mb={2}>
+            Variant B (Second Variant)
+          </Typography>
+          <CampaignForm
+            variant="B"
+            formData={variantBData}
+            setFormData={setVariantBData}
+          />
+        </Box>
+      )}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+        sx={{ mt: 3 }}
+      >
+        Submit Campaign
+      </Button>
       {step === 0 && (
         <Box
           sx={{
