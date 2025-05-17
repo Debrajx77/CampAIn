@@ -189,4 +189,22 @@ router.post("/save-linkedin-ads", protect, async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+router.post("/save-whatsapp", protect, async (req, res) => {
+  const { campaignId, whatsapp } = req.body;
+
+  try {
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.whatsapp = whatsapp;
+    await campaign.save();
+
+    res.json({ message: "WhatsApp Broadcast Config saved" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

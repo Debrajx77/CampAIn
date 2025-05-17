@@ -29,6 +29,7 @@ const EmailSection = React.lazy(() => import("./EmailSection"));
 import GoogleAdsForm from "./GoogleAdsForm";
 import MetaAdsForm from "./MetaAdsForm";
 import LinkedInAdsForm from "./LinkedInAdsForm";
+import WhatsAppForm from "./WhatsAppForm";
 const CHANNELS = [
   {
     key: "email",
@@ -111,6 +112,18 @@ const ChannelConfigForm = ({
           <LinkedInAdsForm
             onChange={(data) => handleChannelConfigChange("linkedin", data)}
             value={channelConfigs.linkedin || {}}
+          />
+        </Box>
+      );
+    case "whatsapp":
+      return (
+        <Box>
+          <Typography variant="h6" mb={2}>
+            WhatsApp Broadcast Setup
+          </Typography>
+          <WhatsAppForm
+            onChange={(data) => handleChannelConfigChange("whatsapp", data)}
+            value={channelConfigs.whatsapp || {}}
           />
         </Box>
       );

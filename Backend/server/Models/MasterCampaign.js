@@ -73,6 +73,16 @@ const LinkedInAdsSchema = new mongoose.Schema({
   },
 });
 
+const WhatsAppSchema = new mongoose.Schema({
+  message: String,
+  audienceType: String,
+  existingList: String,
+  manualAudience: {
+    phoneNumbers: String,
+    tags: String,
+  },
+});
+
 // Individual Channel Schema
 const CampaignSchema = new mongoose.Schema(
   {
@@ -86,6 +96,7 @@ const CampaignSchema = new mongoose.Schema(
     email: EmailSchema,
     metaAds: MetaAdsSchema,
     linkedInAds: LinkedInAdsSchema,
+    whatsapp: WhatsAppSchema,
 
     createdAt: { type: Date, default: Date.now },
   },
