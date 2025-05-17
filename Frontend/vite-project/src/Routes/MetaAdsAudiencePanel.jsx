@@ -26,7 +26,7 @@ const MetaAdsAudiencePanel = ({ onChange }) => {
 
   useEffect(() => {
     onChange?.({ audienceType, existingList, manualAudience });
-  }, [audienceType, existingList, manualAudience]);
+  }, [audienceType, existingList, manualAudience, onChange]);
 
   const handleManualChange = (field, value) => {
     setManualAudience((prev) => ({ ...prev, [field]: value }));
