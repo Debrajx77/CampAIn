@@ -151,8 +151,6 @@ function CreateCampaignPage() {
     description: "",
   });
 
-  const [isABTesting, setIsABTesting] = useState(false);
-
   // Add the handleSubmit function here
   const handleSubmit = async () => {
     const payload = {
