@@ -46,14 +46,18 @@ const ReviewAndLaunchPage = ({ campaignId }) => {
       <Typography variant="h5">Campaign Preview</Typography>
 
       <Grid container spacing={2}>
-        {campaign.channels.map((channel, idx) => (
-          <Grid item xs={12} md={6} key={idx}>
-            <ChannelCard
-              type={channel.type || channel.campaignType || "Unknown"}
-              config={channel}
-            />
-          </Grid>
-        ))}
+        {Array.isArray(campaign.channels) ? (
+          campaign.channels.map((channel, idx) => (
+            <Grid item xs={12} md={6} key={idx}>
+              <ChannelCard
+                type={channel.type || channel.campaignType || "Unknown"}
+                config={channel}
+              />
+            </Grid>
+          ))
+        ) : (
+          <Typography>No channels available.</Typography>
+        )}
       </Grid>
 
       <div className="flex justify-end space-x-4 pt-4">
