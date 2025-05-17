@@ -43,14 +43,16 @@ const LinkedInAdsAudienceSection = ({ audience, setAudience }) => {
               control={
                 <Checkbox
                   checked={audience.gender?.includes(gender) || false}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const isSelected = (audience.gender || []).includes(value);
                     handleChange(
                       "gender",
-                      e.target.checked
-                        ? [...(audience.gender || []), gender]
-                        : audience.gender.filter((g) => g !== gender)
-                    )
-                  }
+                      isSelected
+                        ? audience.gender.filter((g) => g !== value)
+                        : [...(audience.gender || []), value]
+                    );
+                  }}
                 />
               }
               label={gender}
