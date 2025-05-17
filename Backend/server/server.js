@@ -58,7 +58,7 @@ app.use((err, req, res, next) => {
 });
 
 // Only this line for all campaign endpoints:
-app.use("/api/MasterCampaigns", masterCampaignRoutes);
+app.use("/api/campaigns", masterCampaignRoutes);
 
 // Default route
 app.get("/", (req, res) => {
