@@ -101,6 +101,22 @@ const addChannelToCampaign = async (req, res) => {
   }
 };
 
+exports.saveMetaAds = async (req, res) => {
+  const { campaignId, metaAds } = req.body;
+  try {
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign)
+      return res.status(404).json({ message: "Campaign not found" });
+
+    campaign.metaAds = metaAds;
+    await campaign.save();
+
+    res.status(200).json({ message: "Meta Ads saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 module.exports = {
   createMasterCampaign,
   getMasterCampaigns,

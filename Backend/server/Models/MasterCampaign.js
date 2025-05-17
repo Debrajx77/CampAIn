@@ -1,71 +1,83 @@
 const mongoose = require("mongoose");
 
-// Define GoogleAdsAudienceSchema
-const GoogleAdsAudienceSchema = new mongoose.Schema({
-  demographics: {
-    ageRange: [String], // e.g., ['18-24', '25-34']
-    gender: [String], // e.g., ['male', 'female']
-    parentalStatus: [String], // e.g., ['parent', 'not_parent']
-  },
-  locationTargeting: {
-    country: String,
-    cityOrRegion: String,
-    radiusKm: Number,
-  },
-  languages: [String], // e.g., ['en', 'hi']
-  interests: [String], // Affinity audiences
-  inMarketSegments: [String],
-  customAudience: {
-    keywords: [String],
-    urls: [String],
-    apps: [String],
-  },
-  deviceTargeting: [String], // ['desktop', 'mobile']
-  remarketing: [String], // e.g., ['past_visitors', 'abandoned_forms']
-});
-
-// Define MetaAdsSchema
-const MetaAdsSchema = new mongoose.Schema({
-  audienceType: String,
-  existingList: String,
-  manualAudience: {
-    age: [String],
-    gender: [String],
-    location: String,
+// Google Ads Audience Schema
+const GoogleAdsAudienceSchema = new mongoose.Schema(
+  {
+    demographics: {
+      ageRange: [String],
+      gender: [String],
+      parentalStatus: [String],
+    },
+    locationTargeting: {
+      country: String,
+      cityOrRegion: String,
+      radiusKm: Number,
+    },
+    languages: [String],
     interests: [String],
-    behaviors: [String],
-    device: [String],
+    inMarketSegments: [String],
+    customAudience: {
+      keywords: [String],
+      urls: [String],
+      apps: [String],
+    },
+    deviceTargeting: [String],
+    remarketing: [String],
   },
-});
+  { _id: false }
+);
 
-// Define EmailSchema
-const EmailSchema = new mongoose.Schema({
-  subject: String,
-  fromEmail: String,
-  replyTo: String,
-  emailBody: String,
-  audienceType: String,
-  manualEmails: String,
-  csvFile: String,
-  existingList: String,
-});
+// Meta Ads Schema
+const MetaAdsSchema = new mongoose.Schema(
+  {
+    audienceType: String,
+    existingList: String,
+    manualAudience: {
+      age: [String],
+      gender: [String],
+      location: String,
+      interests: [String],
+      behaviors: [String],
+      device: [String],
+    },
+  },
+  { _id: false }
+);
 
-// Define CampaignSchema
-const CampaignSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  campaignName: { type: String, required: true },
-  status: { type: String, default: "draft" },
-  master: { type: Boolean, default: true },
+// Email Marketing Schema
+const EmailSchema = new mongoose.Schema(
+  {
+    subject: String,
+    fromEmail: String,
+    replyTo: String,
+    emailBody: String,
+    audienceType: String,
+    manualEmails: String,
+    csvFile: String,
+    existingList: String,
+  },
+  { _id: false }
+);
 
-  // Save config data for each channel separately
-  googleAds: GoogleAdsAudienceSchema,
-  email: EmailSchema,
-  metaAds: MetaAdsSchema,
+// Individual Channel Schema
+const CampaignSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    campaignName: { type: String, required: true },
+    status: { type: String, default: "draft" },
+    master: { type: Boolean, default: true },
 
-  createdAt: { type: Date, default: Date.now },
-});
+    // Per-channel configuration
+    googleAds: GoogleAdsAudienceSchema,
+    email: EmailSchema,
+    metaAds: MetaAdsSchema,
 
-// Update MasterCampaignSchema to use CampaignSchema
+    createdAt: { type: Date, default: Date.now },
+  },
+  { _id: true }
+);
+
+// Master Campaign Schema
 const MasterCampaignSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -78,7 +90,7 @@ const MasterCampaignSchema = new mongoose.Schema(
       enum: ["draft", "active", "completed"],
       default: "draft",
     },
-    channels: [CampaignSchema], // Use CampaignSchema for channels
+    channels: [CampaignSchema], // Inline subdocs for each ad channel (Google, Meta, Email)
   },
   { timestamps: true }
 );

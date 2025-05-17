@@ -4,15 +4,16 @@ const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
 const protect = require("../middleware/protect");
 
-// Create a new Master Campaign (Draft or Active)
+// Create a new Master Campaign
 router.post("/create", async (req, res) => {
   try {
     const { name, description, budget, startDate, endDate, status, channels } =
       req.body;
-    // Ensure required fields are present
+
     if (!name || !description || !budget || !startDate || !endDate) {
       return res.status(400).json({ msg: "All fields are required" });
     }
+
     const masterCampaign = new MasterCampaign({
       name,
       description,
@@ -21,9 +22,9 @@ router.post("/create", async (req, res) => {
       endDate: new Date(endDate),
       status: status ? status.toLowerCase() : "draft",
     });
+
     await masterCampaign.save();
 
-    // If channels are provided, create them and link to campaign
     if (Array.isArray(channels) && channels.length > 0) {
       for (const ch of channels) {
         const channel = new Channel({
@@ -46,13 +47,12 @@ router.post("/create", async (req, res) => {
   }
 });
 
-// Add a new channel to an existing campaign
+// Add a channel to an existing campaign
 router.post("/:campaignId/channels", async (req, res) => {
   try {
     const { campaignId } = req.params;
     const { campaignType, configuration, status } = req.body;
 
-    // Create the channel
     const channel = new Channel({
       campaignType,
       configuration,
@@ -61,7 +61,6 @@ router.post("/:campaignId/channels", async (req, res) => {
     });
     await channel.save();
 
-    // Add channel to master campaign
     await MasterCampaign.findByIdAndUpdate(
       campaignId,
       { $push: { channels: channel._id } },
@@ -74,10 +73,9 @@ router.post("/:campaignId/channels", async (req, res) => {
   }
 });
 
-// Get all master campaigns (for campaign list)
+// Get all master campaigns
 router.get("/", async (req, res) => {
   try {
-    // Populate channels for list if you want to show channel info in list
     const campaigns = await MasterCampaign.find().populate("channels");
     res.json(campaigns);
   } catch (err) {
@@ -87,7 +85,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get a single campaign by ID with populated channels
+// Get a single campaign with channel details
 router.get("/:id", async (req, res) => {
   try {
     const campaign = await MasterCampaign.findById(req.params.id).populate({
@@ -99,7 +97,6 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ msg: "Campaign not found" });
     }
 
-    // Transform data for frontend compatibility
     const transformedCampaign = {
       ...campaign.toObject(),
       budget: campaign.budget.toLocaleString("en-US", {
@@ -123,7 +120,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Create or update Google Ads under a Master Campaign
+// Google Ads legacy update route
 router.post("/:id/google-ads", async (req, res) => {
   try {
     const { id } = req.params;
@@ -141,16 +138,34 @@ router.post("/:id/google-ads", async (req, res) => {
   }
 });
 
+// Save Google Ads (modern way)
 router.post("/save-google-ads", protect, async (req, res) => {
   const { campaignId, googleAds } = req.body;
   try {
-    const campaign = await Campaign.findById(campaignId);
+    const campaign = await MasterCampaign.findById(campaignId);
     if (!campaign) return res.status(404).json({ error: "Campaign not found" });
 
     campaign.googleAds = googleAds;
     await campaign.save();
 
     res.json({ message: "Google Ads config saved" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ✅ Save Meta Ads configuration
+router.post("/save-meta-ads", protect, async (req, res) => {
+  const { campaignId, metaAds } = req.body;
+  try {
+    const campaign = await MasterCampaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.metaAds = metaAds;
+    await campaign.save();
+
+    res.json({ message: "Meta Ads config saved" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
