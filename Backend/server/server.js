@@ -12,7 +12,7 @@ const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
 const masterCampaignRoutes = require("./Routes/MasterCampaigns");
 const mailchimpRouter = require("./Routes/Mailchimp");
 const audienceRoutes = require("./Routes/Audience");
-const googleAdsRoutes = require("./Routes/MasterCampaigns/google-ads");
+// const googleAdsRoutes = require("./Routes/MasterCampaigns/google-ads");
 
 const app = express();
 const server = http.createServer(app);
@@ -50,7 +50,7 @@ app.use("/api/team/remove-member", removeMembersFromTeamRouter);
 app.use("/api/mailchimp", mailchimpRouter); // Mailchimp routes
 app.use("/api/audience", audienceRoutes);
 app.use("/uploads", express.static("uploads")); // To serve uploaded files
-app.use("/api/MasterCampaigns/google", googleAdsRoutes); // Google Ads routes
+// app.use("/api/MasterCampaigns/google", googleAdsRoutes); // Google Ads routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -58,7 +58,7 @@ app.use((err, req, res, next) => {
 });
 
 // Only this line for all campaign endpoints:
-app.use("/api/campaigns", masterCampaignRoutes);
+app.use("/api/Mastercampaigns", masterCampaignRoutes);
 
 // Default route
 app.get("/", (req, res) => {
