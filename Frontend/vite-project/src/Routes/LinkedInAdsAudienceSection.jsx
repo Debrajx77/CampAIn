@@ -21,7 +21,7 @@ const LinkedInAdsAudienceSection = ({ audience, setAudience }) => {
       <div>
         <Typography>Age</Typography>
         <Select
-          value={audience.age || ""}
+          value={audience.age || []}
           onChange={(e) => handleChange("age", e.target.value)}
           fullWidth
           multiple
