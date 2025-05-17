@@ -4,8 +4,8 @@ const MasterCampaign = require("../Models/MasterCampaign");
 const Channel = require("../Models/Channel");
 const protect = require("../middleware/protect");
 
-// Create a new Master Campaign with channels
-router.post("/create", protect, async (req, res) => {
+// Create a new Master Campaign
+router.post("/create", async (req, res) => {
   try {
     const { name, description, budget, startDate, endDate, status, channels } =
       req.body;
@@ -23,10 +23,8 @@ router.post("/create", protect, async (req, res) => {
       status: status ? status.toLowerCase() : "draft",
     });
 
-    // Save campaign first
     await masterCampaign.save();
 
-    // Save channels if provided
     if (Array.isArray(channels) && channels.length > 0) {
       for (const ch of channels) {
         const channel = new Channel({
@@ -49,17 +47,11 @@ router.post("/create", protect, async (req, res) => {
   }
 });
 
-// Add a new channel to existing campaign
-router.post("/:campaignId/channels", protect, async (req, res) => {
+// Add a channel to an existing campaign
+router.post("/:campaignId/channels", async (req, res) => {
   try {
     const { campaignId } = req.params;
     const { campaignType, configuration, status } = req.body;
-
-    if (!campaignType || !configuration) {
-      return res
-        .status(400)
-        .json({ msg: "campaignType and configuration are required" });
-    }
 
     const channel = new Channel({
       campaignType,
@@ -69,9 +61,11 @@ router.post("/:campaignId/channels", protect, async (req, res) => {
     });
     await channel.save();
 
-    await MasterCampaign.findByIdAndUpdate(campaignId, {
-      $push: { channels: channel._id },
-    });
+    await MasterCampaign.findByIdAndUpdate(
+      campaignId,
+      { $push: { channels: channel._id } },
+      { new: true }
+    );
 
     res.status(201).json(channel);
   } catch (err) {
@@ -79,32 +73,8 @@ router.post("/:campaignId/channels", protect, async (req, res) => {
   }
 });
 
-// Update a specific channel by ID
-router.put("/channels/:channelId", protect, async (req, res) => {
-  try {
-    const { channelId } = req.params;
-    const { configuration, status } = req.body;
-
-    const updatedChannel = await Channel.findByIdAndUpdate(
-      channelId,
-      { configuration, status: status ? status.toLowerCase() : undefined },
-      { new: true }
-    );
-
-    if (!updatedChannel) {
-      return res.status(404).json({ msg: "Channel not found" });
-    }
-
-    res.json(updatedChannel);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ msg: "Failed to update channel", error: err.message });
-  }
-});
-
-// Get all master campaigns with channels populated
-router.get("/", protect, async (req, res) => {
+// Get all master campaigns
+router.get("/", async (req, res) => {
   try {
     const campaigns = await MasterCampaign.find().populate("channels");
     res.json(campaigns);
@@ -115,8 +85,8 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// Get single campaign with channel details
-router.get("/:id", protect, async (req, res) => {
+// Get a single campaign with channel details
+router.get("/:id", async (req, res) => {
   try {
     const campaign = await MasterCampaign.findById(req.params.id).populate({
       path: "channels",
@@ -136,10 +106,9 @@ router.get("/:id", protect, async (req, res) => {
       status:
         campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1),
       channels: campaign.channels.map((channel) => ({
-        id: channel._id,
         type: channel.campaignType,
-        configuration: channel.configuration,
-        status: channel.status,
+        ...channel.configuration,
+        id: channel._id,
       })),
     };
 
@@ -151,26 +120,90 @@ router.get("/:id", protect, async (req, res) => {
   }
 });
 
-// Delete a channel by ID
-router.delete("/channels/:channelId", protect, async (req, res) => {
+// Google Ads legacy update route
+router.post("/:id/google-ads", async (req, res) => {
   try {
-    const { channelId } = req.params;
+    const { id } = req.params;
+    const updateData = {
+      "channels.googleAds": req.body,
+    };
 
-    const channel = await Channel.findById(channelId);
-    if (!channel) return res.status(404).json({ msg: "Channel not found" });
-
-    // Remove reference from master campaign
-    await MasterCampaign.findByIdAndUpdate(channel.masterCampaign, {
-      $pull: { channels: channelId },
+    const updated = await MasterCampaign.findByIdAndUpdate(id, updateData, {
+      new: true,
     });
-
-    await channel.remove();
-
-    res.json({ msg: "Channel deleted successfully" });
+    res.json(updated);
   } catch (err) {
-    res
-      .status(500)
-      .json({ msg: "Failed to delete channel", error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// Save Google Ads (modern way)
+router.post("/save-google-ads", protect, async (req, res) => {
+  const { campaignId, googleAds } = req.body;
+  try {
+    const campaign = await MasterCampaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.googleAds = googleAds;
+    await campaign.save();
+
+    res.json({ message: "Google Ads config saved" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ✅ Save Meta Ads configuration
+router.post("/save-meta-ads", protect, async (req, res) => {
+  const { campaignId, metaAds } = req.body;
+  try {
+    const campaign = await MasterCampaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.metaAds = metaAds;
+    await campaign.save();
+
+    res.json({ message: "Meta Ads config saved" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Save LinkedIn Ads
+router.post("/save-linkedin-ads", protect, async (req, res) => {
+  const { campaignId, linkedInAds } = req.body;
+
+  try {
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.linkedInAds = linkedInAds;
+    await campaign.save();
+
+    res.json({ message: "LinkedIn Ads config saved successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post("/save-whatsapp", protect, async (req, res) => {
+  const { campaignId, whatsapp } = req.body;
+
+  try {
+    const campaign = await Campaign.findById(campaignId);
+    if (!campaign) return res.status(404).json({ error: "Campaign not found" });
+
+    campaign.whatsapp = whatsapp;
+    await campaign.save();
+
+    res.json({ message: "WhatsApp Broadcast Config saved" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

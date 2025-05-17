@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const Channel = new mongoose.Schema({
-  campaignType: { type: String, required: true }, // email, google, meta, linkedin, whatsapp
+  campaignType: { type: String, required: true }, // Should store 'email', 'google', or 'meta'
   configuration: {
     // Email
     subject: String,
@@ -9,30 +9,16 @@ const Channel = new mongoose.Schema({
     replyTo: String,
     emailBody: String,
     audienceType: String, // "existing", "csv", "manual"
-    existingList: String,
-    csvFileUrl: String,
+    existingList: String, // For existing list
+    csvFileUrl: String, // For uploaded CSV
     manualEmails: String,
-
     // Google
     clicks: { type: Number, default: 0 },
     budgetUsed: { type: Number, default: 0 },
     ctr: { type: String, default: "0%" },
-
     // Meta
     reach: { type: Number, default: 0 },
     impressions: { type: Number, default: 0 },
-
-    // LinkedIn
-    jobTitles: [String],
-    industries: [String],
-    location: String,
-    age: [String],
-    gender: [String],
-
-    // WhatsApp
-    senderName: String,
-    templateMessage: String,
-    manualNumbers: String,
   },
   status: { type: String, default: "draft" },
   masterCampaign: {
