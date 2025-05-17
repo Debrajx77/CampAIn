@@ -12,7 +12,7 @@ const removeMembersFromTeamRouter = require("./Routes/removeMembersFromTeam");
 const masterCampaignRoutes = require("./Routes/MasterCampaigns");
 const mailchimpRouter = require("./Routes/Mailchimp");
 const audienceRoutes = require("./Routes/Audience");
-const googleAdsRoutes = require("./Routes/MasterCampaigns/google");
+// const googleAdsRoutes = require("./Routes/MasterCampaigns/google");
 
 const app = express();
 const server = http.createServer(app);
