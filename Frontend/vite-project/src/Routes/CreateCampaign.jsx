@@ -29,7 +29,7 @@ const EmailSection = React.lazy(() => import("./EmailSection"));
 import GoogleAdsForm from "./GoogleAdsForm";
 import MetaAdsForm from "./MetaAdsForm";
 import LinkedInAdsForm from "./LinkedInAdsForm";
-import WhatsAppForm from "./WhatsAppForm";
+import WhatsAppForm from "./WhatsappForm";
 const CHANNELS = [
   {
     key: "email",
