@@ -101,6 +101,18 @@ const addChannelToCampaign = async (req, res) => {
   }
 };
 
+// In server/controllers/campaignController.js
+export const deleteCampaign = async (req, res) => {
+  try {
+    const campaign = await Campaign.findByIdAndDelete(req.params.id);
+    if (!campaign)
+      return res.status(404).json({ message: "Campaign not found" });
+    res.status(200).json({ message: "Campaign deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.saveMetaAds = async (req, res) => {
   const { campaignId, metaAds } = req.body;
   try {

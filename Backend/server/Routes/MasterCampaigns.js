@@ -207,4 +207,6 @@ router.post("/save-whatsapp", protect, async (req, res) => {
   }
 });
 
+router.delete("/:id", deleteCampaign);
+
 module.exports = router;
