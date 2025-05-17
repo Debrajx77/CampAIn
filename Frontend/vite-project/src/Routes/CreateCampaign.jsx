@@ -28,7 +28,7 @@ import axios from "axios";
 const EmailSection = React.lazy(() => import("./EmailSection"));
 import GoogleAdsForm from "./GoogleAdsForm";
 import MetaAdsForm from "./MetaAdsForm";
-
+import LinkedInAdsForm from "./LinkedInAdsForm";
 const CHANNELS = [
   {
     key: "email",
@@ -99,6 +99,18 @@ const ChannelConfigForm = ({
           <MetaAdsForm
             onChange={(data) => handleChannelConfigChange("meta", data)}
             value={channelConfigs.meta || {}}
+          />
+        </Box>
+      );
+    case "linkedin":
+      return (
+        <Box>
+          <Typography variant="h6" mb={2}>
+            LinkedIn Ads Setup
+          </Typography>
+          <LinkedInAdsForm
+            onChange={(data) => handleChannelConfigChange("linkedin", data)}
+            value={channelConfigs.linkedin || {}}
           />
         </Box>
       );

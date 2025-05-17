@@ -59,6 +59,20 @@ const EmailSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const LinkedInAdsSchema = new mongoose.Schema({
+  headline: String,
+  description: String,
+  audienceType: String,
+  existingList: String,
+  manualAudience: {
+    age: [String],
+    gender: [String],
+    location: String,
+    industries: [String],
+    jobTitles: [String],
+  },
+});
+
 // Individual Channel Schema
 const CampaignSchema = new mongoose.Schema(
   {
@@ -71,6 +85,7 @@ const CampaignSchema = new mongoose.Schema(
     googleAds: GoogleAdsAudienceSchema,
     email: EmailSchema,
     metaAds: MetaAdsSchema,
+    linkedInAds: LinkedInAdsSchema,
 
     createdAt: { type: Date, default: Date.now },
   },
