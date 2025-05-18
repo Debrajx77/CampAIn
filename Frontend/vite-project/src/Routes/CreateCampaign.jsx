@@ -415,6 +415,108 @@ function CreateCampaignPage() {
             <Typography variant="h5" fontWeight="bold" mb={3}>
               🅰️ Main Campaign
             </Typography>
+            {step === 0 && (
+              <Box
+                sx={{
+                  p: 3,
+                  borderRadius: 2,
+                  background: theme.palette.background.paper,
+                  boxShadow: 2,
+                  minWidth: isMobile ? "90vw" : 400,
+                }}
+              >
+                <Typography variant="h5" fontWeight={600} mb={2}>
+                  Create Master Campaign
+                </Typography>
+                <TextField
+                  label="Campaign Name"
+                  name="name"
+                  value={masterCampaign.name}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Description"
+                  name="description"
+                  value={masterCampaign.description}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                  multiline
+                  rows={2}
+                />
+                <TextField
+                  label="Budget"
+                  name="budget"
+                  value={masterCampaign.budget}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                  type="number"
+                />
+                <TextField
+                  label="Start Date"
+                  name="startDate"
+                  value={masterCampaign.startDate}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="End Date"
+                  name="endDate"
+                  value={masterCampaign.endDate}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label="Status"
+                  name="status"
+                  value={masterCampaign.status}
+                  onChange={handleMasterChange}
+                  fullWidth
+                  margin="normal"
+                  select
+                >
+                  <MenuItem value="draft">Draft</MenuItem>
+                  <MenuItem value="active">Active</MenuItem>
+                </TextField>
+                <TextField
+                  select
+                  label="Select List"
+                  value={getSafeValue()}
+                  onChange={(e) => setSelected(String(e.target.value))}
+                  fullWidth
+                >
+                  <MenuItem value="">Select a list</MenuItem>
+                  {options.map((opt) => (
+                    <MenuItem key={opt.id} value={String(opt.id)}>
+                      {opt.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                  onClick={handleNext}
+                  disabled={
+                    !masterCampaign.name ||
+                    !masterCampaign.startDate ||
+                    !masterCampaign.endDate
+                  }
+                >
+                  Next: Configure Channels
+                </Button>
+              </Box>
+            )}
+
             <Box sx={{ display: step === 0 ? "block" : "none" }}>
               {/* Master Campaign Form */}
               <TextField
@@ -482,107 +584,6 @@ function CreateCampaignPage() {
           )}
         </AnimatePresence>
       </Box>
-      {step === 0 && (
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 2,
-            background: theme.palette.background.paper,
-            boxShadow: 2,
-            minWidth: isMobile ? "90vw" : 400,
-          }}
-        >
-          <Typography variant="h5" fontWeight={600} mb={2}>
-            Create Master Campaign
-          </Typography>
-          <TextField
-            label="Campaign Name"
-            name="name"
-            value={masterCampaign.name}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            name="description"
-            value={masterCampaign.description}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-            multiline
-            rows={2}
-          />
-          <TextField
-            label="Budget"
-            name="budget"
-            value={masterCampaign.budget}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-            type="number"
-          />
-          <TextField
-            label="Start Date"
-            name="startDate"
-            value={masterCampaign.startDate}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="End Date"
-            name="endDate"
-            value={masterCampaign.endDate}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="Status"
-            name="status"
-            value={masterCampaign.status}
-            onChange={handleMasterChange}
-            fullWidth
-            margin="normal"
-            select
-          >
-            <MenuItem value="draft">Draft</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Select List"
-            value={getSafeValue()}
-            onChange={(e) => setSelected(String(e.target.value))}
-            fullWidth
-          >
-            <MenuItem value="">Select a list</MenuItem>
-            {options.map((opt) => (
-              <MenuItem key={opt.id} value={String(opt.id)}>
-                {opt.name}
-              </MenuItem>
-            ))}
-          </TextField>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
-            onClick={handleNext}
-            disabled={
-              !masterCampaign.name ||
-              !masterCampaign.startDate ||
-              !masterCampaign.endDate
-            }
-          >
-            Next: Configure Channels
-          </Button>
-        </Box>
-      )}
 
       {step === 1 && (
         <Box sx={{ width: "100%", maxWidth: 900 }}>
