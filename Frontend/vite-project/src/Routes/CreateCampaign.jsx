@@ -32,7 +32,8 @@ import LinkedInAdsForm from "./LinkedInAdsForm";
 import WhatsappForm from "./WhatsappForm";
 import ReviewAndLaunch from "./ReviewAndLaunch";
 import CampaignForm from "./CampaignForm";
-
+import { motion, AnimatePresence } from "framer-motion";
+import { Collapse, Grow } from "@mui/material";
 import { Switch, FormControlLabel } from "@mui/material";
 const CHANNELS = [
   {
@@ -385,37 +386,101 @@ function CreateCampaignPage() {
           </Step>
         ))}
       </Stepper>
+      {/* Variants Container */}
       <Box
         sx={{
-          display: "grid",
+          display: "flex",
           gap: 3,
-          gridTemplateColumns: isABTesting ? "repeat(2, 1fr)" : "1fr",
+          minHeight: 480,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         {/* Variant A */}
-        <Card sx={{ p: 3, borderRadius: 3 }}>
-          <Typography variant="h5" fontWeight="bold" mb={3}>
-            🅰️ Variant A
-          </Typography>
-          <CampaignForm
-            variant="A"
-            formData={variantAData}
-            setFormData={setVariantAData}
-          />
-        </Card>
-
-        {isABTesting && (
-          <Card sx={{ p: 3, borderRadius: 3 }}>
+        <motion.div
+          className="variant-card"
+          style={{ flex: isABTesting ? 1 : 1 }}
+          initial={{ width: "100%" }}
+          animate={{ width: isABTesting ? "50%" : "100%" }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              height: "100%",
+              boxShadow: 3,
+            }}
+          >
             <Typography variant="h5" fontWeight="bold" mb={3}>
-              🅱️ Variant B
+              🅰️ Main Campaign
             </Typography>
-            <CampaignForm
-              variant="B"
-              formData={variantBData}
-              setFormData={setVariantBData}
-            />
+            <Box sx={{ display: step === 0 ? "block" : "none" }}>
+              {/* Master Campaign Form */}
+              <TextField
+                label="Campaign Name"
+                name="name"
+                value={masterCampaign.name}
+                onChange={handleMasterChange}
+                fullWidth
+                margin="normal"
+              />
+              {/* ... other master campaign fields ... */}
+            </Box>
+
+            {/* Show variant A fields when not in master campaign step */}
+            <Box sx={{ display: step !== 0 ? "block" : "none" }}>
+              <CampaignForm
+                variant="A"
+                formData={variantAData}
+                setFormData={setVariantAData}
+              />
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="h6" mb={2}>
+                  🛣️ Channel Configuration
+                </Typography>
+                {/* Existing channel configuration components */}
+              </Box>
+            </Box>
           </Card>
-        )}
+        </motion.div>
+
+        <AnimatePresence>
+          {isABTesting && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.3 }}
+              style={{ flex: 1 }}
+            >
+              <Card
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  height: "100%",
+                  boxShadow: 3,
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Typography variant="h5" fontWeight="bold" mb={3}>
+                  🅱️ Variant B
+                </Typography>
+                <CampaignForm
+                  variant="B"
+                  formData={variantBData}
+                  setFormData={setVariantBData}
+                />
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="h6" mb={2}>
+                    🛣️ Channel Configuration
+                  </Typography>
+                  {/* Duplicated channel configuration for variant B */}
+                </Box>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Box>
       {step === 0 && (
         <Box
