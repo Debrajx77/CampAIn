@@ -410,10 +410,13 @@ function CreateCampaignPage() {
               borderRadius: 3,
               height: "100%",
               boxShadow: 3,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
             }}
           >
-            <Typography variant="h5" fontWeight="bold" mb={3}>
-              🅰️ Main Campaign
+            <Typography variant="h4" fontWeight="bold" mb={2}>
+              {step === 0 ? "🎯 Variant A (Master)" : "🅰️ Variant A"}
             </Typography>
             {step === 0 && (
               <Box
@@ -547,6 +550,7 @@ function CreateCampaignPage() {
           </Card>
         </motion.div>
 
+        {/* Variant B Section */}
         <AnimatePresence>
           {isABTesting && (
             <motion.div
@@ -565,20 +569,143 @@ function CreateCampaignPage() {
                   bgcolor: "background.paper",
                 }}
               >
-                <Typography variant="h5" fontWeight="bold" mb={3}>
-                  🅱️ Variant B
+                <Typography variant="h4" fontWeight="bold" mb={2}>
+                  {step === 0 ? "🎯 Variant B" : "🅱️ Variant B"}
                 </Typography>
-                <CampaignForm
-                  variant="B"
-                  formData={variantBData}
-                  setFormData={setVariantBData}
-                />
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" mb={2}>
-                    🛣️ Channel Configuration
-                  </Typography>
-                  {/* Duplicated channel configuration for variant B */}
-                </Box>
+
+                {step === 0 && (
+                  <Box
+                    sx={{
+                      p: 3,
+                      borderRadius: 2,
+                      background: theme.palette.background.paper,
+                      boxShadow: 2,
+                      minWidth: isMobile ? "90vw" : 400,
+                    }}
+                  >
+                    <Typography variant="h5" fontWeight={600} mb={2}>
+                      Create Variant B
+                    </Typography>
+                    <TextField
+                      label="Campaign Name"
+                      name="name"
+                      value={variantBData.name}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                    />
+                    <TextField
+                      label="Description"
+                      name="description"
+                      value={variantBData.description}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                      multiline
+                      rows={2}
+                    />
+                    <TextField
+                      label="Budget"
+                      name="budget"
+                      value={variantBData.budget}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          budget: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                      type="number"
+                    />
+                    <TextField
+                      label="Start Date"
+                      name="startDate"
+                      value={variantBData.startDate}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                      type="date"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                      label="End Date"
+                      name="endDate"
+                      value={variantBData.endDate}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                      type="date"
+                      InputLabelProps={{ shrink: true }}
+                    />
+                    <TextField
+                      label="Status"
+                      name="status"
+                      value={variantBData.status}
+                      onChange={(e) =>
+                        setVariantBData((prev) => ({
+                          ...prev,
+                          status: e.target.value,
+                        }))
+                      }
+                      fullWidth
+                      margin="normal"
+                      select
+                    >
+                      <MenuItem value="draft">Draft</MenuItem>
+                      <MenuItem value="active">Active</MenuItem>
+                    </TextField>
+                    <TextField
+                      select
+                      label="Select List"
+                      value={getSafeValue()}
+                      onChange={(e) => setSelected(String(e.target.value))}
+                      fullWidth
+                    >
+                      <MenuItem value="">Select a list</MenuItem>
+                      {options.map((opt) => (
+                        <MenuItem key={opt.id} value={String(opt.id)}>
+                          {opt.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Box>
+                )}
+
+                {step !== 0 && (
+                  <>
+                    <CampaignForm
+                      variant="B"
+                      formData={variantBData}
+                      setFormData={setVariantBData}
+                    />
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="h6" mb={2}>
+                        🛣️ Channel Configuration
+                      </Typography>
+                    </Box>
+                  </>
+                )}
               </Card>
             </motion.div>
           )}
