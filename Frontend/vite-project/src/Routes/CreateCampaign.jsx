@@ -352,30 +352,32 @@ function CreateCampaignPage() {
   const [isABTesting, setIsABTesting] = useState(false);
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        py: 6,
-        px: 2,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <FormControlLabel
-        control={
+    <Box sx={{ flex: 1, p: 4 }}>
+      {/* Header Section */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold">
+          📁 Create Campaign
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant="body1">Enable A/B Testing</Typography>
           <Switch
             checked={isABTesting}
             onChange={() => setIsABTesting(!isABTesting)}
+            color="primary"
           />
-        }
-        label="Enable A/B Testing"
-        sx={{ ml: "auto" }} // to push it to right
-      />
+        </Box>
+      </Box>
       <Stepper
         activeStep={step}
         alternativeLabel
-        sx={{ mb: 4, width: "100%", maxWidth: 800 }}
+        sx={{ mb: 4, width: "100%", maxWidth: 800, mx: "auto" }}
       >
         {STEPS.map((label) => (
           <Step key={label}>
@@ -383,34 +385,38 @@ function CreateCampaignPage() {
           </Step>
         ))}
       </Stepper>
-      <Typography variant="h6" fontWeight={600} mb={2}>
-        Variant A (Main Campaign)
-      </Typography>
-      <CampaignForm
-        variant="A"
-        formData={variantAData}
-        setFormData={setVariantAData}
-      />
-      {isABTesting && (
-        <Box mt={5}>
-          <Typography variant="h6" fontWeight={600} mb={2}>
-            Variant B (Second Variant)
+      <Box
+        sx={{
+          display: "grid",
+          gap: 3,
+          gridTemplateColumns: isABTesting ? "repeat(2, 1fr)" : "1fr",
+        }}
+      >
+        {/* Variant A */}
+        <Card sx={{ p: 3, borderRadius: 3 }}>
+          <Typography variant="h5" fontWeight="bold" mb={3}>
+            🅰️ Variant A
           </Typography>
           <CampaignForm
-            variant="B"
-            formData={variantBData}
-            setFormData={setVariantBData}
+            variant="A"
+            formData={variantAData}
+            setFormData={setVariantAData}
           />
-        </Box>
-      )}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        sx={{ mt: 3 }}
-      >
-        Submit Campaign
-      </Button>
+        </Card>
+
+        {isABTesting && (
+          <Card sx={{ p: 3, borderRadius: 3 }}>
+            <Typography variant="h5" fontWeight="bold" mb={3}>
+              🅱️ Variant B
+            </Typography>
+            <CampaignForm
+              variant="B"
+              formData={variantBData}
+              setFormData={setVariantBData}
+            />
+          </Card>
+        )}
+      </Box>
       {step === 0 && (
         <Box
           sx={{
@@ -604,6 +610,25 @@ function CreateCampaignPage() {
       )}
 
       {step === 3 && <ReviewSection />}
+
+      {/* Submit Button */}
+      <Box sx={{ pt: 4, width: "100%", maxWidth: 1200, mx: "auto" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          size="large"
+          onClick={handleSubmit}
+          sx={{
+            borderRadius: 2,
+            py: 1.5,
+            textTransform: "none",
+            fontSize: "1.125rem",
+          }}
+        >
+          🚀 Launch Campaign
+        </Button>
+      </Box>
 
       <Snackbar
         open={toast.open}
